@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -281,34 +281,501 @@ function drawChar(x,y,frame,isPlayer){
   ctx.fillStyle='#1a1010';ctx.fillRect(px-5,py-5,3,3);ctx.fillRect(px+2,py-5,3,3);
   if(isPlayer&&petFollow){ctx.font='16px serif';ctx.fillText(petEmoji,px+14,py+10)}
 }
-function drawWorld(){
-  ctx.fillStyle='#8a7a68';ctx.fillRect(0,-camY,W,500);
-  ctx.strokeStyle='rgba(0,0,0,0.12)';
-  for(let by=0;by<500;by+=16)for(let bx=0;bx<W;bx+=24)ctx.strokeRect(bx+(Math.floor(by/16)%2)*12,by-camY,24,16);
-  ctx.fillStyle='#6a8a6a';ctx.fillRect(0,-camY,W,36);ctx.fillRect(0,470-camY,W,30);
-  ctx.fillStyle='#7a9a7a';ctx.fillRect(0,500-camY,W,400);
-  ctx.fillStyle='#5a9a4a';ctx.fillRect(0,900-camY,W,500);
-  ctx.fillStyle='#c07040';ctx.fillRect(100,950-camY,160,300);
-  ctx.fillStyle='#4a8a3a';ctx.fillRect(0,1400-camY,W,400);
-  ctx.fillStyle='#c03030';ctx.fillRect(40,1450-camY,280,8);
-  ctx.fillStyle='#6a5a4a';ctx.fillRect(0,1800-camY,W,200);
-  ctx.fillStyle='#6a5040';ctx.fillRect(60,150-camY,90,36);
-  ctx.fillStyle='#4a80a0';ctx.fillRect(70,138-camY,26,18);
-  ctx.fillStyle='#5a4030';ctx.fillRect(30,100-camY,36,56);
-  ctx.fillStyle='#c04040';ctx.fillRect(34,108-camY,12,14);
-  ctx.fillStyle='#4080c0';ctx.fillRect(48,108-camY,12,14);
-  ctx.fillStyle='#c0a070';ctx.fillRect(140,330-camY,90,50);
-  ctx.fillStyle='#a05030';ctx.fillRect(150,340-camY,22,30);ctx.fillRect(200,340-camY,22,30);
-  ctx.fillStyle='#408080';ctx.fillRect(230,410-camY,90,32);
-  ctx.fillStyle='#d0e0f0';ctx.fillRect(300,350-camY,22,40);
-  ctx.fillStyle='#60a0d0';ctx.fillRect(304,338-camY,14,16);
-  ctx.fillStyle='#5a4030';ctx.fillRect(190,195-camY,42,30);
-  npcs.forEach(n=>{const ny=n.y-camY;if(ny>-40&&ny<H+40){ctx.fillStyle=n.color;ctx.fillRect(n.x-9,ny,18,26);ctx.fillStyle='#e8c090';ctx.fillRect(n.x-7,ny-12,14,14);ctx.fillStyle='#fff';ctx.font='10px sans-serif';ctx.fillText(n.name,n.x-12,ny-16)}});
-  if(xiaoyuState>=1){const xy=xiaoyu.y-camY;ctx.fillStyle='#2a4060';ctx.fillRect(xiaoyu.x-9,xy,18,26);ctx.fillStyle='#e8c090';ctx.fillRect(xiaoyu.x-7,xy-12,14,14);ctx.fillStyle='#1a2030';ctx.fillRect(xiaoyu.x-8,xy-14,16,6);if(xiaoyuState>=2){ctx.fillStyle='#a05030';ctx.fillRect(xiaoyu.x-11,xy+10,22,18)}}
-  drawChar(player.x,player.y,player.frame,true);
-  ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(W/2-40,H-28,80,16);
-  ctx.fillStyle='#c8d0e0';ctx.font='11px sans-serif';ctx.textAlign='center';
-  ctx.fillText({counsel:'輔導室',corridor:'走廊',yard:'中庭',field:'操場',home:'家'}[zone]||'',W/2,H-16);ctx.textAlign='left';
+
+// ===== 視覺特效粒子系統 =====
+let vParticles = [];
+let vLeaves = [];
+let vMotes = [];
+
+function initVisualFX() {
+  vLeaves = [];
+  for (let i = 0; i < 24; i++) {
+    vLeaves.push({
+      x: Math.random() * W,
+      y: 900 + Math.random() * 850,
+      vx: 0.35 + Math.random() * 0.45,
+      vy: 0.4 + Math.random() * 0.5,
+      sz: 2 + Math.random() * 2.5,
+      col: Math.random() > 0.4 ? '#f2a0b4' : '#f0ca65',
+      rot: Math.random() * 6.28
+    });
+  }
+  vMotes = [];
+  for (let i = 0; i < 22; i++) {
+    vMotes.push({
+      x: 180 + Math.random() * 160,
+      y: 80 + Math.random() * 380,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -0.2 - Math.random() * 0.25,
+      sz: 1 + Math.random() * 1.5,
+      a: 0.25 + Math.random() * 0.55
+    });
+  }
+}
+initVisualFX();
+
+function spawnFootDust(x, y) {
+  if (vParticles.length > 35) return;
+  vParticles.push({
+    x: x + (Math.random() - 0.5) * 8,
+    y: y + 26,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: -0.15 - Math.random() * 0.15,
+    sz: 2.5,
+    life: 1.0,
+    decay: 0.06,
+    col: 'rgba(220, 205, 185, 0.55)'
+  });
+}
+
+function spawnCoffeeSteam() {
+  if (Math.random() < 0.28 && vParticles.length < 50) {
+    vParticles.push({
+      x: 210 + (Math.random() - 0.5) * 6,
+      y: 195,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: -0.38 - Math.random() * 0.28,
+      sz: 2.2,
+      life: 1.0,
+      decay: 0.024,
+      col: 'rgba(250, 245, 235, 0.4)'
+    });
+  }
+}
+
+function updateVisualFX() {
+  spawnCoffeeSteam();
+  for (let i = vParticles.length - 1; i >= 0; i--) {
+    let p = vParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) vParticles.splice(i, 1);
+  }
+  vLeaves.forEach(l => {
+    l.x += l.vx;
+    l.y += l.vy;
+    l.rot += 0.04;
+    if (l.x > W + 8) l.x = -8;
+    if (l.y > 1800) l.y = 900;
+  });
+  vMotes.forEach(m => {
+    m.x += m.vx;
+    m.y += m.vy;
+    if (m.y < 70) m.y = 440;
+    if (m.x < 170) m.x = 345;
+    if (m.x > 350) m.x = 180;
+  });
+}
+
+// 陰影輔助
+function drawShadow(x, y, rx, ry) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(18, 12, 10, 0.32)';
+  ctx.beginPath();
+  ctx.ellipse(x, y - camY, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// 精緻植栽
+function drawPixelPlant(x, y) {
+  const py = y - camY;
+  // 陰影
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  ctx.beginPath(); ctx.ellipse(x+9, py+24, 8, 3.5); ctx.fill();
+  // 陶盆
+  ctx.fillStyle = '#94482a'; ctx.fillRect(x+3, py+14, 12, 10);
+  ctx.fillStyle = '#b65835'; ctx.fillRect(x+2, py+12, 14, 3);
+  ctx.fillStyle = '#682e18'; ctx.fillRect(x+4, py+22, 10, 2);
+  // 綠葉（深淺層次立體感）
+  ctx.fillStyle = '#1c542a'; ctx.fillRect(x+1, py+4, 16, 9);
+  ctx.fillStyle = '#2d7c3d'; ctx.fillRect(x+3, py+1, 12, 10);
+  ctx.fillStyle = '#48a858'; ctx.fillRect(x+5, py-1, 8, 7);
+  ctx.fillStyle = '#7cd888'; ctx.fillRect(x+6, py+1, 4, 3);
+}
+
+// 精緻幾何地毯
+function drawPixelRug(x, y, w, h) {
+  const ry = y - camY;
+  ctx.fillStyle = '#2f5a4a'; ctx.fillRect(x, ry, w, h);
+  ctx.fillStyle = '#3f705d'; ctx.fillRect(x+3, ry+3, w-6, h-6);
+  // 流蘇花邊
+  ctx.fillStyle = '#f0deb0';
+  for(let fx = x; fx < x+w; fx += 4) {
+    ctx.fillRect(fx, ry-1, 2, 2);
+    ctx.fillRect(fx, ry+h-1, 2, 2);
+  }
+  // 圖騰花紋
+  ctx.strokeStyle = '#d4b068'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(x+6, ry+6, w-12, h-12);
+  ctx.strokeRect(x+14, ry+12, w-28, h-24);
+  ctx.fillStyle = '#d4b068'; ctx.fillRect(x+w/2-4, ry+h/2-4, 8, 8);
+}
+
+// 精緻書架
+function drawPixelBookshelf(x, y, w, h) {
+  const sy = y - camY;
+  ctx.fillStyle = '#482a17'; ctx.fillRect(x, sy, w, h);
+  ctx.fillStyle = '#5c371f'; ctx.fillRect(x+2, sy+2, w-4, h-4);
+  const shelfH = 17;
+  const bookColors = ['#ad3333', '#2b62a6', '#3b8744', '#d99e28', '#8144b0', '#c9596b', '#399994'];
+  for(let row = sy+3; row < sy+h-6; row += shelfH) {
+    ctx.fillStyle = '#2e190c'; ctx.fillRect(x+2, row+shelfH-3, w-4, 3);
+    let bx = x+4;
+    let bIdx = Math.floor(row);
+    while(bx < x+w-7) {
+      let bw = 3 + (bIdx % 3);
+      let bh = 10 + (bIdx % 4);
+      let col = bookColors[(bIdx + bx) % bookColors.length];
+      ctx.fillStyle = col; ctx.fillRect(bx, row+shelfH-3-bh, bw, bh);
+      ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(bx, row+shelfH-3-bh, 1, bh);
+      bx += bw + 1;
+      bIdx++;
+    }
+  }
+}
+
+// 暖色木地板繪製
+function drawWoodFloor(topY, bottomY) {
+  const plankH = 14;
+  const plankColors = ['#865234', '#935c3b', '#7e4c2e', '#9b6341', '#8c5536'];
+  for(let py = topY; py < bottomY; py += plankH) {
+    const drawY = py - camY;
+    if (drawY < -plankH || drawY > H) continue;
+    let rowIndex = Math.floor(py / plankH);
+    let col = plankColors[rowIndex % plankColors.length];
+    ctx.fillStyle = col;
+    ctx.fillRect(0, drawY, W, plankH);
+    // 縫隙暗線
+    ctx.fillStyle = 'rgba(40, 20, 10, 0.35)';
+    ctx.fillRect(0, drawY + plankH - 1, W, 1);
+    // 木板接縫與木釘
+    let offset = (rowIndex % 3) * 38;
+    for(let px = offset; px < W; px += 76) {
+      ctx.fillRect(px, drawY, 1, plankH);
+      // 釘子
+      ctx.fillStyle = 'rgba(30, 15, 8, 0.4)';
+      ctx.fillRect(px + 3, drawY + 2, 1, 1);
+      ctx.fillRect(px + 72, drawY + plankH - 3, 1, 1);
+      ctx.fillStyle = 'rgba(40, 20, 10, 0.35)';
+    }
+  }
+}
+
+function drawWorld() {
+  updateVisualFX();
+
+  // ================= 1. 輔導室區域 (0 ~ 500) =================
+  drawWoodFloor(0, 500);
+
+  // 輔導室牆壁飾板
+  const wallH = 46;
+  ctx.fillStyle = '#613c24'; ctx.fillRect(0, -camY, W, wallH);
+  ctx.fillStyle = '#73472c';
+  for(let wx = 0; wx < W; wx += 24) {
+    ctx.fillRect(wx + 2, -camY + 2, 20, wallH - 4);
+  }
+  ctx.fillStyle = '#422514'; ctx.fillRect(0, wallH - 2 - camY, W, 3); // 踢腳線
+
+  // 右側大落地窗（暖陽光照）
+  const winX = 265, winY = 4 - camY, winW = 85, winH = 38;
+  ctx.fillStyle = '#ffeed0'; ctx.fillRect(winX, winY, winW, winH);
+  ctx.fillStyle = '#ffe09e'; ctx.fillRect(winX + 3, winY + 3, winW - 6, winH - 6);
+  // 窗框
+  ctx.fillStyle = '#613c24';
+  ctx.fillRect(winX, winY, winW, 2); ctx.fillRect(winX, winY + winH - 2, winW, 2);
+  ctx.fillRect(winX, winY, 2, winH); ctx.fillRect(winX + winW - 2, winY, 2, winH);
+  ctx.fillRect(winX + winW/2 - 1, winY, 2, winH); // 窗櫺
+
+  // 牆面掛畫與佈告板
+  ctx.fillStyle = '#caa572'; ctx.fillRect(16, 8 - camY, 32, 28);
+  ctx.fillStyle = '#f8f4ec'; ctx.fillRect(18, 10 - camY, 28, 24);
+  ctx.fillStyle = '#4a90c0'; ctx.fillRect(20, 12 - camY, 24, 12); // 風景海報天空
+  ctx.fillStyle = '#50a040'; ctx.fillRect(20, 22 - camY, 24, 6);  // 草地
+
+  // 佈告欄
+  ctx.fillStyle = '#b08450'; ctx.fillRect(56, 8 - camY, 40, 28);
+  ctx.fillStyle = '#d8ba82'; ctx.fillRect(58, 10 - camY, 36, 24);
+  ctx.fillStyle = '#fff'; ctx.fillRect(62, 14 - camY, 10, 14); // 便條紙
+  ctx.fillStyle = '#ffef99'; ctx.fillRect(76, 14 - camY, 12, 10);
+
+  // 精緻書架
+  drawPixelBookshelf(25, 95, 38, 58);
+  drawPixelBookshelf(295, 95, 42, 58);
+
+  // 辦公電腦桌與設備 (x: 80, y: 160)
+  drawShadow(110, 185, 38, 10);
+  ctx.fillStyle = '#583620'; ctx.fillRect(70, 150 - camY, 75, 36);
+  ctx.fillStyle = '#7a4e30'; ctx.fillRect(72, 152 - camY, 71, 32);
+  // 桌上文件
+  ctx.fillStyle = '#fdfcf9'; ctx.fillRect(80, 158 - camY, 16, 12);
+  ctx.fillStyle = '#f4eedd'; ctx.fillRect(86, 162 - camY, 14, 12);
+  // 電腦螢幕與微光
+  ctx.fillStyle = '#22262c'; ctx.fillRect(112, 144 - camY, 24, 18);
+  ctx.fillStyle = '#3a8cc8'; ctx.fillRect(114, 146 - camY, 20, 14);
+  ctx.fillStyle = '#70c5ff'; ctx.fillRect(116, 148 - camY, 16, 4); // 螢幕發光線
+  ctx.fillStyle = '#1c1f24'; ctx.fillRect(122, 162 - camY, 4, 6); ctx.fillRect(118, 168 - camY, 12, 2);
+
+  // 手沖咖啡吧 (x: 200, y: 200)
+  drawShadow(216, 218, 22, 8);
+  ctx.fillStyle = '#52341f'; ctx.fillRect(195, 195 - camY, 44, 28);
+  ctx.fillStyle = '#70462b'; ctx.fillRect(197, 197 - camY, 40, 24);
+  // 咖啡機本體
+  ctx.fillStyle = '#1e1e24'; ctx.fillRect(205, 185 - camY, 16, 16);
+  ctx.fillStyle = '#caa472'; ctx.fillRect(208, 193 - camY, 10, 7); // 咖啡壺玻璃
+  ctx.fillStyle = '#42220f'; ctx.fillRect(209, 196 - camY, 8, 4);  // 咖啡液
+
+  // 飲水機 (x: 300, y: 360)
+  drawShadow(312, 385, 14, 6);
+  ctx.fillStyle = '#e2e7ec'; ctx.fillRect(302, 348 - camY, 20, 38);
+  ctx.fillStyle = '#cad3dc'; ctx.fillRect(304, 350 - camY, 16, 34);
+  // 水桶（透亮水藍色）
+  ctx.fillStyle = '#58a8e0'; ctx.fillRect(305, 335 - camY, 14, 15);
+  ctx.fillStyle = '#8bd0ff'; ctx.fillRect(307, 337 - camY, 4, 11);
+  // 出水口
+  ctx.fillStyle = '#c03434'; ctx.fillRect(307, 362 - camY, 3, 4); // 熱水
+  ctx.fillStyle = '#347ac0'; ctx.fillRect(314, 362 - camY, 3, 4); // 溫冷水
+
+  // 會談區地毯 (Patterned Rug)
+  drawPixelRug(135, 310, 170, 95);
+
+  // 長沙發 (x: 240, y: 420)
+  drawShadow(275, 438, 40, 10);
+  ctx.fillStyle = '#4a7266'; ctx.fillRect(235, 412 - camY, 80, 28);
+  ctx.fillStyle = '#659487'; ctx.fillRect(238, 414 - camY, 74, 22);
+  ctx.fillStyle = '#7baaa0'; ctx.fillRect(242, 417 - camY, 32, 16); ctx.fillRect(276, 417 - camY, 32, 16); // 坐墊
+  // 抱枕
+  ctx.fillStyle = '#d48858'; ctx.fillRect(240, 418 - camY, 10, 12);
+  ctx.fillStyle = '#e8a87a'; ctx.fillRect(242, 420 - camY, 6, 8);
+
+  // 晤談單人椅 (兩張)
+  drawShadow(160, 365, 14, 7);
+  ctx.fillStyle = '#5a3d28'; ctx.fillRect(150, 338 - camY, 20, 24);
+  ctx.fillStyle = '#845c3e'; ctx.fillRect(152, 340 - camY, 16, 16);
+  ctx.fillStyle = '#e0cfb8'; ctx.fillRect(153, 342 - camY, 14, 12); // 米色坐墊
+
+  drawShadow(210, 365, 14, 7);
+  ctx.fillStyle = '#5a3d28'; ctx.fillRect(200, 338 - camY, 20, 24);
+  ctx.fillStyle = '#845c3e'; ctx.fillRect(202, 340 - camY, 16, 16);
+  ctx.fillStyle = '#e0cfb8'; ctx.fillRect(203, 342 - camY, 14, 12);
+
+  // 茶几
+  drawShadow(185, 358, 20, 8);
+  ctx.fillStyle = '#6a472c'; ctx.fillRect(174, 344 - camY, 24, 14);
+  ctx.fillStyle = '#8a5e3d'; ctx.fillRect(175, 345 - camY, 22, 11);
+
+  // 多處室內盆栽點綴
+  drawPixelPlant(20, 175);
+  drawPixelPlant(275, 80);
+  drawPixelPlant(28, 430);
+  drawPixelPlant(325, 430);
+
+  // 門檻分界
+  ctx.fillStyle = '#3a2215'; ctx.fillRect(0, 488 - camY, W, 12);
+  ctx.fillStyle = '#9e734a'; ctx.fillRect(0, 492 - camY, W, 4);
+
+  // ================= 2. 走廊區域 (500 ~ 900) =================
+  ctx.fillStyle = '#a6b8a2'; ctx.fillRect(0, 500 - camY, W, 400);
+  // 水磨石地板格紋
+  ctx.strokeStyle = 'rgba(70, 95, 75, 0.22)';
+  for(let gy = 500; gy < 900; gy += 20) {
+    let dy = gy - camY;
+    ctx.beginPath(); ctx.moveTo(0, dy); ctx.lineTo(W, dy); ctx.stroke();
+  }
+  for(let gx = 0; gx < W; gx += 20) {
+    ctx.beginPath(); ctx.moveTo(gx, 500 - camY); ctx.lineTo(gx, 900 - camY); ctx.stroke();
+  }
+
+  // 洗手間門 (x: 40, y: 700)
+  drawShadow(64, 735, 22, 6);
+  ctx.fillStyle = '#4c6278'; ctx.fillRect(40, 695 - camY, 48, 44);
+  ctx.fillStyle = '#657e96'; ctx.fillRect(44, 699 - camY, 40, 38);
+  ctx.fillStyle = '#f0f4f8'; ctx.fillRect(58, 706 - camY, 12, 12); // 男/女廁標誌
+  ctx.fillStyle = '#2060b0'; ctx.fillRect(60, 708 - camY, 8, 8);
+
+  // 走廊大公佈欄 (x: 200, y: 620)
+  ctx.fillStyle = '#63442a'; ctx.fillRect(180, 615 - camY, 68, 38);
+  ctx.fillStyle = '#b8905a'; ctx.fillRect(182, 617 - camY, 64, 34);
+  ctx.fillStyle = '#fff8e2'; ctx.fillRect(188, 622 - camY, 18, 14); // 獎狀
+  ctx.fillStyle = '#ffe0e0'; ctx.fillRect(212, 624 - camY, 16, 12);
+  ctx.fillStyle = '#e2f0ff'; ctx.fillRect(194, 638 - camY, 24, 10);
+
+  // 班級門牌與走廊窗戶
+  for(let cx = 100; cx < W; cx += 110) {
+    ctx.fillStyle = '#4a3220'; ctx.fillRect(cx, 510 - camY, 28, 36);
+    ctx.fillStyle = '#6b4932'; ctx.fillRect(cx+2, 512 - camY, 24, 32);
+    ctx.fillStyle = '#e8d89a'; ctx.fillRect(cx+4, 515 - camY, 20, 8); // 8年3班
+  }
+
+  // ================= 3. 中庭花園與大樹 (900 ~ 1400) =================
+  ctx.fillStyle = '#4e8d42'; ctx.fillRect(0, 900 - camY, W, 500);
+  // 石磚人行步道
+  ctx.fillStyle = '#b89c7c'; ctx.fillRect(115, 930 - camY, 130, 440);
+  ctx.fillStyle = '#caa988';
+  for(let py = 930; py < 1370; py += 16) {
+    for(let px = 115; px < 240; px += 26) {
+      ctx.fillRect(px + ((Math.floor(py/16)%2)*13), py - camY, 24, 14);
+    }
+  }
+
+  // 大樹 (x: 80, y: 1000)
+  drawShadow(100, 1055, 30, 10);
+  ctx.fillStyle = '#4e3321'; ctx.fillRect(94, 980 - camY, 14, 70); // 樹幹
+  // 樹冠多層次像素綠
+  ctx.fillStyle = '#1c5e26'; ctx.beginPath(); ctx.arc(101, 970 - camY, 38, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2d7c38'; ctx.beginPath(); ctx.arc(97, 960 - camY, 32, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#48a855'; ctx.beginPath(); ctx.arc(105, 955 - camY, 26, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#78cf84'; ctx.beginPath(); ctx.arc(102, 950 - camY, 14, 0, Math.PI*2); ctx.fill();
+
+  // 木休閒長椅 (x: 200, y: 1050)
+  drawShadow(224, 1068, 26, 6);
+  ctx.fillStyle = '#4a2f1b'; ctx.fillRect(198, 1045 - camY, 52, 22);
+  ctx.fillStyle = '#845735'; ctx.fillRect(200, 1047 - camY, 48, 8); // 椅背
+  ctx.fillStyle = '#9b6840'; ctx.fillRect(200, 1057 - camY, 48, 7); // 椅面
+
+  // 金毛犬 (x: 260, y: 1100)
+  drawShadow(276, 1118, 16, 6);
+  ctx.fillStyle = '#de9a38'; ctx.fillRect(264, 1102 - camY, 24, 14); // 身體
+  ctx.fillStyle = '#f0b04c'; ctx.fillRect(280, 1096 - camY, 12, 12); // 頭
+  ctx.fillStyle = '#c87e22'; ctx.fillRect(278, 1102 - camY, 5, 8);  // 耳朵
+  ctx.fillStyle = '#222'; ctx.fillRect(288, 1100 - camY, 3, 3); // 眼睛與鼻子
+
+  // ================= 4. 操場與教室 (1400 ~ 1800) =================
+  ctx.fillStyle = '#3f7c32'; ctx.fillRect(0, 1400 - camY, W, 400);
+  // 紅色 PU 跑道
+  ctx.fillStyle = '#b83b32'; ctx.fillRect(30, 1440 - camY, 300, 16);
+  ctx.fillStyle = '#d4493f'; ctx.fillRect(30, 1442 - camY, 300, 12);
+  ctx.fillStyle = '#fff';
+  for(let rx = 35; rx < 330; rx += 30) ctx.fillRect(rx, 1447 - camY, 14, 2); // 分道白線
+
+  // 網球/羽球場 (x: 180, y: 1550)
+  ctx.fillStyle = '#2b6f52'; ctx.fillRect(135, 1520 - camY, 90, 60);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.strokeRect(140, 1525 - camY, 80, 50);
+
+  // 鋼琴與美術教室 (1700 ~ 1800)
+  drawShadow(124, 1775, 24, 7);
+  ctx.fillStyle = '#18181c'; ctx.fillRect(100, 1745 - camY, 48, 28);
+  ctx.fillStyle = '#fff'; ctx.fillRect(104, 1765 - camY, 40, 6); // 琴鍵
+  ctx.fillStyle = '#000';
+  for(let k = 107; k < 140; k += 5) ctx.fillRect(k, 1765 - camY, 3, 4);
+
+  // 美術畫架 (x: 260, y: 1720)
+  drawShadow(284, 1745, 16, 5);
+  ctx.fillStyle = '#8a5c36'; ctx.fillRect(282, 1715 - camY, 4, 30);
+  ctx.fillStyle = '#fff8e8'; ctx.fillRect(268, 1718 - camY, 28, 20); // 畫布
+  ctx.fillStyle = '#d44238'; ctx.fillRect(272, 1722 - camY, 8, 8);  // 顏料筆觸
+  ctx.fillStyle = '#2c78c8'; ctx.fillRect(282, 1726 - camY, 10, 6);
+
+  // ================= 5. 家裡溫馨客廳 (1800 ~ 2000) =================
+  drawWoodFloor(1800, 2000);
+  ctx.fillStyle = '#4a2f1b'; ctx.fillRect(0, 1800 - camY, W, 10); // 門口地墊
+
+  // ================= 6. 角色、NPC 與小宇繪製 =================
+  // NPCs
+  npcs.forEach(n => {
+    const ny = n.y - camY;
+    if (ny > -40 && ny < H + 40) {
+      drawShadow(n.x, n.y + 26, 10, 4);
+      ctx.fillStyle = n.color; ctx.fillRect(n.x - 9, ny, 18, 26);
+      ctx.fillStyle = '#e8c090'; ctx.fillRect(n.x - 7, ny - 12, 14, 14);
+      ctx.fillStyle = '#1a1008'; ctx.fillRect(n.x - 8, ny - 14, 16, 5);
+      // 名稱標籤
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(n.x - 18, ny - 28, 36, 13);
+      ctx.fillStyle = '#ffe080'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(n.name, n.x, ny - 18);
+      ctx.textAlign = 'left';
+    }
+  });
+
+  // 小宇
+  if (xiaoyuState >= 1) {
+    const xy = xiaoyu.y - camY;
+    drawShadow(xiaoyu.x, xiaoyu.y + 26, 10, 4);
+    ctx.fillStyle = '#2a4060'; ctx.fillRect(xiaoyu.x - 9, xy, 18, 26);
+    ctx.fillStyle = '#e8c090'; ctx.fillRect(xiaoyu.x - 7, xy - 12, 14, 14);
+    ctx.fillStyle = '#1a2030'; ctx.fillRect(xiaoyu.x - 8, xy - 14, 16, 6);
+    if (xiaoyuState >= 2) {
+      ctx.fillStyle = '#a05030'; ctx.fillRect(xiaoyu.x - 11, xy + 10, 22, 18);
+    }
+    // 小宇名牌
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(xiaoyu.x - 18, xy - 28, 36, 13);
+    ctx.fillStyle = '#70c8ff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('小宇', xiaoyu.x, xy - 18);
+    ctx.textAlign = 'left';
+  }
+
+  // 玩家腳印粉塵粒子
+  vParticles.forEach(p => {
+    ctx.fillStyle = p.col;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - camY, p.sz * p.life, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 玩家
+  drawShadow(player.x, player.y + 26, 10, 4.5);
+  drawChar(player.x, player.y, player.frame, true);
+
+  // 中庭漂浮落葉與花瓣
+  vLeaves.forEach(l => {
+    const ly = l.y - camY;
+    if (ly > -10 && ly < H + 10) {
+      ctx.save();
+      ctx.translate(l.x, ly);
+      ctx.rotate(l.rot);
+      ctx.fillStyle = l.col;
+      ctx.fillRect(-l.sz/2, -l.sz/2, l.sz, l.sz * 1.5);
+      ctx.restore();
+    }
+  });
+
+  // ================= 7. 光影層（斜射窗光 + 灰塵微粒） =================
+  if (player.y < 650) {
+    ctx.save();
+    // 窗戶斜射進來的溫暖光柱 (God Rays)
+    const rayGrad = ctx.createLinearGradient(270, 0 - camY, 150, 420 - camY);
+    rayGrad.addColorStop(0, 'rgba(255, 230, 160, 0.28)');
+    rayGrad.addColorStop(0.5, 'rgba(255, 215, 130, 0.16)');
+    rayGrad.addColorStop(1, 'rgba(255, 200, 110, 0.0)');
+
+    ctx.fillStyle = rayGrad;
+    ctx.beginPath();
+    ctx.moveTo(260, 15 - camY);
+    ctx.lineTo(348, 15 - camY);
+    ctx.lineTo(260, 440 - camY);
+    ctx.lineTo(130, 440 - camY);
+    ctx.closePath();
+    ctx.fill();
+
+    // 光柱中的金黃微塵
+    vMotes.forEach(m => {
+      const my = m.y - camY;
+      if (my > 0 && my < H) {
+        ctx.fillStyle = `rgba(255, 245, 210, ${m.a})`;
+        ctx.beginPath();
+        ctx.arc(m.x, my, m.sz, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  // ================= 8. 電影感柔和暗角 (Cinematic Vignette) =================
+  const vigGrad = ctx.createRadialGradient(W/2, H/2, H*0.35, W/2, H/2, H*0.7);
+  vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0.0)');
+  vigGrad.addColorStop(1, 'rgba(10, 8, 16, 0.42)');
+  ctx.fillStyle = vigGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 區域指示標籤
+  ctx.fillStyle = 'rgba(14, 18, 24, 0.75)';
+  ctx.strokeStyle = '#4a5568'; ctx.lineWidth = 1;
+  ctx.strokeRect(W/2 - 42, H - 30, 84, 18);
+  ctx.fillRect(W/2 - 42, H - 30, 84, 18);
+  ctx.fillStyle = '#f0e6c8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText({counsel:'輔導室',corridor:'走廊',yard:'中庭花園',field:'運動操場',home:'溫馨的家'}[zone]||'', W/2, H - 17);
+  ctx.textAlign = 'left';
 }
 function getZone(y){if(y<500)return 'counsel';if(y<900)return 'corridor';if(y<1400)return 'yard';if(y<1800)return 'field';return 'home'}
 function update(dt){
@@ -317,7 +784,1702 @@ function update(dt){
   if(keys['ArrowDown']||keys['s']||touch.down)my=1;
   if(keys['ArrowLeft']||keys['a']||touch.left)mx=-1;
   if(keys['ArrowRight']||keys['d']||touch.right)mx=1;
-  if(mx||my){player.x+=mx*player.speed;player.y+=my*player.speed;player.x=Math.max(20,Math.min(W-20,player.x));player.y=Math.max(60,Math.min(WORLD_H-40,player.y));player.walk+=0.15;player.frame=Math.floor(player.walk)%2;if(Math.random()<0.08)sfx('step');status.toilet=Math.min(100,status.toilet+0.02);status.energy=Math.max(0,status.energy-0.005)}
+  if(mx||my){player.x+=mx*player.speed;player.y+=my*player.speed;player.x=Math.max(20,Math.min(W-20,player.x));player.y=Math.max(60,Math.min(WORLD_H-40,player.y));player.walk+=0.15;player.frame=Math.floor(player.walk)%2;if(Math.random()<0.08)sfx('step');spawnFootDust(player.x, player.y);status.toilet=Math.min(100,status.toilet+0.02);status.energy=Math.max(0,status.energy-0.005)}
+  camY=player.y-H*0.45;camY=Math.max(0,Math.min(WORLD_H-H,camY));zone=getZone(player.y);status.time+=dt/60000*0.4;
+  if(xiaoyuState===0&&status.time>8*60+4){xiaoyuState=1;toast('小宇往輔導室走來了。');setTask('小宇不想回教室','輔導室');phoneUnread=2;updateBadge()}
+  if(xiaoyuState===1){xiaoyu.y-=0.9;if(xiaoyu.y<=380){xiaoyu.y=380;xiaoyuState=2;toast('先坐一下。')}}
+  nearObj=null;let best=42;
+  objs.forEach(o=>{const d=Math.hypot(o.x+o.w/2-player.x,o.y+o.h/2-player.y);if(d<best){best=d;nearObj=o}});
+  npcs.forEach(n=>{const d=Math.hypot(n.x-player.x,n.y-player.y);if(d<best){best=d;nearObj={id:'npc_'+n.id,npc:n,icon:'💬',label:n.name}}});
+  if(xiaoyuState>=2&&xiaoyuState<4){const d=Math.hypot(xiaoyu.x-player.x,xiaoyu.y-player.y);if(d<55){nearObj={id:'xiaoyu',icon:'💬',label:'小宇'}}}
+  document.getElementById('ctxBtn').textContent=nearObj?(nearObj.icon||'💬'):'✋';
+  if(status.mood>=80&&!humming&&Math.random()<0.002){humming=true;toast('🎵 ♪ Golden... working all day ♪');setTimeout(()=>humming=false,3000)}
+  updateHUD();
+}
+function updateHUD(){
+  const h=Math.floor(status.time/60),m=Math.floor(status.time%60);
+  document.getElementById('hudTime').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const remain=Math.max(0,9*60-(status.time-8*60));
+  document.getElementById('hudLoc').textContent=({counsel:'輔導室',corridor:'走廊',yard:'中庭',field:'操場',home:'家'}[zone]||'')+'・剩 '+Math.floor(remain/60)+':'+String(Math.floor(remain%60)).padStart(2,'0');
+  document.getElementById('barEn').style.width=status.energy+'%';document.getElementById('vEn').textContent=Math.round(status.energy);
+  document.getElementById('barMo').style.width=status.mood+'%';document.getElementById('vMo').textContent=Math.round(status.mood);
+  document.getElementById('barWk').style.width=status.work+'%';document.getElementById('vWk').textContent=Math.round(status.work);
+  document.getElementById('barTo').style.width=status.toilet+'%';document.getElementById('vTo').textContent=Math.round(status.toilet);
+  document.getElementById('toRow').className='brow to'+(status.toilet>75?' warn':'');
+}
+function setTask(t,s,cd){document.getElementById('taskTitle').textContent=t;document.getElementById('taskSub').textContent=s;document.getElementById('taskCd').textContent=cd||''}
+function updateBadge(){const b=document.getElementById('phBadge');if(phoneUnread>0){b.style.display='flex';b.textContent=phoneUnread}else b.style.display='none'}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
+function floatNum(txt,col){const el=document.createElement('div');el.className='float';el.textContent=txt;el.style.color=col||'#ffe066';el.style.left=(W/2)+'px';el.style.top=(H/2)+'px';document.getElementById('ui').appendChild(el);setTimeout(()=>el.remove(),1200)}
+function showDlg(who,txt,opts,isInner){
+  dialogOpen=true;document.getElementById('dlg').classList.add('show');
+  document.getElementById('dlgName').textContent=who;
+  document.getElementById('dlgAv').textContent=who.includes('內心')?'🧑':who.includes('小宇')?'👦':who.includes('林')?'👨‍🏫':'👤';
+  document.getElementById('dlgTxt').innerHTML=(isInner?'<span class="inner">':'')+txt+(isInner?'</span>':'');
+  const box=document.getElementById('dlgOpts');box.innerHTML='';
+  (opts||[]).forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.innerHTML='<span>'+(o.letter||String.fromCharCode(65+i))+'. '+o.t+'</span>'+(o.cost?'<span class="cost">⏱ '+o.cost+'</span>':'');b.onclick=()=>{sfx('click');closeDlg();if(o.a)o.a()};box.appendChild(b)});
+  if(!opts||!opts.length){const b=document.createElement('button');b.className='opt';b.textContent='繼續';b.onclick=closeDlg;box.appendChild(b)}
+}
+function closeDlg(){dialogOpen=false;document.getElementById('dlg').classList.remove('show')}
+function showInner(txt,opts){showDlg('【我的內心】',txt,opts,true)}
+function tryInteract(){
+  if(dialogOpen)return;initA();sfx('click');
+  if(!nearObj){showInner('四周靜悄悄的。');return}
+  const id=nearObj.id;
+  if(id==='xiaoyu')return talkXiaoyu();
+  if(id==='npc_late')return talkLate();
+  if(id==='npc_hw')return talkHomework();
+  if(id==='npc_stand')return talkStand();
+  if(id==='npc_fight1'||id==='npc_fight2')return talkFight();
+  if(id.startsWith('npc_'))return nearObj.npc.talk();
+  if(id==='desk')return interactDesk();
+  if(id==='sofa')return interactSofa();
+  if(id==='chairs')return interactChairs();
+  if(id==='water')return interactWater();
+  if(id==='coffee')return interactCoffee();
+  if(id==='toilet')return interactToilet();
+  if(id==='dog')return interactDog();
+  if(id==='photo')return interactPhoto();
+  if(id==='field')return miniCatch();
+  if(id==='piano')return miniPiano();
+  if(id==='art')return miniArt();
+  if(id==='home_door')return goHome();
+  if(id==='board')return showDlg('公佈欄','今日：英文廣播社・防詐宣導・接球練習',[{t:'知道了',a:()=>{}}]);
+  showDlg(nearObj.label||'物件','靠近了 '+nearObj.label,[{t:'離開',a:()=>{}}]);
+}
+function interactDesk(){showDlg('電腦','螢幕亮著，個案系統開啟中。',[
+  {t:'查看個案紀錄',letter:'A',cost:'2分',a:()=>{status.work=Math.min(100,status.work+5);status.time+=2;floatNum('+5📄','#60b0e0');setTask('個案紀錄','輔導室・電腦');showInner('13:30 有一場個案會議。先把資料備好。')}},
+  {t:'回覆郵件',letter:'B',cost:'5分',a:()=>{status.work+=3;status.energy-=2;status.time+=5;toast('郵件已回');updateHUD()}},
+  {t:'開啟英文練習',letter:'C',a:()=>openEng()}
+])}
+function interactSofa(){showDlg('長沙發','可以閉目休息一下。',[
+  {t:'坐下小憩',a:()=>{status.mood=Math.min(100,status.mood+10);floatNum('+10💚','#40d060');showInner('深呼吸，今天也要穩住。');updateHUD()}},
+  {t:'離開',a:()=>{}}
+])}
+function interactChairs(){if(xiaoyuState>=2)talkXiaoyu();else showDlg('會談椅','兩張椅子相對。',[{t:'整理一下',a:()=>{status.work+=1;toast('椅子排整齊了')}}])}
+function interactWater(){showDlg('飲水機','水聲輕輕作響。',[
+  {t:'把水壺裝滿',a:()=>{bag.water=5;toast('水壺已滿');sfx('water')}},
+  {t:'直接喝一杯',a:()=>{status.energy=Math.min(100,status.energy+5);status.toilet+=3;sfx('water');showInner('咕嚕咕嚕，水好冰涼');floatNum('+5⚡','#e0a020');updateHUD()}}
+])}
+function interactCoffee(){showDlg('手沖咖啡吧','',[
+  {t:'磨一杯給自己',letter:'A',a:()=>{sfx('coffee');status.energy=Math.min(100,status.energy+15);floatNum('+15⚡','#e0a020');showInner('整間辦公室都是咖啡香');updateHUD()}},
+  {t:'手沖一壺分給大家（+3杯）',letter:'B',cost:'10分',a:()=>{bag.coffee+=3;status.time+=10;status.energy-=3;toast('背包獲得 3 杯手沖咖啡');sfx('coffee');updateHUD()}}
+])}
+function interactToilet(){showDlg('洗手間','',[{t:'使用馬桶',a:()=>{if(status.toilet<10){toast('現在不需要');return}status.toilet=5;sfx('flush');status.mood+=2;toast('清爽多了');updateHUD()}}])}
+function interactDog(){showDlg('金毛獵犬','尾巴搖得好開心！',[
+  {t:'摸摸牠',a:()=>{status.mood=Math.min(100,status.mood+8);floatNum('+8💚','#40d060');toast('汪！');updateHUD()}},
+  {t:'餵零食（需橘子）',a:()=>{if(bag.orange<1){toast('背包沒有橘子');return}bag.orange--;status.mood+=12;toast('狗狗很開心！');updateHUD()}}
+])}
+function interactPhoto(){showDlg('出遊打卡點','要拍一張嗎？',[{t:'📸 拍照發 PixelGram',a:()=>{if(Math.random()>0.5)showDlg('⚠️ 個資警示','照片可能拍到校名或門牌！',[{t:'模糊處理後再發',a:()=>{status.stars+=3;toast('安全發文 +3⭐');sfx('ok')}},{t:'還是算了',a:()=>toast('明智的選擇')}]);else{status.stars+=2;toast('打卡成功 +2⭐');sfx('ok')}}}])}
+function talkXiaoyu(){
+  if(xiaoyuState===4){showDlg('小宇 八年三班','……謝謝老師。',[{t:'加油',a:()=>{status.mood+=2;affection.xiaoyu+=5}}]);return}
+  if(xiaoyuState===2){xiaoyuState=3;
+    showDlg('小宇 八年三班','……老師，我不想回教室。',[
+      {t:'好，那先在這裡坐一下。',letter:'A',cost:'5分',a:()=>{
+        status.time+=5;status.energy-=3;status.mood+=1;floatNum('+5分','#e0c060');floatNum('-3⚡','#e08040');floatNum('+1💚','#40d060');
+        showDlg('小宇','……沒事啦。',[{t:'繼續',a:()=>{
+          showInner('「沒事」通常是「現在還不想說」。',[
+            {t:'繼續陪他沉默，等他準備好',letter:'A',cost:'15分',a:()=>{
+              status.time+=15;status.energy-=6;status.mood+=8;floatNum('+15分');floatNum('-6⚡');floatNum('+8💚');
+              showDlg('小宇','……我爸媽昨天又吵到半夜。我沒睡。',[{t:'繼續',a:()=>{
+                showInner('十五分鐘，換來一句話。這筆帳很划算。',[{t:'接到林老師分機',a:()=>{
+                  showDlg('林老師 分機','老師，小宇有在你那邊嗎？他早上又沒進教室…',[
+                    {t:'抱歉，我接一下。',letter:'A',cost:'3分',a:()=>{
+                      status.time+=3;status.mood-=3;
+                      showInner('我看見小宇把帽子又拉低了一點。',[{t:'繼續',a:()=>{
+                        showDlg('小宇','……我第二節再回去，可以嗎？',[
+                          {t:'可以。我跟林老師說一聲。',letter:'A',cost:'2分',a:()=>{
+                            status.time+=2;status.mood+=2;status.work+=2;floatNum('+2💚');floatNum('+2📄');
+                            showDlg('小宇','……嗯。',[{t:'結束晤談',a:()=>{
+                              xiaoyuState=4;affection.xiaoyu+=20;status.stars+=10;
+                              setTask('林老師的求助','教師辦公室','⏱ 09:50');
+                              toast('任務完成！+10⭐');sfx('clap');xiaoyu.y=500;
+                            }}]);
+                          }},
+                          {t:'可以。午休後我們再約一次，好嗎？',letter:'B',cost:'2分',a:()=>{
+                            status.time+=2;status.mood+=3;status.work+=2;affection.xiaoyu+=15;status.stars+=8;
+                            xiaoyuState=4;setTask('林老師的求助','教師辦公室');toast('+8⭐');sfx('ok');
+                          }}
+                        ]);
+                      }}]);
+                    }},
+                    {t:'讓它響，先陪著眼前的人',letter:'B',a:()=>{status.mood+=5;toast('你選擇陪伴');showInner('有些事，比電話更重要。')}}
+                  ]);
+                }}]);
+              }}]);
+            }},
+            {t:'遞給他一張便條紙：「不想說的話，可以寫。」',letter:'B',cost:'10分',a:()=>{status.time+=10;status.mood+=6;status.stars+=5;toast('他接過便條');updateHUD()}},
+            {t:'先聊別的：「早餐吃了嗎？」',letter:'C',cost:'8分',a:()=>{status.time+=8;status.mood+=4;toast('他搖搖頭');updateHUD()}}
+          ]);
+        }}]);
+        updateHUD();
+      }},
+      {t:'發生什麼事了？可以跟我說說嗎？',letter:'B',cost:'5分',a:()=>{status.time+=5;status.mood+=2;showDlg('小宇','……不想說。',[{t:'沒關係，我在這裡。',a:()=>showInner('給他一點空間。')}])}},
+      {t:'第一節是什麼課？我陪你走回去。',letter:'C',cost:'5分',a:()=>{status.time+=5;status.energy-=4;showDlg('小宇','……不要。',[{t:'好，那先坐著。',a:()=>{}}])}}
+    ]);
+  }
+}
+function talkChunbo(){showDlg('春伯','年輕人，今天也要加油啊。',[
+  {t:'春伯早！送您喉糖',a:()=>{if(bag.throat<1){toast('沒有喉糖');return}bag.throat--;affection.chunbo+=10;status.mood+=5;toast('春伯笑了 +好感');sfx('ok')}},
+  {t:'聊聊天氣',a:()=>{status.mood+=3;toast('聊得很開心')}},
+  {t:'請教防詐經驗',a:()=>{status.stars+=2;showDlg('春伯','收到不明連結千萬別點，先問家人。',[{t:'謝謝春伯',a:()=>{}}])}}
+])}
+function talkEmma(){showDlg('Emma','Hey! Did you finish the English homework?',[
+  {t:'Almost done! (聽發音)',a:()=>{speak('Almost done');status.stars+=1;openEng()}},
+  {t:'送她咖啡',a:()=>{if(bag.coffee<1){toast('沒有咖啡');return}bag.coffee--;affection.emma+=12;toast('Emma: Thanks!');status.stars+=2}},
+  {t:'分享廣播連結',a:()=>{window.open('https://youtube.com/@mebook888','_blank');toast('已開啟廣播頻道')}}
+])}
+function talkTeacher(){showDlg('林老師','小宇的狀況怎麼樣了？',[
+  {t:'回報剛才的晤談',a:()=>{if(xiaoyuState>=4){status.work+=10;status.stars+=5;toast('林老師點頭 +5⭐');sfx('ok')}else toast('還沒完成晤談')}},
+  {t:'請教輔導技巧',a:()=>{status.work+=3;showInner('有時候沉默，比追問更有力量。')}}
+])}
+function miniCatch(){showDlg('接高飛球','遠方打出高飛球！',[
+  {t:'往左跑接球',a:()=>{if(Math.random()>0.35){status.stars+=5;toast('Catch! +5⭐');sfx('ok')}else{toast('差一點！');speak('Nice try');updateHUD()}}},
+  {t:'往右跑接球',a:()=>{if(Math.random()>0.35){status.stars+=5;toast('Catch! +5⭐');sfx('ok')}else{toast('Almost!');updateHUD()}}},
+  {t:'原地準備',a:()=>{status.stars+=2;toast('安全接住 +2⭐');sfx('ok')}}
+])}
+function miniPiano(){
+  showDlg('音樂教室・大鋼琴','可以自由彈奏，或挑戰聽音與樂譜',[
+    {t:'🎹 自由彈奏（看鍵盤）',letter:'A',a:function(){openPianoPlay()}},
+    {t:'👂 絕對音感測驗',letter:'B',a:function(){pianoEarTest()}},
+    {t:'📜 樂譜練唱（簡易）',letter:'C',a:function(){pianoSheet()}}
+  ]);
+}
+function openPianoPlay(){
+  var freqs={C:261.6,D:293.7,E:329.6,F:349.2,G:392,A:440,B:493.9};
+  var keys=['C','D','E','F','G','A','B'];
+  showDlg('自由彈奏','點選音名即可發聲（純 Web Audio）',keys.map(function(n){
+    return {t:'♪ '+n,a:function(){initA();tone(freqs[n],0.35,'sine',0.12);toast('♪ '+n)}};
+  }).concat([{t:'完成練習 +2⭐',a:function(){status.stars+=2;status.mood+=3;toast('+2⭐');sfx('ok');updateHUD()}}]));
+}
+function pianoEarTest(){
+  var notes=['C','D','E','F','G','A','B'],ans=notes[Math.floor(Math.random()*notes.length)];
+  var freqs={C:261,D:293,E:329,F:349,G:392,A:440,B:493};
+  showDlg('絕對音感','先聽音，再選正確音名',[
+    {t:'▶ 播放神秘音符',a:function(){
+      initA();tone(freqs[ans],0.55,'sine',0.12);
+      setTimeout(function(){
+        showDlg('你聽到的是？','選一個',notes.map(function(n){return {
+          t:n,
+          a:function(){
+            if(n===ans){status.stars+=5;toast('Correct! +5⭐');sfx('clap')}
+            else{toast('答案是 '+ans+'，再試一次');sfx('click');setTimeout(pianoEarTest,500)}
+            updateHUD();
+          }
+        }}));
+      },400);
+    }}
+  ]);
+}
+function pianoSheet(){
+  showDlg('樂譜練唱','譜例：C - E - G - E - C（Do Mi Sol Mi Do）',[
+    {t:'▶ 播放整段示範',a:function(){
+      initA();
+      var seq=[{n:261,t:0},{n:329,t:350},{n:392,t:700},{n:329,t:1050},{n:261,t:1400}];
+      seq.forEach(function(s){setTimeout(function(){tone(s.n,0.3,'sine',0.1)},s.t)});
+      toast('跟著唱：Do Mi Sol Mi Do');
+    }},
+    {t:'我唱完了 ✅',a:function(){status.stars+=4;status.mood+=5;toast('+4⭐ 唱得很好');sfx('clap');updateHUD()}},
+    {t:'再聽一次',a:function(){pianoSheet()}}
+  ]);
+}
+
+function miniArt(){
+  showDlg('美術教室・色彩學','學習如何判斷配色關係',[
+    {t:'🔴🟢 互補色 Complementary',letter:'A',a:function(){artLesson('comp')}},
+    {t:'🔺 分裂互補 Split-Complementary',letter:'B',a:function(){artLesson('split')}},
+    {t:'🟡🟢 類似色 Analogous',letter:'C',a:function(){artLesson('analog')}},
+    {t:'△ 三角配色 Triadic',letter:'D',a:function(){artLesson('triadic')}}
+  ]);
+}
+function artLesson(type){
+  var lessons={
+    comp:{
+      title:'互補色 Complementary',
+      txt:'色相環上相對 <b>180 度</b> 的顏色（如紅與綠、藍與橙）。視覺衝擊最強烈，常用於創造焦點，但比例若沒抓好容易顯得俗氣。',
+      q:'紅的互補色是？',
+      opts:[{t:'綠色',ok:1},{t:'藍色',ok:0},{t:'黃色',ok:0}]
+    },
+    split:{
+      title:'分裂互補 Split-Complementary',
+      txt:'主色搭配其互補色<b>兩側的鄰近色</b>。既有互補色的對比感，視覺上又比純互補色更和諧。',
+      q:'以藍色為主色，分裂互補會靠近？',
+      opts:[{t:'橙黃與橙紅一帶',ok:1},{t:'純橘色一個',ok:0},{t:'綠色與紫色',ok:0}]
+    },
+    analog:{
+      title:'類似色 Analogous',
+      txt:'色相環上<b>相鄰的 3～4 個顏色</b>（如黃、黃綠、綠）。畫面極具整體感與流暢度，常用於營造特定氛圍。',
+      q:'黃、黃綠、綠 屬於？',
+      opts:[{t:'類似色',ok:1},{t:'互補色',ok:0},{t:'三角配色',ok:0}]
+    },
+    triadic:{
+      title:'三角配色 Triadic',
+      txt:'在色相環上呈<b>等邊三角形</b>的三色（如紅、黃、藍）。畫面色彩豐富且平衡感強。',
+      q:'紅、黃、藍 是典型的？',
+      opts:[{t:'三角配色',ok:1},{t:'類似色',ok:0},{t:'互補色',ok:0}]
+    }
+  };
+  var L=lessons[type];
+  showDlg(L.title,L.txt,[
+    {t:'我懂了，做小測驗',a:function(){
+      showDlg('小測驗',L.q,L.opts.map(function(o){return {
+        t:o.t,
+        a:function(){
+          if(o.ok){status.stars+=5;status.work+=2;toast('Correct! +5⭐');sfx('clap');floatNum('+5⭐')}
+          else{toast('再想一下～可以重看說明');sfx('click');setTimeout(function(){artLesson(type)},500)}
+          updateHUD();
+        }
+      }}));
+    }},
+    {t:'返回色彩選單',a:function(){miniArt()}}
+  ]);
+}
+
+
+/* ===== 真實校園情境：遲到 / 未寫功課 / 罰站 / 吵架（中英雙語學習） ===== */
+function enSpeak(text){
+  try{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.85;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function biline(zh,en){
+  return zh+'<br><span style="color:#7ec8e3;font-size:13px" onclick="enSpeak(\''+en.replace(/'/g,"\\'")+'\')">🔊 '+en+'</span>';
+}
+function talkLate(){
+  if(scenarioState.late>=2){
+    showDlg('小華','老師早！我今天準時了。<br><span style="color:#7ec8e3;font-size:13px" onclick="enSpeak(\'Good morning, teacher! I am on time today.\')">🔊 Good morning, teacher! I am on time today.</span>',[
+      {t:'很好，繼續保持！ / Great job!',a:function(){status.mood+=2;affection.xiaoyu=affection.xiaoyu||0;toast('+2💚');updateHUD()}}
+    ]);return;
+  }
+  if(scenarioState.late===0){
+    scenarioState.late=1;
+    showDlg('小華（氣喘吁吁）',biline('老師對不起……我遲到了。鬧鐘沒響。','Sorry, teacher… I am late. My alarm didn\'t go off.'),[
+      {t:'A. 先冷靜，為什麼遲到？ / Why are you late?',letter:'A',cost:'3分',a:function(){
+        status.time+=3;status.energy-=2;
+        showDlg('小華',biline('我昨晚寫功課太晚，睡過頭了。','I stayed up late doing homework and overslept.'),[
+          {t:'繼續',a:function(){
+            showDlg('輔導老師',biline('遲到會影響你和同學。我們一起想辦法好嗎？','Being late affects you and your classmates. Shall we find a solution together?'),[
+              {t:'A. 教他時間管理 / Teach time management',letter:'A',a:function(){
+                showDlg('時間管理小技巧',biline('1. 睡前把書包整理好<br>2. 設定兩個鬧鐘<br>3. 早睡早起','1. Pack your bag before bed<br>2. Set two alarms<br>3. Go to bed early'),[
+                  {t:'小華：我會試試！ / I will try!',a:function(){
+                    scenarioState.late=2;status.stars+=5;status.mood+=5;status.work+=3;
+                    toast('+5⭐ 幫助遲到同學');sfx('clap');floatNum('+5⭐');updateHUD();
+                    showInner('你幫助同學學會準時。這就是校園生活的一部分。');
+                  }}
+                ]);
+              }},
+              {t:'B. 請他向老師道歉 / Ask him to apologize',letter:'B',a:function(){
+                showDlg('小華',biline('我去跟導師說對不起。','I will go apologize to the homeroom teacher.'),[
+                  {t:'很好 / Good',a:function(){
+                    scenarioState.late=2;status.stars+=4;status.mood+=3;
+                    toast('+4⭐');sfx('ok');updateHUD();
+                  }}
+                ]);
+              }}
+            ]);
+          }}
+        ]);
+      }},
+      {t:'B. 下次請準時 / Please be on time next time',letter:'B',a:function(){
+        status.mood-=1;
+        showDlg('小華',biline('好的……對不起。','Okay… I\'m sorry.'),[
+          {t:'結束',a:function(){scenarioState.late=1;toast('可以再來關心他')}}
+        ]);
+      }}
+    ]);
+  } else {
+    showDlg('小華',biline('老師，我還在學怎麼準時。','Teacher, I\'m still learning to be on time.'),[
+      {t:'加油 / Keep going',a:function(){status.mood+=2;updateHUD()}}
+    ]);
+  }
+}
+function talkHomework(){
+  if(scenarioState.homework>=2){
+    showDlg('小美',biline('老師，我今天有交作業了！','Teacher, I handed in my homework today!'),[
+      {t:'真棒！ / Awesome!',a:function(){status.mood+=2;status.stars+=1;toast('+1⭐');updateHUD()}}
+    ]);return;
+  }
+  showDlg('小美（低著頭）',biline('老師……我沒有寫功課。我不敢進教室。','Teacher… I didn\'t do my homework. I\'m afraid to go into the classroom.'),[
+    {t:'A. 為什麼沒寫？ / Why didn\'t you do it?',letter:'A',cost:'4分',a:function(){
+      status.time+=4;status.energy-=2;
+      showDlg('小美',biline('題目太難了，我看不懂。怕被罵。','The questions were too hard. I didn\'t understand. I was afraid of being scolded.'),[
+        {t:'繼續',a:function(){
+          showDlg('輔導老師',biline('不會可以問老師或同學。逃避會更難受。','If you don\'t understand, you can ask the teacher or classmates. Avoiding it feels worse.'),[
+            {t:'A. 陪她一起看一題 / Help with one question',letter:'A',cost:'8分',a:function(){
+              status.time+=8;status.energy-=4;status.work+=5;
+              showDlg('小美',biline('原來這題要先……我好像懂一點了。謝謝老師。','Oh, I need to… I think I understand a little. Thank you, teacher.'),[
+                {t:'下次早點開始寫 / Start earlier next time',a:function(){
+                  scenarioState.homework=2;status.stars+=6;status.mood+=6;
+                  toast('+6⭐ 協助未寫功課的同學');sfx('clap');floatNum('+6⭐');updateHUD();
+                  showInner(biline('誠實說出「我不會」是勇敢的第一步。','Admitting "I don\'t understand" is a brave first step.'));
+                }}
+              ]);
+            }},
+            {t:'B. 鼓勵她去找科任老師 / Encourage asking the subject teacher',letter:'B',a:function(){
+              showDlg('小美',biline('好…我去問數學老師。','Okay… I\'ll ask the math teacher.'),[
+                {t:'去吧，我幫你跟導師說一聲',a:function(){
+                  scenarioState.homework=2;status.stars+=5;status.mood+=4;
+                  toast('+5⭐');sfx('ok');updateHUD();
+                }}
+              ]);
+            }}
+          ]);
+        }}
+      ]);
+    }},
+    {t:'B. 先深呼吸，我們慢慢來 / Take a deep breath',letter:'B',a:function(){
+      status.mood+=3;
+      showDlg('小美',biline('……好。','…Okay.'),[
+        {t:'可以再找我談',a:function(){scenarioState.homework=1}}
+      ]);
+    }}
+  ]);
+}
+function talkStand(){
+  if(scenarioState.stand>=2){
+    showDlg('阿哲',biline('老師，我知道上課不能聊天了。','Teacher, I know I shouldn\'t chat in class.'),[
+      {t:'記住就好 / Just remember that',a:function(){status.mood+=2;updateHUD()}}
+    ]);return;
+  }
+  showDlg('阿哲（站在走廊）',biline('老師叫我罰站……因為我上課講話。','The teacher made me stand here… because I talked in class.'),[
+    {t:'A. 罰站的感覺如何？ / How does it feel?',letter:'A',cost:'3分',a:function(){
+      status.time+=3;
+      showDlg('阿哲',biline('很丟臉，腳也痠。可是我真的忍不住想講。','It\'s embarrassing, and my legs hurt. But I really couldn\'t help talking.'),[
+        {t:'繼續',a:function(){
+          showDlg('輔導老師',biline('規則是為了讓大家能專心。我們可以練習「想講先舉手」。','Rules help everyone focus. We can practice "raise your hand before speaking".'),[
+            {t:'A. 練習自我控制小方法 / Self-control tips',letter:'A',a:function(){
+              showDlg('小技巧',biline('1. 想說話時先數到 3<br>2. 把話寫在紙上稍後再講<br>3. 下課再討論','1. Count to 3 when you want to speak<br>2. Write it down and share later<br>3. Talk after class'),[
+                {t:'阿哲：我試試看 / I\'ll try',a:function(){
+                  scenarioState.stand=2;status.stars+=5;status.mood+=5;status.work+=2;
+                  toast('+5⭐ 幫助罰站同學');sfx('clap');floatNum('+5⭐');updateHUD();
+                  showInner(biline('處罰之後的陪伴，比處罰本身更重要。','Support after punishment matters more than the punishment itself.'));
+                }}
+              ]);
+            }},
+            {t:'B. 等罰站結束再回教室 / Wait until standing ends',letter:'B',a:function(){
+              status.mood+=2;scenarioState.stand=1;
+              showDlg('阿哲',biline('好…我再站五分鐘。','Okay… I\'ll stand for five more minutes.'),[{t:'結束',a:function(){}}]);
+            }}
+          ]);
+        }}
+      ]);
+    }},
+    {t:'B. 遵守教室規則很重要 / Classroom rules matter',letter:'B',a:function(){
+      showDlg('阿哲',biline('我知道了……','I understand…'),[{t:'結束',a:function(){scenarioState.stand=1}}]);
+    }}
+  ]);
+}
+function talkFight(){
+  if(scenarioState.fight>=2){
+    showDlg('小強 & 小芳',biline('我們和好了，謝謝老師。','We made up. Thank you, teacher.'),[
+      {t:'以後用說的，不要用吵的 / Talk, don\'t fight',a:function(){status.mood+=2;status.stars+=1;toast('+1⭐');updateHUD()}}
+    ]);return;
+  }
+  showDlg('小強（生氣）',biline('是她先搶我的球！','She grabbed my ball first!'),[
+    {t:'先聽小芳說 / Let\'s hear from 小芳',letter:'A',cost:'2分',a:function(){
+      status.time+=2;
+      showDlg('小芳（也生氣）',biline('明明是他先不讓我玩！太霸道了！','He wouldn\'t let me play! He\'s so bossy!'),[
+        {t:'繼續調解',a:function(){
+          showDlg('輔導老師',biline('兩個人都想玩，但用吵架解決不了。我們用「我訊息」說話。','Both of you want to play, but arguing doesn\'t help. Let\'s use "I-messages".'),[
+            {t:'A. 教「我訊息」 / Teach I-messages',letter:'A',cost:'6分',a:function(){
+              status.time+=6;status.energy-=3;
+              showDlg('溝通練習',biline(
+                '小強可以說：<br>「我感到難過，因為球被拿走了。」<br>小芳可以說：<br>「我希望大家可以輪流玩。」',
+                '小強: "I feel sad because the ball was taken."<br>小芳: "I hope we can take turns."'
+              ),[
+                {t:'兩人試著說一次',a:function(){
+                  showDlg('小強',biline('……我感到生氣，因為沒人問我就拿走。','…I feel angry because no one asked before taking it.'),[
+                    {t:'小芳也說',a:function(){
+                      showDlg('小芳',biline('我希望可以一起玩，輪流就好。','I hope we can play together and take turns.'),[
+                        {t:'很好，握手言和 / Shake hands',a:function(){
+                          scenarioState.fight=2;status.stars+=7;status.mood+=8;status.work+=3;
+                          toast('+7⭐ 成功調解吵架');sfx('clap');floatNum('+7⭐');updateHUD();
+                          showInner(biline('衝突不可怕，學會表達感受才重要。','Conflict is okay; learning to express feelings is what matters.'));
+                        }}
+                      ]);
+                    }}
+                  ]);
+                }}
+              ]);
+            }},
+            {t:'B. 請雙方先冷靜 5 分鐘 / Cool down first',letter:'B',a:function(){
+              status.mood+=2;scenarioState.fight=1;
+              showDlg('兩人',biline('……好吧。','…Fine.'),[{t:'稍後再來',a:function(){}}]);
+            }}
+          ]);
+        }}
+      ]);
+    }},
+    {t:'B. 先分開，不要繼續吵 / Separate them first',letter:'B',a:function(){
+      status.mood+=1;scenarioState.fight=1;
+      showDlg('小強',biline('哼。','Hmph.'),[{t:'結束',a:function(){}}]);
+    }}
+  ]);
+}
+
+function goHome(){showDlg('回家','',[
+  {t:'玄關：放書包脫鞋',letter:'A',a:()=>{status.work+=2;status.mood+=3;toast('鞋子放整齊了');floatNum('+3💚')}},
+  {t:'廚房：洗碗洗便當盒',letter:'B',a:()=>{status.energy-=5;status.mood+=5;status.stars+=3;toast('碗盤清乾淨 +3⭐')}},
+  {t:'寫作業（英文練習）',letter:'C',a:()=>{status.energy-=8;status.work+=10;status.stars+=5;openEng()}},
+  {t:'打電話叫爸爸回家吃晚餐',letter:'D',a:()=>{status.mood+=10;affection.mom+=5;toast('爸爸：好，我馬上回去');sfx('ok');floatNum('+10💚')}}
+])}
+function openPhone(){phoneOpen=true;document.getElementById('phone').classList.add('show');phoneUnread=0;updateBadge();showPhoneList()}
+function closePhone(){phoneOpen=false;document.getElementById('phone').classList.remove('show')}
+function showPhoneList(){
+  currentChat=null;
+  var bar=document.getElementById('phInputBar');
+  var panel=document.getElementById('phStickerPanel');
+  if(bar)bar.style.display='none';
+  if(panel)panel.style.display='none';
+  document.getElementById('phTitle').textContent='訊息';
+  document.getElementById('phBody').innerHTML=`<div class="ph-list">
+    <div class="item" onclick="openChat('mom')"><div class="av" style="background:#c04040">媽</div><div class="info"><div class="nm">媽媽 ❤️</div><div class="pv">記得吃早餐…</div></div><div class="tm">08:01</div></div>
+    <div class="item" onclick="openChat('family')"><div class="av" style="background:#e08030">家</div><div class="info"><div class="nm">相親相愛一家人</div><div class="pv">爸爸傳了長輩圖</div></div><div class="tm">08:02</div><div class="dot"></div></div>
+    <div class="item" onclick="openChat('emma')"><div class="av" style="background:#4080c0">E</div><div class="info"><div class="nm">Emma</div><div class="pv">Homework?</div></div><div class="tm">昨天</div></div>
+    <div class="item" onclick="openChat('friends')"><div class="av" style="background:#50a060">群</div><div class="info"><div class="nm">死黨群組</div><div class="pv">小傑：今天中午打球？</div></div><div class="tm">07:50</div><div class="dot"></div></div>
+    <div class="item" onclick="openChat('scam')"><div class="av" style="background:#c03030">!</div><div class="info"><div class="nm">物流通知中心</div><div class="pv">【限時】您的包裹異常…</div></div><div class="tm">09:20</div><div class="dot"></div></div>
+    <div class="item" onclick="openChat('broadcast')"><div class="av" style="background:#60a040">📻</div><div class="info"><div class="nm">英文廣播 / 音樂 / 科普</div><div class="pv">好朋友傳來的連結</div></div><div class="tm">連結</div></div>
+    <div class="item" onclick="openChat('jukebox')"><div class="av" style="background:#a050c0">🎵</div><div class="info"><div class="nm">心情點歌台</div><div class="pv">Mood Jukebox</div></div></div>
+  </div>`;
+}
+
+let chatLogs={mom:[],family:[],emma:[],friends:[]};
+let chatStage={mom:0,family:0,emma:0,friends:0};
+
+const ELDER_STICKERS=[
+  {cls:'pink',sun:'🌸😊🌸',msg:'早　安',sub:'以微笑打開每一天<br>天天都是星期天'},
+  {cls:'gold',sun:'☀️🌻✨',msg:'早安　平安喜樂',sub:'願你今天事事順心<br>健康平安　充滿力量'},
+  {cls:'sky',sun:'🌈🍀💫',msg:'新的一天加油',sub:'你是最棒的<br>學習進步　身心健康'},
+  {cls:'pink',sun:'🌷🤍😊',msg:'周末愉快',sub:'好好休息　補充能量<br>下週繼續閃亮'},
+  {cls:'gold',sun:'🙏🌸',msg:'一切順心',sub:'吃飯了嗎？多喝水<br>記得想家人和朋友'}
+];
+
+function elderHTML(s){
+  return '<div class="elder-card '+s.cls+'"><div class="sun">'+s.sun+'</div><div class="msg">'+s.msg+'</div><div class="sub">'+s.sub+'</div></div>';
+}
+
+function appendBubble(side,html,name){
+  var box=document.querySelector('#phBody .room-msgs');
+  if(!box)return;
+  var div=document.createElement('div');
+  div.className='bubble '+side;
+  div.innerHTML=(name?'<div class="name">'+name+'</div>':'')+html+'<div class="tm">剛剛</div>';
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+
+function setChoices(btns){
+  var c=document.querySelector('#phBody .room-choices');
+  if(!c)return;
+  c.innerHTML=btns.map(function(b){
+    return '<button onclick="'+b.fn+'">'+b.t+'</button>';
+  }).join('');
+}
+
+function stickerBar(target){
+  return '<div class="sticker-bar">'+
+    '<button title="長輩圖1" onclick="sendElderSticker(\''+target+'\',0)">🌸</button>'+
+    '<button title="長輩圖2" onclick="sendElderSticker(\''+target+'\',1)">☀️</button>'+
+    '<button title="長輩圖3" onclick="sendElderSticker(\''+target+'\',2)">🌈</button>'+
+    '<button title="愛心" onclick="sendPlainSticker(\''+target+'\',\'❤️ 愛你\')">❤️</button>'+
+    '<button title="加油" onclick="sendPlainSticker(\''+target+'\',\'💪 加油！\')">💪</button>'+
+    '<button title="OK" onclick="sendPlainSticker(\''+target+'\',\'👍 OK\')">👍</button>'+
+  '</div>';
+}
+
+function sendElderSticker(target,idx){
+  var s=ELDER_STICKERS[idx||0];
+  appendBubble('me',elderHTML(s));
+  status.mood+=2;affection.mom=(affection.mom||0)+3;toast('已傳送長輩貼圖');sfx('ok');updateHUD();
+  setTimeout(function(){
+    if(target==='family'){
+      appendBubble('them',elderHTML(ELDER_STICKERS[1]),'爸爸');
+      setTimeout(function(){
+        appendBubble('them','收到啦！今天也要開心喔 😊','媽媽');
+        setChoices([
+          {t:'再回一張長輩圖 🌸',fn:"sendElderSticker('family',2)"},
+          {t:'回覆：謝謝爸媽！',fn:"familyText('謝謝爸媽！今天會準時回家')"},
+          {t:'回覆：愛你們 ❤️',fn:"familyText('愛你們 ❤️')"}
+        ]);
+      },700);
+    } else if(target==='mom'){
+      appendBubble('them','好可愛的圖！媽媽也祝你一天順利 💕');
+      setChoices([
+        {t:'再傳一張 ☀️',fn:"sendElderSticker('mom',1)"},
+        {t:'晚上想吃什麼？',fn:"momText('晚上想吃什麼？我可以幫忙')"},
+        {t:'好的，會注意身體',fn:"momText('好的，會注意身體')"}
+      ]);
+    }
+  },600);
+}
+
+function sendPlainSticker(target,txt){
+  appendBubble('me',txt);
+  status.mood+=1;toast('已傳送');sfx('click');
+  setTimeout(function(){
+    if(target==='family') appendBubble('them','收到～','媽媽');
+    else if(target==='mom') appendBubble('them','嗯嗯 ❤️');
+    else if(target==='friends') appendBubble('them','哈哈 +1','同學');
+  },500);
+}
+
+function familyText(txt){
+  appendBubble('me',txt);
+  affection.mom=(affection.mom||0)+4;status.mood+=3;updateHUD();sfx('ok');
+  setTimeout(function(){
+    appendBubble('them','好，媽媽等你回來吃飯。','媽媽');
+    setTimeout(function(){
+      appendBubble('them','工作順利，你也要加油！','爸爸');
+      setChoices([
+        {t:'傳長輩圖回覆 🌸',fn:"sendElderSticker('family',0)"},
+        {t:'回覆：知道了！',fn:"familyText('知道了！愛你們')"},
+        {t:'回群組列表',fn:"showPhoneList()"}
+      ]);
+    },800);
+  },600);
+}
+
+function momText(txt){
+  appendBubble('me',txt);
+  affection.mom=(affection.mom||0)+3;status.mood+=2;updateHUD();sfx('ok');
+  setTimeout(function(){
+    var replies=['媽媽知道了，乖乖的。','好，有事打給我。','記得吃午餐喔。'];
+    appendBubble('them',replies[Math.floor(Math.random()*replies.length)]);
+    setChoices([
+      {t:'傳長輩圖 ☀️',fn:"sendElderSticker('mom',1)"},
+      {t:'我愛你，媽',fn:"momText('我愛你，媽 ❤️')"},
+      {t:'回訊息列表',fn:"showPhoneList()"}
+    ]);
+  },600);
+}
+
+
+let currentChat=null;
+
+function showChatInput(show){
+  var bar=document.getElementById('phInputBar');
+  var panel=document.getElementById('phStickerPanel');
+  if(!bar)return;
+  bar.style.display=show?'flex':'none';
+  if(panel)panel.style.display='none';
+  if(show){
+    var inp=document.getElementById('phInput');
+    if(inp){inp.value='';setTimeout(function(){try{inp.focus()}catch(e){}},200)}
+  }
+}
+
+function sendTypedMessage(){
+  var inp=document.getElementById('phInput');
+  if(!inp||!currentChat)return;
+  var text=(inp.value||'').trim();
+  if(!text)return;
+  inp.value='';
+  // hide sticker panel
+  var panel=document.getElementById('phStickerPanel');
+  if(panel)panel.style.display='none';
+
+  appendBubble('me', escapeHtml(text));
+  status.mood+=1;sfx('ok');updateHUD();
+
+  // auto reply based on chat + keywords
+  setTimeout(function(){ autoReplyChat(currentChat, text); }, 600 + Math.random()*400);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function autoReplyChat(chat, text){
+  var lower=text.toLowerCase();
+  var reply=null, name=null;
+
+  if(chat==='mom'){
+    name=null;
+    if(/早|morning|good morning/.test(lower)) reply='早啊～記得吃早餐，天氣涼穿多一點。';
+    else if(/愛|love|想你/.test(lower)) reply='媽媽也愛你 ❤️ 晚上早點回來。';
+    else if(/晚|遲|加班|輔導/.test(lower)) reply='好，那你注意安全，到家傳訊息給我。';
+    else if(/吃|飯|晚餐|lunch|dinner/.test(lower)) reply='想吃什麼告訴媽媽，我準備。';
+    else if(/長輩|貼圖|stick/.test(lower)) reply='哈哈好可愛！再傳一張給媽媽看～';
+    else if(/謝謝|thanks|thank/.test(lower)) reply='不客氣，有事就跟媽媽說。';
+    else reply=['嗯嗯，媽媽知道了。','好，乖乖的。','收到，注意身體喔。','知道了，愛你 💕'][Math.floor(Math.random()*4)];
+  }
+  else if(chat==='family'){
+    if(/早|morning/.test(lower)){ name='媽媽'; reply='早安！今天也要開心喔。'; }
+    else if(/弟|玩/.test(lower)){ name='弟弟'; reply='好耶！晚上等你回來一起玩～'; }
+    else if(/爸|工作|加油/.test(lower)){ name='爸爸'; reply='收到，你也要加油學習！'; }
+    else if(/愛|love/.test(lower)){ name='媽媽'; reply='我們也愛你 ❤️❤️'; }
+    else {
+      name=['媽媽','爸爸','弟弟'][Math.floor(Math.random()*3)];
+      reply=['收到～','好的！','嗯嗯！','知道了 😊'][Math.floor(Math.random()*4)];
+    }
+  }
+  else if(chat==='emma'){
+    name=null;
+    if(/help|幫|教/.test(lower)) reply='Sure! We can study together after class. 📚';
+    else if(/finish|done|寫完|完成/.test(lower)) reply='Great job! See you tomorrow 😊';
+    else if(/hi|hello|hey|嗨/.test(lower)) reply='Hey! How are you today?';
+    else if(/thank|謝謝/.test(lower)) reply='You\'re welcome!';
+    else if(/bye|再見|掰/.test(lower)) reply='Bye~ Take care!';
+    else reply=['OK!','Got it 👍','Haha nice','I see!'][Math.floor(Math.random()*4)];
+    // speak short english if mostly english
+    if(/^[a-zA-Z0-9\s.,!?'"]+$/.test(text) && text.length<40){ try{speak(text)}catch(e){} }
+  }
+  else if(chat==='friends'){
+    if(/球|打球|basket|ball/.test(lower)){ name='小傑'; reply='好！中午球場見 🏀'; }
+    else if(/圖書館|library|讀書|複習/.test(lower)){ name='小雨'; reply='我在圖書館等你！'; }
+    else if(/小宇|輔導/.test(lower)){ name='阿明'; reply='了解，謝謝你說。'; }
+    else {
+      name=['小傑','小雨','阿明'][Math.floor(Math.random()*3)];
+      reply=['哈哈','好啊','收到～','+1'][Math.floor(Math.random()*4)];
+    }
+  }
+  else {
+    return; // scam/broadcast no free chat reply
+  }
+
+  if(reply) appendBubble('them', reply, name);
+}
+
+function pickSticker(idx){
+  if(!currentChat)return;
+  var map=[
+    {type:'elder',i:0},{type:'elder',i:1},{type:'elder',i:2},
+    {type:'text',t:'❤️'},{type:'text',t:'💪 加油！'},{type:'text',t:'👍'},
+    {type:'text',t:'😂'},{type:'text',t:'🙏 謝謝'}
+  ];
+  var s=map[idx];
+  if(!s)return;
+  document.getElementById('phStickerPanel').style.display='none';
+  if(s.type==='elder' && typeof ELDER_STICKERS!=='undefined'){
+    appendBubble('me', elderHTML(ELDER_STICKERS[s.i]));
+    status.mood+=2;affection.mom=(affection.mom||0)+2;updateHUD();sfx('ok');
+    setTimeout(function(){ autoReplyChat(currentChat, '長輩貼圖'); },700);
+  } else {
+    appendBubble('me', s.t);
+    sfx('click');
+    setTimeout(function(){ autoReplyChat(currentChat, s.t); },500);
+  }
+}
+
+function bindPhoneInput(){
+  var btn=document.getElementById('phSendBtn');
+  var inp=document.getElementById('phInput');
+  var st=document.getElementById('phStickerBtn');
+  if(btn) btn.onclick=function(){ sendTypedMessage(); };
+  if(inp){
+    inp.onkeydown=function(e){
+      if(e.key==='Enter'){ e.preventDefault(); sendTypedMessage(); }
+    };
+  }
+  if(st) st.onclick=function(){
+    var panel=document.getElementById('phStickerPanel');
+    if(!panel)return;
+    panel.style.display=panel.style.display==='none'?'flex':'none';
+  };
+}
+// bind when DOM ready
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindPhoneInput);
+else setTimeout(bindPhoneInput, 0);
+
+function openChat(id){
+
+  const body=document.getElementById('phBody');
+  if(id==='family'){
+    currentChat='family';showChatInput(true);document.getElementById('phTitle').textContent='相親相愛一家人';
+    body.innerHTML='<div class="room-msgs">'+
+      '<div class="bubble them"><div class="name">爸爸</div>'+elderHTML(ELDER_STICKERS[0])+'<div class="tm">08:02</div></div>'+
+      '<div class="bubble them"><div class="name">媽媽</div>早啊，記得吃早餐，晚上早點回來。<div class="tm">08:03</div></div>'+
+      '<div class="bubble them"><div class="name">弟弟</div>姐／哥早上好～今天會回來玩嗎？<div class="tm">08:05</div></div>'+
+    '</div>'+
+    '<div class="room-choices">'+
+      '<button onclick="familyText(\'早安！今天會準時回家吃飯\')">回覆：早安！今天會準時回家</button>'+
+      '<button onclick="sendElderSticker(\'family\',1)">回傳長輩圖 ☀️🌸</button>'+
+      '<button onclick="familyText(\'弟弟等我，晚上陪你玩\')">回覆弟弟：晚上陪你玩</button>'+
+    '</div>'+stickerBar('family');
+  }
+  else if(id==='mom'){
+    currentChat='mom';showChatInput(true);document.getElementById('phTitle').textContent='媽媽 ❤️';
+    body.innerHTML='<div class="room-msgs">'+
+      '<div class="bubble them">記得吃早餐，晚上早點回家。<div class="tm">08:01</div></div>'+
+      '<div class="bubble them">天氣涼，穿多一點喔。<div class="tm">08:01</div></div>'+
+    '</div>'+
+    '<div class="room-choices">'+
+      '<button onclick="momText(\'好的，媽媽 ❤️ 我有吃早餐\')">好的，媽媽 ❤️ 我有吃早餐</button>'+
+      '<button onclick="sendElderSticker(\'mom\',0)">傳長輩圖給媽媽 🌸</button>'+
+      '<button onclick="momText(\'今天可能稍晚，有輔導工作\')">今天可能稍晚一點回來</button>'+
+    '</div>'+stickerBar('mom');
+  }
+  else if(id==='emma'){
+    currentChat='emma';showChatInput(true);document.getElementById('phTitle').textContent='Emma';
+    body.innerHTML='<div class="room-msgs">'+
+      '<div class="bubble them">Hey! Did you <span class="eng-word" onclick="speak(\'finish\')">finish</span> the English homework?<div class="tm">昨天</div></div>'+
+    '</div>'+
+    '<div class="room-choices">'+
+      '<button onclick="emmaReply(1)">A. I will finish it soon. 🔊</button>'+
+      '<button onclick="emmaReply(2)">B. Can you help me? 🔊</button>'+
+      '<button onclick="emmaReply(3)">C. Not yet, I need more time. 🔊</button>'+
+    '</div>';
+  }
+  else if(id==='friends'){
+    currentChat='friends';showChatInput(true);document.getElementById('phTitle').textContent='死黨群組';
+    body.innerHTML='<div class="room-msgs">'+
+      '<div class="bubble them"><div class="name">小傑</div>今天中午要不要一起打球？<div class="tm">07:50</div></div>'+
+      '<div class="bubble them"><div class="name">小雨</div>我要去圖書館複習…有人要一起嗎？<div class="tm">07:52</div></div>'+
+      '<div class="bubble them"><div class="name">阿明</div>誰看到小宇了？他好像沒來教室<div class="tm">08:10</div></div>'+
+    '</div>'+
+    '<div class="room-choices">'+
+      '<button onclick="friendsReply(1)">回覆：中午可以打球</button>'+
+      '<button onclick="friendsReply(2)">回覆：我去圖書館</button>'+
+      '<button onclick="friendsReply(3)">回覆：小宇在輔導室，別擔心</button>'+
+    '</div>'+stickerBar('friends');
+  }
+  else if(id==='scam'){
+    currentChat=null;showChatInput(false);document.getElementById('phTitle').textContent='物流通知中心';
+    body.innerHTML='<div class="room-msgs"><div class="bubble them">【限時】您的包裹異常，請點擊連結確認個資。<br><span style="color:#06c">http://bit.ly/free-gift-scam</span><div class="tm">09:20</div></div></div>'+
+    '<div class="room-choices"><button onclick="scamOk()">🔒 封鎖並檢舉（正確）</button><button onclick="scamBad()">點擊連結查看</button><button onclick="scamAsk()">先問爸媽／老師</button></div>';
+  }
+  else if(id==='broadcast'){
+    currentChat=null;showChatInput(false);document.getElementById('phTitle').textContent='廣播・音樂・科普';
+    body.innerHTML='<div class="room-msgs" style="padding:16px"><p style="color:#ccc;margin-bottom:12px;font-size:13px">好朋友傳來的學習連結：</p>'+
+    '<button onclick="window.open(\'https://youtube.com/@mebook888\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;background:#c03030;color:#fff;border:none;border-radius:8px">📻 英文廣播 @mebook888</button>'+
+    '<button onclick="window.open(\'https://youtube.com/playlist?list=PLB1PuqtbwVQnYd1AOnvVARNmJGgV5K4_\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;background:#8040a0;color:#fff;border:none;border-radius:8px">🎵 音樂播放清單</button>'+
+    '<button onclick="window.open(\'https://youtube.com/channel/UCWdigI7S6VaNPs6ooIBbiwg\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;background:#2080c0;color:#fff;border:none;border-radius:8px">🔬 科普學習頻道</button></div>';
+  }
+  else if(id==='jukebox'){
+    currentChat=null;showChatInput(false);document.getElementById('phTitle').textContent='心情點歌台';
+    body.innerHTML='<div class="room-msgs" style="padding:12px"><p style="color:#c8b070;font-size:13px;margin-bottom:8px">心情 ≥80% 時角色會隨口哼唱</p>'+
+    '<button onclick="speak(\'I was a golden girl\');toast(\'♪ Golden...\')" style="width:100%;padding:8px;margin:3px 0;background:#3a3050;color:#e0d0ff;border:none;border-radius:8px">♪ Golden（獵魔女風）</button>'+
+    '<button onclick="speak(\'Work work work\');toast(\'♪ Work...\')" style="width:100%;padding:8px;margin:3px 0;background:#3a3050;color:#e0d0ff;border:none;border-radius:8px">♪ Work（ATEEZ 風）</button>'+
+    '<button onclick="speak(\'I am happy today\');toast(\'♪ Happy\')" style="width:100%;padding:8px;margin:3px 0;background:#3a3050;color:#e0d0ff;border:none;border-radius:8px">♪ 心情好時哼歌</button></div>';
+  }
+}
+
+function emmaReply(n){
+  var lines={
+    1:{me:'I will finish it soon.',en:'I will finish it soon.',them:'OK! Text me if you need help. 📚'},
+    2:{me:'Can you help me?',en:'Can you help me?',them:'Sure! Let\'s meet at the library after class.'},
+    3:{me:'Not yet, I need more time.',en:'Not yet, I need more time.',them:'No rush. You can do it! 💪'}
+  };
+  var L=lines[n];
+  speak(L.en);
+  appendBubble('me',L.me);
+  status.stars+=2;status.mood+=2;updateHUD();sfx('ok');
+  setTimeout(function(){
+    appendBubble('them',L.them);
+    setChoices([
+      {t:'Thanks! 🔊',fn:"emmaThanks()"},
+      {t:'See you later!',fn:"emmaBye()"},
+      {t:'回訊息列表',fn:"showPhoneList()"}
+    ]);
+  },700);
+}
+function emmaThanks(){
+  speak('Thanks');
+  appendBubble('me','Thanks!');
+  setTimeout(function(){appendBubble('them','Anytime 😊');setChoices([{t:'回列表',fn:'showPhoneList()'}]);},500);
+}
+function emmaBye(){
+  speak('See you later');
+  appendBubble('me','See you later!');
+  setTimeout(function(){appendBubble('them','Bye~');setChoices([{t:'回列表',fn:'showPhoneList()'}]);},500);
+}
+
+function friendsReply(n){
+  if(n===1){
+    appendBubble('me','中午可以打球！');
+    setTimeout(function(){
+      appendBubble('them','好！球場見 🏀','小傑');
+      setTimeout(function(){
+        appendBubble('them','那我中午去圖書館，你們玩開心','小雨');
+        setChoices([
+          {t:'傳貼圖 👍',fn:"sendPlainSticker('friends','👍 球場見')"},
+          {t:'回覆：一起加油',fn:"friendsMore('大家一起加油！')"},
+          {t:'回列表',fn:"showPhoneList()"}
+        ]);
+      },600);
+    },500);
+  } else if(n===2){
+    appendBubble('me','我去圖書館複習');
+    setTimeout(function(){
+      appendBubble('them','那我們一起佔位子！','小雨');
+      setTimeout(function(){
+        appendBubble('them','打完球再去找你們','小傑');
+        setChoices([
+          {t:'好啊',fn:"friendsMore('好啊，圖書館見')"},
+          {t:'傳貼圖 💪',fn:"sendPlainSticker('friends','💪')"},
+          {t:'回列表',fn:"showPhoneList()"}
+        ]);
+      },600);
+    },500);
+  } else {
+    appendBubble('me','小宇在輔導室，別擔心，他没事');
+    setTimeout(function(){
+      appendBubble('them','喔喔好，謝謝你說','阿明');
+      setTimeout(function(){
+        appendBubble('them','有你真好 💛','小雨');
+        status.stars+=3;status.mood+=4;updateHUD();toast('+3⭐ 關心同學');
+        setChoices([
+          {t:'回覆：舉手之勞',fn:"friendsMore('舉手之勞，大家互相照顧')"},
+          {t:'傳貼圖 ❤️',fn:"sendPlainSticker('friends','❤️')"},
+          {t:'回列表',fn:"showPhoneList()"}
+        ]);
+      },600);
+    },500);
+  }
+  sfx('ok');
+}
+function friendsMore(txt){
+  appendBubble('me',txt);
+  status.mood+=2;updateHUD();
+  setTimeout(function(){
+    appendBubble('them','嗯嗯！','小傑');
+    setChoices([{t:'回列表',fn:'showPhoneList()'}]);
+  },500);
+}
+
+function replyFamily(n){familyText(['早安！今天會準時回家吃飯','謝謝爸的祝福 ❤️','工作順利！'][n-1]||'早安');}
+function scamOk(){status.stars+=8;toast('正確！已封鎖檢舉 +8⭐');sfx('clap');showPhoneList()}
+function scamBad(){status.mood-=10;toast('⚠️ 這是詐騙！下次先求證');showInner('個資不能隨便填寫。')}
+function scamAsk(){status.stars+=5;toast('先問家人是好習慣 +5⭐');sfx('ok')}
+
+document.getElementById('phBack').onclick=()=>{if(document.getElementById('phTitle').textContent==='訊息')closePhone();else showPhoneList()};
+function openBag(){document.getElementById('bagPanel').classList.add('show');document.getElementById('bagList').innerHTML=`<div class="shop-item"><span>⭐ 學力星 ${status.stars}</span></div><div class="shop-item"><span>🪙 金幣 ${status.coins}</span></div><div class="shop-item"><span>☕ 手沖咖啡 ×${bag.coffee}</span></div><div class="shop-item"><span>🍊 橘子 ×${bag.orange}</span></div><div class="shop-item"><span>🍬 喉糖 ×${bag.throat}</span></div><div class="shop-item"><span>💧 水壺 ${bag.water}/5</span></div><div class="shop-item"><button onclick="openShop()">去福利小舖</button></div>`}
+function openShop(){closePanel('bagPanel');document.getElementById('shopPanel').classList.add('show');document.getElementById('shopList').innerHTML=`<div class="shop-item"><span>☕ 咖啡包 (5⭐)</span><button onclick="buy('coffee',5)">兌換</button></div><div class="shop-item"><span>🍊 橘子 (3⭐)</span><button onclick="buy('orange',3)">兌換</button></div><div class="shop-item"><span>🍬 喉糖 (2⭐)</span><button onclick="buy('throat',2)">兌換</button></div><div class="shop-item"><span>送春伯喉糖</span><button onclick="giftChunbo()">贈送</button></div><div class="shop-item"><span>送 Emma 咖啡</span><button onclick="giftEmma()">贈送</button></div>`}
+function buy(item,cost){if(status.stars<cost){toast('星星不足');return}status.stars-=cost;bag[item]=(bag[item]||0)+1;toast('獲得 '+item);sfx('ok');openShop()}
+function giftChunbo(){if(bag.throat<1){toast('沒有喉糖');return}bag.throat--;affection.chunbo+=15;toast('春伯好感 +15');sfx('ok')}
+function giftEmma(){if(bag.coffee<1){toast('沒有咖啡');return}bag.coffee--;affection.emma+=15;toast('Emma 好感 +15');sfx('ok')}
+function closePanel(id){document.getElementById(id).classList.remove('show')}
+function openEng(){document.getElementById('engPanel').classList.add('show');
+  const words=[{w:'responsibility',ph:'/rɪˌspɒnsəˈbɪləti/',zh:'責任',ex:'I take responsibility for my choices.'},{w:'empathize',ph:'/ˈempəθaɪz/',zh:'同理',ex:'We should empathize with others.'},{w:'deadline',ph:'/ˈdedlaɪn/',zh:'截止日期',ex:'The deadline is tomorrow.'},{w:'discipline',ph:'/ˈdɪsəplɪn/',zh:'自律',ex:'Discipline helps us grow.'},{w:'procrastinate',ph:'/prəˈkræstɪneɪt/',zh:'拖延',ex:'Do not procrastinate on homework.'}];
+  let html='<p style="color:#a0b070;font-size:12px;margin-bottom:8px">點單字聽發音 → 影子跟讀 → 確認（念錯可再試）</p>';
+  words.forEach((o,i)=>{html+=`<div style="margin:8px 0;padding:8px;background:#1a2030;border-radius:8px"><span class="eng-word" style="font-size:16px" onclick="speak('${o.w}')">${o.w}</span><div class="eng-hint">${o.ph}　${o.zh}</div><div style="font-size:12px;color:#c8d0e0;margin:4px 0">${o.ex}</div><button onclick="speak('${o.ex}');startShadow('${o.w}')" style="margin-top:4px;padding:4px 10px;background:#2a5080;color:#c0d8f0;border:none;border-radius:6px;font-size:12px">跟讀練習</button></div>`});
+  html+=`<button onclick="closePanel('engPanel');toast('我懂了，繼續');status.stars+=1" style="width:100%;padding:8px;margin-top:8px;background:#3a6040;color:#c0e0c0;border:none;border-radius:8px">我懂了，繼續（+1⭐）</button>`;
+  document.getElementById('engContent').innerHTML=html;
+}
+function startShadow(word){speak(word,0.75);setTimeout(()=>{showDlg('影子跟讀','請跟著念：'+word,[
+  {t:'✅ 我念對了',a:()=>{status.stars+=3;toast('掌聲！+3⭐');sfx('clap');floatNum('+3⭐')}},
+  {t:'再聽一次／再試',a:()=>{speak(word,0.7);setTimeout(()=>startShadow(word),800)}},
+  {t:'我懂了，繼續',a:()=>{status.stars+=1;toast('+1⭐')}}
+])},600)}
+function openTodo(){document.getElementById('todoPanel').classList.add('show');document.getElementById('todoList').innerHTML=`<div class="shop-item"><span>${xiaoyuState>=4?'✅':'⬜'} 小宇晤談</span></div><div class="shop-item"><span>⬜ 13:30 個案會議</span></div><div class="shop-item"><span>⬜ 回覆林老師</span></div><div class="shop-item"><span>⬜ 放學家庭常規</span></div><div class="shop-item"><span>⭐ ${status.stars}　🪙 ${status.coins}</span></div>`}
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '||e.key==='Enter')tryInteract();if(e.key==='Escape'){closeDlg();closePhone()}});
+window.addEventListener('keyup',e=>keys[e.key]=false);
+document.querySelectorAll('.dpad button').forEach(btn=>{const d=btn.dataset.d;if(!d)return;const on=e=>{e.preventDefault();touch[d]=1;initA()};const off=e=>{e.preventDefault();touch[d]=0};btn.addEventListener('touchstart',on,{passive:false});btn.addEventListener('touchend',off);btn.addEventListener('mousedown',on);btn.addEventListener('mouseup',off);btn.addEventListener('mouseleave',off)});
+document.getElementById('ctxBtn').onclick=tryInteract;
+document.getElementById('btnPhone').onclick=()=>{sfx('click');openPhone()};
+document.getElementById('btnBag').onclick=()=>{sfx('click');openBag()};
+document.getElementById('btnTodo').onclick=()=>{sfx('click');openTodo()};
+document.getElementById('btnPause').onclick=()=>{showDlg('暫停','',[
+  {t:'繼續遊戲',a:()=>{}},
+  {t:'英文練習',a:()=>openEng()},
+  {t:'福利小舖',a:()=>openShop()},
+  {t:'變裝切換',a:()=>{outfit=(outfit+1)%4;toast(['學生制服','運動服','休閒外套','正式襯衫'][outfit])}}
+])};
+document.querySelectorAll('#charGrid .sel-btn').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#charGrid .sel-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');charId=+b.dataset.c}});
+document.querySelectorAll('#outfitRow .outfit-btn').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#outfitRow .outfit-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');outfit=+b.dataset.o}});
+document.querySelectorAll('#petRow .pet-btn').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#petRow .pet-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');petEmoji=b.dataset.p}});
+document.getElementById('startGo').onclick=()=>{document.getElementById('start').style.display='none';initA();sfx('ok');
+  showInner('走廊上有人在趕作業。輔導室的冷氣又在滴水。',[{t:'繼續',a:()=>{
+    showInner('我把今天的行程攤開。上面只寫了一行：13:30 個案會議。',[{t:'開始工作',a:()=>{setTask('個案紀錄','輔導室・電腦');toast('方向鍵移動，金色鈕互動。往下走會到走廊／中庭／操場／家')}}]);
+  }}]);
+};
+initWorld();updateHUD();setTask('個案紀錄','輔導室・電腦');
+let last=performance.now();
+function loop(now){const dt=now-last;last=now;if(!dialogOpen&&!phoneOpen)update(dt);ctx.clearRect(0,0,W,H);drawWorld();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>校園生活大冒險：今天也不能倒下！</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{width:100%;height:100%;background:#0a0a10;overflow:hidden;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;justify-content:center;align-items:center}
+#wrap{position:relative;width:100%;max-width:430px;height:100%;max-height:100dvh;background:#111;box-shadow:0 0 40px #000}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;background:#1a1a24}
+#ui{position:absolute;inset:0;pointer-events:none;z-index:20}
+#ui *{pointer-events:auto}
+.hud{position:absolute;top:6px;left:6px;right:48px;display:flex;gap:5px;align-items:flex-start}
+.timebox{background:rgba(10,12,18,.9);border:1px solid #3a4558;border-radius:8px;padding:4px 9px;min-width:72px}
+.timebox .tm{font-size:17px;font-weight:700;color:#ffe066;letter-spacing:1px;line-height:1.1}
+.timebox .lc{font-size:10px;color:#c8b070;margin-top:1px}
+.bars{flex:1;background:rgba(10,12,18,.9);border:1px solid #3a4558;border-radius:8px;padding:4px 7px;display:grid;grid-template-columns:1fr 1fr;gap:2px 6px}
+.brow{display:flex;align-items:center;gap:3px;font-size:10px;color:#ddd}
+.brow .v{min-width:20px;text-align:right;font-weight:600;color:#eee}
+.trk{flex:1;height:6px;background:#1a1e28;border:1px solid #445;border-radius:3px;overflow:hidden}
+.fil{height:100%;border-radius:2px;transition:width .3s}
+.en .fil{background:linear-gradient(90deg,#e8a020,#f0c840)}
+.mo .fil{background:linear-gradient(90deg,#28a850,#48d070)}
+.wk .fil{background:linear-gradient(90deg,#3078b8,#48a8e0)}
+.to .fil{background:linear-gradient(90deg,#7850b8,#a878d8)}
+.to.warn .fil{background:linear-gradient(90deg,#c02828,#e04848);animation:bl .7s infinite}
+@keyframes bl{50%{opacity:.5}}
+.task{position:absolute;top:52px;left:6px;right:48px;background:rgba(16,26,20,.94);border:1.5px solid #c9a040;border-radius:6px;padding:5px 9px;display:flex;align-items:center;gap:7px;min-height:32px}
+.task .fg{color:#e04040;font-size:13px}
+.task .tt{font-size:12px;color:#f5f0d0;font-weight:600;line-height:1.2}
+.task .ts{font-size:10px;color:#98b888}
+.task .cd{margin-left:auto;font-size:11px;color:#e0c060}
+.side{position:absolute;top:52px;right:6px;display:flex;flex-direction:column;gap:6px}
+.sb{width:36px;height:36px;background:rgba(14,16,24,.92);border:1.5px solid #4a5568;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ddd;position:relative}
+.sb .badge{position:absolute;top:-4px;right:-4px;background:#e03030;color:#fff;font-size:9px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.ctrls{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;align-items:flex-end}
+.dpad{display:grid;grid-template-columns:36px 36px 36px;grid-template-rows:36px 36px 36px;gap:2px}
+.dpad button{width:36px;height:36px;background:rgba(30,34,44,.92);border:1.5px solid #5a6578;border-radius:8px;color:#c8d0e0;font-size:14px;font-weight:700}
+.dpad button:active{background:#3a4050;transform:scale(.92)}
+.dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .r{grid-column:3;grid-row:2}.dpad .d{grid-column:2;grid-row:3}
+.dpad .mid{grid-column:2;grid-row:2;background:transparent;border:none;pointer-events:none}
+.ctx{width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f0d060,#c89020);border:3px solid #fff8e0;box-shadow:0 4px 12px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:22px;color:#3a2800}
+.ctx:active{transform:scale(.9)}
+.dlg{position:absolute;bottom:90px;left:8px;right:8px;background:rgba(12,16,22,.96);border:1.5px solid #4a5568;border-radius:12px;padding:12px;display:none;z-index:40;max-height:48%;overflow-y:auto}
+.dlg.show{display:block}
+.dlg .who{font-size:13px;color:#70c0e8;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.dlg .who .av{width:28px;height:28px;border-radius:6px;background:#2a3040;display:flex;align-items:center;justify-content:center;font-size:14px}
+.dlg .txt{font-size:14px;color:#f0ece0;line-height:1.45;margin-bottom:8px}
+.dlg .opts{display:flex;flex-direction:column;gap:6px}
+.dlg .opt{background:rgba(30,40,52,.95);border:1px solid #4a6080;border-radius:8px;padding:8px 10px;font-size:13px;color:#e8e4d8;text-align:left;display:flex;justify-content:space-between;align-items:center;width:100%}
+.dlg .opt:active{background:#3a5068}
+.dlg .opt .cost{font-size:11px;color:#a0b0c8;white-space:nowrap;margin-left:8px}
+.dlg .inner{color:#c8b888;font-style:italic}
+.float{position:absolute;font-size:13px;font-weight:700;pointer-events:none;z-index:50;animation:up 1.2s forwards}
+@keyframes up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.toast{position:absolute;top:100px;left:50%;transform:translateX(-50%);background:rgba(20,24,32,.95);border:1px solid #5a6a80;border-radius:8px;padding:8px 14px;font-size:13px;color:#f0e8d0;z-index:60;display:none;white-space:nowrap}
+.phone{position:absolute;inset:0;background:rgba(0,0,0,.75);display:none;z-index:70;align-items:center;justify-content:center}
+.phone.show{display:flex}
+.ph-frame{width:92%;max-width:360px;height:88%;background:#1a1e28;border-radius:28px;border:3px solid #3a4050;overflow:hidden;display:flex;flex-direction:column}
+.ph-island{width:100px;height:22px;background:#0a0a10;border-radius:12px;margin:8px auto 0}
+.ph-nav{display:flex;align-items:center;padding:8px 12px;gap:8px;border-bottom:1px solid #2a3040}
+.ph-nav .back{font-size:18px;color:#60b0e0;cursor:pointer}
+.ph-nav .title{flex:1;text-align:center;font-size:15px;color:#eee;font-weight:600}
+.ph-body{flex:1;overflow-y:auto;background:#0e1218;min-height:0}
+.ph-input-bar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:#1a2332;border-top:1px solid #2a3548;flex-shrink:0}
+.ph-input-bar input{flex:1;background:#0e1520;border:1px solid #3a4560;border-radius:22px;padding:10px 14px;color:#e8eef5;font-size:15px;outline:none}
+.ph-input-bar input::placeholder{color:#6a7890}
+.ph-input-bar input:focus{border-color:#30a050}
+.ph-send-btn{width:40px;height:40px;border-radius:50%;border:none;background:#30a050;color:#fff;font-size:18px;font-weight:700;flex-shrink:0}
+.ph-send-btn:active{transform:scale(.92);background:#28a048}
+.ph-sticker-btn{width:36px;height:36px;border-radius:50%;border:none;background:#2a3548;font-size:18px;flex-shrink:0}
+.ph-sticker-panel{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#151c28;border-top:1px solid #2a3548;justify-content:center}
+.ph-sticker-panel button{width:48px;height:48px;font-size:24px;border-radius:12px;border:1px solid #3a4560;background:#1e2838}
+.ph-list .item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #1a2030;cursor:pointer}
+.ph-list .item:active{background:#1a2430}
+.ph-list .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.ph-list .info{flex:1;min-width:0}
+.ph-list .nm{font-size:14px;color:#eee;font-weight:600}
+.ph-list .pv{font-size:12px;color:#8890a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph-list .tm{font-size:11px;color:#6a7080}
+.ph-list .dot{width:8px;height:8px;background:#30c050;border-radius:50%;flex-shrink:0}
+.room-msgs{padding:10px;display:flex;flex-direction:column;gap:8px}
+.bubble{max-width:80%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.4}
+.bubble.them{background:#fff;color:#222;align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.me{background:#92e060;color:#1a2a10;align-self:flex-end;border-bottom-right-radius:4px}
+.bubble .tm{font-size:10px;color:#889;margin-top:3px}
+.elder-card{background:linear-gradient(160deg,#ffe0f0 0%,#fff5e6 40%,#e8f8e0 100%);border:3px solid #e070a0;border-radius:14px;padding:14px 10px;text-align:center;margin:6px 0;box-shadow:0 4px 0 #d06090;position:relative;overflow:hidden}
+.elder-card .sun{font-size:36px;line-height:1.2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.elder-card .msg{font-size:20px;color:#c02060;font-weight:800;margin:8px 0 4px;letter-spacing:2px;text-shadow:0 1px 0 #fff}
+.elder-card .sub{font-size:13px;color:#605040;line-height:1.5;font-weight:600}
+.elder-card.pink{background:linear-gradient(160deg,#ffd0e8,#fff0f5,#ffe8f0);border-color:#e05090}
+.elder-card.gold{background:linear-gradient(160deg,#fff3c0,#ffeaa0,#fff8e0);border-color:#e0a020}
+.elder-card.sky{background:linear-gradient(160deg,#d0f0ff,#e8f8ff,#f0fff0);border-color:#40a0d0}
+.sticker-bar{display:flex;gap:6px;padding:6px 8px;overflow-x:auto;background:#1a2030;border-top:1px solid #2a3548}
+.sticker-bar button{flex-shrink:0;width:52px;height:52px;border-radius:10px;border:2px solid #3a4560;background:#2a3040;font-size:22px;cursor:pointer}
+.sticker-bar button:active{transform:scale(.92);border-color:#e0a040}
+.room-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:280px}
+.bubble.them .name{font-size:11px;color:#8ab;margin-bottom:2px}
+.room-choices{padding:8px;display:flex;flex-direction:column;gap:6px}
+.room-choices button{background:#30a050;color:#fff;border:none;border-radius:18px;padding:9px 12px;font-size:13px;text-align:left}
+#start{position:absolute;inset:0;background:linear-gradient(180deg,#1a2030,#0e1218);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#start h1{font-size:20px;color:#f0e8c0;text-align:center;margin-bottom:4px}
+#start .sub{font-size:12px;color:#8898a8;margin-bottom:16px}
+.sel-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}
+.sel-btn{width:56px;height:56px;border-radius:12px;background:#1e2430;border:2px solid #3a4558;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;color:#ccc}
+.sel-btn.on{border-color:#e0b040;background:#2a3040;box-shadow:0 0 8px rgba(224,176,64,.4)}
+.sel-btn span{font-size:9px;color:#aab}
+.outfit-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.outfit-btn{padding:6px 10px;border-radius:8px;background:#1e2430;border:1.5px solid #3a4558;font-size:12px;color:#ccc}
+.outfit-btn.on{border-color:#60b0e0;color:#a0d8f0}
+#startGo{margin-top:10px;padding:12px 36px;background:linear-gradient(180deg,#e0b040,#c89020);border:none;border-radius:24px;font-size:16px;font-weight:700;color:#2a1a00}
+#startGo:active{transform:scale(.95)}
+.panel{position:absolute;inset:0;background:rgba(0,0,0,.8);display:none;z-index:80;align-items:center;justify-content:center}
+.panel.show{display:flex}
+.panel-box{width:90%;max-width:340px;max-height:80%;background:#161c28;border:1.5px solid #4a5568;border-radius:14px;padding:14px;overflow-y:auto}
+.panel-box h3{font-size:16px;color:#f0e0b0;margin-bottom:10px;text-align:center}
+.shop-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a3040;font-size:13px;color:#ddd}
+.shop-item button{background:#3a6a40;color:#c8e0c0;border:none;border-radius:6px;padding:4px 10px;font-size:12px}
+.eng-word{color:#4ad4ff;text-decoration:underline;cursor:pointer}
+.eng-hint{font-size:11px;color:#a0b070;margin-top:4px}
+</style>
+</head>
+<body>
+<div id="wrap">
+<canvas id="cv" width="360" height="640"></canvas>
+<div id="ui">
+  <div class="hud">
+    <div class="timebox"><div class="tm" id="hudTime">08:00</div><div class="lc" id="hudLoc">輔導室・剩 9:00</div></div>
+    <div class="bars">
+      <div class="brow en">⚡ <div class="trk"><div class="fil" id="barEn" style="width:85%"></div></div><span class="v" id="vEn">85</span></div>
+      <div class="brow mo">💚 <div class="trk"><div class="fil" id="barMo" style="width:40%"></div></div><span class="v" id="vMo">40</span></div>
+      <div class="brow wk">📄 <div class="trk"><div class="fil" id="barWk" style="width:15%"></div></div><span class="v" id="vWk">15</span></div>
+      <div class="brow to" id="toRow">🚽 <div class="trk"><div class="fil" id="barTo" style="width:20%"></div></div><span class="v" id="vTo">20</span></div>
+    </div>
+  </div>
+  <div class="task" id="taskBar"><span class="fg">⚑</span><div><div class="tt" id="taskTitle">個案紀錄</div><div class="ts" id="taskSub">輔導室・電腦</div></div><span class="cd" id="taskCd"></span></div>
+  <div class="side">
+    <div class="sb" id="btnTodo">📋</div>
+    <div class="sb" id="btnBag">🎒</div>
+    <div class="sb" id="btnPhone">📱<span class="badge" id="phBadge" style="display:none">1</span></div>
+    <div class="sb" id="btnPause">⏸</div>
+  </div>
+  <div class="ctrls">
+    <div class="dpad">
+      <button class="u" data-d="up">▲</button><div class="mid"></div>
+      <button class="l" data-d="left">◀</button>
+      <button class="r" data-d="right">▶</button>
+      <button class="d" data-d="down">▼</button>
+    </div>
+    <button class="ctx" id="ctxBtn">✋</button>
+  </div>
+  <div class="dlg" id="dlg">
+    <div class="who" id="dlgWho"><span class="av" id="dlgAv">👤</span><span id="dlgName">我</span></div>
+    <div class="txt" id="dlgTxt"></div>
+    <div class="opts" id="dlgOpts"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+<div class="phone" id="phone">
+  <div class="ph-frame">
+    <div class="ph-island"></div>
+    <div class="ph-nav"><span class="back" id="phBack">‹</span><span class="title" id="phTitle">訊息</span><span style="width:24px"></span></div>
+    <div class="ph-body" id="phBody"></div>
+    <div class="ph-input-bar" id="phInputBar" style="display:none">
+      <button type="button" class="ph-sticker-btn" id="phStickerBtn" title="貼圖">😀</button>
+      <input type="text" id="phInput" placeholder="輸入訊息…" autocomplete="off" enterkeyhint="send" />
+      <button type="button" class="ph-send-btn" id="phSendBtn">➤</button>
+    </div>
+    <div class="ph-sticker-panel" id="phStickerPanel" style="display:none">
+      <button onclick="pickSticker(0)">🌸</button>
+      <button onclick="pickSticker(1)">☀️</button>
+      <button onclick="pickSticker(2)">🌈</button>
+      <button onclick="pickSticker(3)">❤️</button>
+      <button onclick="pickSticker(4)">💪</button>
+      <button onclick="pickSticker(5)">👍</button>
+      <button onclick="pickSticker(6)">😂</button>
+      <button onclick="pickSticker(7)">🙏</button>
+    </div>
+  </div>
+</div>
+<div id="start">
+  <h1>校園生活大冒險<br>今天也不能倒下！</h1>
+  <div class="sub">選擇角色・服裝變裝・寵物可帶上學</div>
+  <div style="font-size:12px;color:#889;margin-bottom:6px">角色</div>
+  <div class="sel-row" id="charGrid">
+    <div class="sel-btn on" data-c="0">🧑<span>短髮</span></div>
+    <div class="sel-btn" data-c="1">👩<span>長髮</span></div>
+    <div class="sel-btn" data-c="2">🧔<span>老師風</span></div>
+  </div>
+  <div style="font-size:12px;color:#889;margin-bottom:6px">服裝變裝</div>
+  <div class="outfit-row" id="outfitRow">
+    <div class="outfit-btn on" data-o="0">學生制服</div>
+    <div class="outfit-btn" data-o="1">運動服</div>
+    <div class="outfit-btn" data-o="2">休閒外套</div>
+    <div class="outfit-btn" data-o="3">正式襯衫</div>
+  </div>
+  <div style="font-size:12px;color:#889;margin-bottom:6px">寵物（可帶上學）</div>
+  <div class="sel-row" id="petRow">
+    <div class="pet-btn sel-btn on" data-p="🐰">🐰<span>兔</span></div>
+    <div class="pet-btn sel-btn" data-p="🐱">🐱<span>貓</span></div>
+    <div class="pet-btn sel-btn" data-p="🐶">🐶<span>狗</span></div>
+    <div class="pet-btn sel-btn" data-p="🦔">🦔<span>刺蝟</span></div>
+    <div class="pet-btn sel-btn" data-p="🐹">🐹<span>倉鼠</span></div>
+    <div class="pet-btn sel-btn" data-p="🐊">🐊<span>鱷魚</span></div>
+    <div class="pet-btn sel-btn" data-p="🐟">🐟<span>魚</span></div>
+    <div class="pet-btn sel-btn" data-p="🦖">🦖<span>恐龍</span></div>
+  </div>
+  <button id="startGo">開始上學</button>
+</div>
+<div class="panel" id="bagPanel"><div class="panel-box"><h3>🎒 背包</h3><div id="bagList"></div><button onclick="closePanel('bagPanel')" style="margin-top:10px;width:100%;padding:8px;background:#333;color:#ccc;border:none;border-radius:8px">關閉</button></div></div>
+<div class="panel" id="shopPanel"><div class="panel-box"><h3>🛒 福利小舖</h3><div id="shopList"></div><button onclick="closePanel('shopPanel')" style="margin-top:10px;width:100%;padding:8px;background:#333;color:#ccc;border:none;border-radius:8px">關閉</button></div></div>
+<div class="panel" id="engPanel"><div class="panel-box"><h3>📚 英文影子跟讀</h3><div id="engContent"></div><button onclick="closePanel('engPanel')" style="margin-top:10px;width:100%;padding:8px;background:#333;color:#ccc;border:none;border-radius:8px">關閉</button></div></div>
+<div class="panel" id="todoPanel"><div class="panel-box"><h3>📋 今日任務</h3><div id="todoList"></div><button onclick="closePanel('todoPanel')" style="margin-top:10px;width:100%;padding:8px;background:#333;color:#ccc;border:none;border-radius:8px">關閉</button></div></div>
+</div>
+<script>
+const W=360,H=640,WORLD_H=2000;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+let status={energy:85,mood:40,work:15,toilet:20,stars:0,coins:50,time:8*60};
+let player={x:180,y:280,dir:0,frame:0,walk:0,speed:1.6};
+let camY=0,keys={},touch={};
+let charId=0,outfit=0,petEmoji='🐰',petFollow=true;
+let dialogOpen=false,phoneOpen=false,nearObj=null;
+let bag={throat:1,coffee:0,orange:0,water:3};
+let affection={chunbo:50,emma:60,mom:80,xiaoyu:0};
+let npcs=[],objs=[],zone='counsel';
+let xiaoyuState=0;
+let scenarioState={late:0,homework:0,stand:0,fight:0};
+let xiaoyu={x:180,y:620};
+let phoneUnread=1,humming=false;
+let actx=null;
+function initA(){if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)()}
+function tone(f,d,type='square',v=0.08){if(!actx)return;const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+d);o.stop(actx.currentTime+d)}
+function sfx(n){initA();if(n==='step')tone(120+Math.random()*40,0.04,'triangle',0.04);else if(n==='ok'){tone(523,0.08);setTimeout(()=>tone(659,0.1),80)}else if(n==='click')tone(400,0.03,'sine',0.05);else if(n==='clap'){tone(800,0.05);setTimeout(()=>tone(1000,0.08),50);setTimeout(()=>tone(1200,0.1),100)}else if(n==='water')tone(200,0.15,'sine',0.06);else if(n==='flush'){tone(150,0.2,'sawtooth',0.05);setTimeout(()=>tone(80,0.3,'sawtooth',0.04),150)}else if(n==='coffee'){for(let i=0;i<5;i++)setTimeout(()=>tone(100+Math.random()*50,0.04,'sawtooth',0.03),i*40)}}
+function speak(t,rate=0.85){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate;speechSynthesis.cancel();speechSynthesis.speak(u)}
+function initWorld(){
+  objs=[
+    {id:'desk',x:80,y:160,w:64,h:40,icon:'🖥️',label:'電腦'},
+    {id:'sofa',x:240,y:420,w:80,h:32,icon:'🛋️',label:'沙發'},
+    {id:'chairs',x:160,y:340,w:80,h:48,icon:'🪑',label:'會談椅'},
+    {id:'water',x:300,y:360,w:24,h:40,icon:'🚰',label:'飲水機'},
+    {id:'coffee',x:200,y:200,w:40,h:32,icon:'☕',label:'咖啡吧'},
+    {id:'toilet',x:40,y:700,w:48,h:48,icon:'🚽',label:'洗手間'},
+    {id:'board',x:200,y:620,w:48,h:32,icon:'📋',label:'公佈欄'},
+    {id:'npc_late',x:120,y:560,w:28,h:36,icon:'😰',label:'遲到的小華'},
+    {id:'npc_hw',x:280,y:680,w:28,h:36,icon:'📚',label:'沒交作業的小美'},
+    {id:'npc_stand',x:60,y:520,w:28,h:36,icon:'🧍',label:'罰站的阿哲'},
+    {id:'npc_fight1',x:150,y:780,w:28,h:36,icon:'😠',label:'吵架的小強'},
+    {id:'npc_fight2',x:190,y:780,w:28,h:36,icon:'😤',label:'吵架的小芳'},
+    {id:'tree',x:80,y:1000,w:48,h:64,icon:'🌳',label:'大樹'},
+    {id:'bench',x:200,y:1050,w:48,h:24,icon:'🪑',label:'長椅'},
+    {id:'dog',x:260,y:1100,w:32,h:24,icon:'🐕',label:'金毛'},
+    {id:'photo',x:160,y:980,w:32,h:32,icon:'📸',label:'打卡點'},
+    {id:'field',x:180,y:1550,w:80,h:60,icon:'🎾',label:'球場'},
+    {id:'piano',x:100,y:1750,w:48,h:32,icon:'🎹',label:'鋼琴'},
+    {id:'art',x:260,y:1720,w:48,h:32,icon:'🎨',label:'美術'},
+    {id:'home_door',x:180,y:1900,w:40,h:48,icon:'🏠',label:'回家'}
+  ];
+  npcs=[
+    {id:'chunbo',name:'春伯',x:120,y:750,color:'#6080a0',talk:talkChunbo},
+    {id:'emma',name:'Emma',x:220,y:1080,color:'#e080a0',talk:talkEmma},
+    {id:'teacher',name:'林老師',x:280,y:200,color:'#50a070',talk:talkTeacher}
+  ];
+}
+function drawChar(x,y,frame,isPlayer){
+  const px=Math.floor(x),py=Math.floor(y-camY);
+  const colors=[['#e8c090','#c87030'],['#f0d0a0','#e08090'],['#d0b080','#505060']];
+  const c=colors[charId]||colors[0];
+  const oc=[['#c87030','#3060a0'],['#208040','#185030'],['#406080','#304050'],['#e0e0e8','#808090']][outfit];
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(px-9,py+28,18,4);
+  ctx.fillStyle='#2a3040';
+  if(frame%2===0){ctx.fillRect(px-7,py+20,6,12);ctx.fillRect(px+1,py+20,6,12)}
+  else{ctx.fillRect(px-6,py+20,6,12);ctx.fillRect(px,py+22,6,10)}
+  ctx.fillStyle=oc[0];ctx.fillRect(px-9,py+4,18,18);
+  if(isPlayer){ctx.fillStyle='#4a6080';ctx.fillRect(px-12,py+6,5,14);ctx.fillRect(px+7,py+6,5,14)}
+  ctx.fillStyle=c[0];ctx.fillRect(px-8,py-12,16,16);
+  ctx.fillStyle=charId===1?'#3a2010':'#2a1810';
+  if(charId===1){ctx.fillRect(px-9,py-14,18,7);ctx.fillRect(px-10,py-6,4,12);ctx.fillRect(px+6,py-6,4,12)}
+  else ctx.fillRect(px-8,py-14,16,6);
+  ctx.fillStyle='#1a1010';ctx.fillRect(px-5,py-5,3,3);ctx.fillRect(px+2,py-5,3,3);
+  if(isPlayer&&petFollow){ctx.font='16px serif';ctx.fillText(petEmoji,px+14,py+10)}
+}
+
+// ===== 視覺特效粒子系統 =====
+let vParticles = [];
+let vLeaves = [];
+let vMotes = [];
+
+function initVisualFX() {
+  vLeaves = [];
+  for (let i = 0; i < 24; i++) {
+    vLeaves.push({
+      x: Math.random() * W,
+      y: 900 + Math.random() * 850,
+      vx: 0.35 + Math.random() * 0.45,
+      vy: 0.4 + Math.random() * 0.5,
+      sz: 2 + Math.random() * 2.5,
+      col: Math.random() > 0.4 ? '#f2a0b4' : '#f0ca65',
+      rot: Math.random() * 6.28
+    });
+  }
+  vMotes = [];
+  for (let i = 0; i < 22; i++) {
+    vMotes.push({
+      x: 180 + Math.random() * 160,
+      y: 80 + Math.random() * 380,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -0.2 - Math.random() * 0.25,
+      sz: 1 + Math.random() * 1.5,
+      a: 0.25 + Math.random() * 0.55
+    });
+  }
+}
+initVisualFX();
+
+function spawnFootDust(x, y) {
+  if (vParticles.length > 35) return;
+  vParticles.push({
+    x: x + (Math.random() - 0.5) * 8,
+    y: y + 26,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: -0.15 - Math.random() * 0.15,
+    sz: 2.5,
+    life: 1.0,
+    decay: 0.06,
+    col: 'rgba(220, 205, 185, 0.55)'
+  });
+}
+
+function spawnCoffeeSteam() {
+  if (Math.random() < 0.28 && vParticles.length < 50) {
+    vParticles.push({
+      x: 210 + (Math.random() - 0.5) * 6,
+      y: 195,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: -0.38 - Math.random() * 0.28,
+      sz: 2.2,
+      life: 1.0,
+      decay: 0.024,
+      col: 'rgba(250, 245, 235, 0.4)'
+    });
+  }
+}
+
+function updateVisualFX() {
+  spawnCoffeeSteam();
+  for (let i = vParticles.length - 1; i >= 0; i--) {
+    let p = vParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) vParticles.splice(i, 1);
+  }
+  vLeaves.forEach(l => {
+    l.x += l.vx;
+    l.y += l.vy;
+    l.rot += 0.04;
+    if (l.x > W + 8) l.x = -8;
+    if (l.y > 1800) l.y = 900;
+  });
+  vMotes.forEach(m => {
+    m.x += m.vx;
+    m.y += m.vy;
+    if (m.y < 70) m.y = 440;
+    if (m.x < 170) m.x = 345;
+    if (m.x > 350) m.x = 180;
+  });
+}
+
+// 陰影輔助
+function drawShadow(x, y, rx, ry) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(18, 12, 10, 0.32)';
+  ctx.beginPath();
+  ctx.ellipse(x, y - camY, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// 精緻植栽
+function drawPixelPlant(x, y) {
+  const py = y - camY;
+  // 陰影
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  ctx.beginPath(); ctx.ellipse(x+9, py+24, 8, 3.5); ctx.fill();
+  // 陶盆
+  ctx.fillStyle = '#94482a'; ctx.fillRect(x+3, py+14, 12, 10);
+  ctx.fillStyle = '#b65835'; ctx.fillRect(x+2, py+12, 14, 3);
+  ctx.fillStyle = '#682e18'; ctx.fillRect(x+4, py+22, 10, 2);
+  // 綠葉（深淺層次立體感）
+  ctx.fillStyle = '#1c542a'; ctx.fillRect(x+1, py+4, 16, 9);
+  ctx.fillStyle = '#2d7c3d'; ctx.fillRect(x+3, py+1, 12, 10);
+  ctx.fillStyle = '#48a858'; ctx.fillRect(x+5, py-1, 8, 7);
+  ctx.fillStyle = '#7cd888'; ctx.fillRect(x+6, py+1, 4, 3);
+}
+
+// 精緻幾何地毯
+function drawPixelRug(x, y, w, h) {
+  const ry = y - camY;
+  ctx.fillStyle = '#2f5a4a'; ctx.fillRect(x, ry, w, h);
+  ctx.fillStyle = '#3f705d'; ctx.fillRect(x+3, ry+3, w-6, h-6);
+  // 流蘇花邊
+  ctx.fillStyle = '#f0deb0';
+  for(let fx = x; fx < x+w; fx += 4) {
+    ctx.fillRect(fx, ry-1, 2, 2);
+    ctx.fillRect(fx, ry+h-1, 2, 2);
+  }
+  // 圖騰花紋
+  ctx.strokeStyle = '#d4b068'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(x+6, ry+6, w-12, h-12);
+  ctx.strokeRect(x+14, ry+12, w-28, h-24);
+  ctx.fillStyle = '#d4b068'; ctx.fillRect(x+w/2-4, ry+h/2-4, 8, 8);
+}
+
+// 精緻書架
+function drawPixelBookshelf(x, y, w, h) {
+  const sy = y - camY;
+  ctx.fillStyle = '#482a17'; ctx.fillRect(x, sy, w, h);
+  ctx.fillStyle = '#5c371f'; ctx.fillRect(x+2, sy+2, w-4, h-4);
+  const shelfH = 17;
+  const bookColors = ['#ad3333', '#2b62a6', '#3b8744', '#d99e28', '#8144b0', '#c9596b', '#399994'];
+  for(let row = sy+3; row < sy+h-6; row += shelfH) {
+    ctx.fillStyle = '#2e190c'; ctx.fillRect(x+2, row+shelfH-3, w-4, 3);
+    let bx = x+4;
+    let bIdx = Math.floor(row);
+    while(bx < x+w-7) {
+      let bw = 3 + (bIdx % 3);
+      let bh = 10 + (bIdx % 4);
+      let col = bookColors[(bIdx + bx) % bookColors.length];
+      ctx.fillStyle = col; ctx.fillRect(bx, row+shelfH-3-bh, bw, bh);
+      ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(bx, row+shelfH-3-bh, 1, bh);
+      bx += bw + 1;
+      bIdx++;
+    }
+  }
+}
+
+// 暖色木地板繪製
+function drawWoodFloor(topY, bottomY) {
+  const plankH = 14;
+  const plankColors = ['#865234', '#935c3b', '#7e4c2e', '#9b6341', '#8c5536'];
+  for(let py = topY; py < bottomY; py += plankH) {
+    const drawY = py - camY;
+    if (drawY < -plankH || drawY > H) continue;
+    let rowIndex = Math.floor(py / plankH);
+    let col = plankColors[rowIndex % plankColors.length];
+    ctx.fillStyle = col;
+    ctx.fillRect(0, drawY, W, plankH);
+    // 縫隙暗線
+    ctx.fillStyle = 'rgba(40, 20, 10, 0.35)';
+    ctx.fillRect(0, drawY + plankH - 1, W, 1);
+    // 木板接縫與木釘
+    let offset = (rowIndex % 3) * 38;
+    for(let px = offset; px < W; px += 76) {
+      ctx.fillRect(px, drawY, 1, plankH);
+      // 釘子
+      ctx.fillStyle = 'rgba(30, 15, 8, 0.4)';
+      ctx.fillRect(px + 3, drawY + 2, 1, 1);
+      ctx.fillRect(px + 72, drawY + plankH - 3, 1, 1);
+      ctx.fillStyle = 'rgba(40, 20, 10, 0.35)';
+    }
+  }
+}
+
+function drawWorld() {
+  updateVisualFX();
+
+  // ================= 1. 輔導室區域 (0 ~ 500) =================
+  drawWoodFloor(0, 500);
+
+  // 輔導室牆壁飾板
+  const wallH = 46;
+  ctx.fillStyle = '#613c24'; ctx.fillRect(0, -camY, W, wallH);
+  ctx.fillStyle = '#73472c';
+  for(let wx = 0; wx < W; wx += 24) {
+    ctx.fillRect(wx + 2, -camY + 2, 20, wallH - 4);
+  }
+  ctx.fillStyle = '#422514'; ctx.fillRect(0, wallH - 2 - camY, W, 3); // 踢腳線
+
+  // 右側大落地窗（暖陽光照）
+  const winX = 265, winY = 4 - camY, winW = 85, winH = 38;
+  ctx.fillStyle = '#ffeed0'; ctx.fillRect(winX, winY, winW, winH);
+  ctx.fillStyle = '#ffe09e'; ctx.fillRect(winX + 3, winY + 3, winW - 6, winH - 6);
+  // 窗框
+  ctx.fillStyle = '#613c24';
+  ctx.fillRect(winX, winY, winW, 2); ctx.fillRect(winX, winY + winH - 2, winW, 2);
+  ctx.fillRect(winX, winY, 2, winH); ctx.fillRect(winX + winW - 2, winY, 2, winH);
+  ctx.fillRect(winX + winW/2 - 1, winY, 2, winH); // 窗櫺
+
+  // 牆面掛畫與佈告板
+  ctx.fillStyle = '#caa572'; ctx.fillRect(16, 8 - camY, 32, 28);
+  ctx.fillStyle = '#f8f4ec'; ctx.fillRect(18, 10 - camY, 28, 24);
+  ctx.fillStyle = '#4a90c0'; ctx.fillRect(20, 12 - camY, 24, 12); // 風景海報天空
+  ctx.fillStyle = '#50a040'; ctx.fillRect(20, 22 - camY, 24, 6);  // 草地
+
+  // 佈告欄
+  ctx.fillStyle = '#b08450'; ctx.fillRect(56, 8 - camY, 40, 28);
+  ctx.fillStyle = '#d8ba82'; ctx.fillRect(58, 10 - camY, 36, 24);
+  ctx.fillStyle = '#fff'; ctx.fillRect(62, 14 - camY, 10, 14); // 便條紙
+  ctx.fillStyle = '#ffef99'; ctx.fillRect(76, 14 - camY, 12, 10);
+
+  // 精緻書架
+  drawPixelBookshelf(25, 95, 38, 58);
+  drawPixelBookshelf(295, 95, 42, 58);
+
+  // 辦公電腦桌與設備 (x: 80, y: 160)
+  drawShadow(110, 185, 38, 10);
+  ctx.fillStyle = '#583620'; ctx.fillRect(70, 150 - camY, 75, 36);
+  ctx.fillStyle = '#7a4e30'; ctx.fillRect(72, 152 - camY, 71, 32);
+  // 桌上文件
+  ctx.fillStyle = '#fdfcf9'; ctx.fillRect(80, 158 - camY, 16, 12);
+  ctx.fillStyle = '#f4eedd'; ctx.fillRect(86, 162 - camY, 14, 12);
+  // 電腦螢幕與微光
+  ctx.fillStyle = '#22262c'; ctx.fillRect(112, 144 - camY, 24, 18);
+  ctx.fillStyle = '#3a8cc8'; ctx.fillRect(114, 146 - camY, 20, 14);
+  ctx.fillStyle = '#70c5ff'; ctx.fillRect(116, 148 - camY, 16, 4); // 螢幕發光線
+  ctx.fillStyle = '#1c1f24'; ctx.fillRect(122, 162 - camY, 4, 6); ctx.fillRect(118, 168 - camY, 12, 2);
+
+  // 手沖咖啡吧 (x: 200, y: 200)
+  drawShadow(216, 218, 22, 8);
+  ctx.fillStyle = '#52341f'; ctx.fillRect(195, 195 - camY, 44, 28);
+  ctx.fillStyle = '#70462b'; ctx.fillRect(197, 197 - camY, 40, 24);
+  // 咖啡機本體
+  ctx.fillStyle = '#1e1e24'; ctx.fillRect(205, 185 - camY, 16, 16);
+  ctx.fillStyle = '#caa472'; ctx.fillRect(208, 193 - camY, 10, 7); // 咖啡壺玻璃
+  ctx.fillStyle = '#42220f'; ctx.fillRect(209, 196 - camY, 8, 4);  // 咖啡液
+
+  // 飲水機 (x: 300, y: 360)
+  drawShadow(312, 385, 14, 6);
+  ctx.fillStyle = '#e2e7ec'; ctx.fillRect(302, 348 - camY, 20, 38);
+  ctx.fillStyle = '#cad3dc'; ctx.fillRect(304, 350 - camY, 16, 34);
+  // 水桶（透亮水藍色）
+  ctx.fillStyle = '#58a8e0'; ctx.fillRect(305, 335 - camY, 14, 15);
+  ctx.fillStyle = '#8bd0ff'; ctx.fillRect(307, 337 - camY, 4, 11);
+  // 出水口
+  ctx.fillStyle = '#c03434'; ctx.fillRect(307, 362 - camY, 3, 4); // 熱水
+  ctx.fillStyle = '#347ac0'; ctx.fillRect(314, 362 - camY, 3, 4); // 溫冷水
+
+  // 會談區地毯 (Patterned Rug)
+  drawPixelRug(135, 310, 170, 95);
+
+  // 長沙發 (x: 240, y: 420)
+  drawShadow(275, 438, 40, 10);
+  ctx.fillStyle = '#4a7266'; ctx.fillRect(235, 412 - camY, 80, 28);
+  ctx.fillStyle = '#659487'; ctx.fillRect(238, 414 - camY, 74, 22);
+  ctx.fillStyle = '#7baaa0'; ctx.fillRect(242, 417 - camY, 32, 16); ctx.fillRect(276, 417 - camY, 32, 16); // 坐墊
+  // 抱枕
+  ctx.fillStyle = '#d48858'; ctx.fillRect(240, 418 - camY, 10, 12);
+  ctx.fillStyle = '#e8a87a'; ctx.fillRect(242, 420 - camY, 6, 8);
+
+  // 晤談單人椅 (兩張)
+  drawShadow(160, 365, 14, 7);
+  ctx.fillStyle = '#5a3d28'; ctx.fillRect(150, 338 - camY, 20, 24);
+  ctx.fillStyle = '#845c3e'; ctx.fillRect(152, 340 - camY, 16, 16);
+  ctx.fillStyle = '#e0cfb8'; ctx.fillRect(153, 342 - camY, 14, 12); // 米色坐墊
+
+  drawShadow(210, 365, 14, 7);
+  ctx.fillStyle = '#5a3d28'; ctx.fillRect(200, 338 - camY, 20, 24);
+  ctx.fillStyle = '#845c3e'; ctx.fillRect(202, 340 - camY, 16, 16);
+  ctx.fillStyle = '#e0cfb8'; ctx.fillRect(203, 342 - camY, 14, 12);
+
+  // 茶几
+  drawShadow(185, 358, 20, 8);
+  ctx.fillStyle = '#6a472c'; ctx.fillRect(174, 344 - camY, 24, 14);
+  ctx.fillStyle = '#8a5e3d'; ctx.fillRect(175, 345 - camY, 22, 11);
+
+  // 多處室內盆栽點綴
+  drawPixelPlant(20, 175);
+  drawPixelPlant(275, 80);
+  drawPixelPlant(28, 430);
+  drawPixelPlant(325, 430);
+
+  // 門檻分界
+  ctx.fillStyle = '#3a2215'; ctx.fillRect(0, 488 - camY, W, 12);
+  ctx.fillStyle = '#9e734a'; ctx.fillRect(0, 492 - camY, W, 4);
+
+  // ================= 2. 走廊區域 (500 ~ 900) =================
+  ctx.fillStyle = '#a6b8a2'; ctx.fillRect(0, 500 - camY, W, 400);
+  // 水磨石地板格紋
+  ctx.strokeStyle = 'rgba(70, 95, 75, 0.22)';
+  for(let gy = 500; gy < 900; gy += 20) {
+    let dy = gy - camY;
+    ctx.beginPath(); ctx.moveTo(0, dy); ctx.lineTo(W, dy); ctx.stroke();
+  }
+  for(let gx = 0; gx < W; gx += 20) {
+    ctx.beginPath(); ctx.moveTo(gx, 500 - camY); ctx.lineTo(gx, 900 - camY); ctx.stroke();
+  }
+
+  // 洗手間門 (x: 40, y: 700)
+  drawShadow(64, 735, 22, 6);
+  ctx.fillStyle = '#4c6278'; ctx.fillRect(40, 695 - camY, 48, 44);
+  ctx.fillStyle = '#657e96'; ctx.fillRect(44, 699 - camY, 40, 38);
+  ctx.fillStyle = '#f0f4f8'; ctx.fillRect(58, 706 - camY, 12, 12); // 男/女廁標誌
+  ctx.fillStyle = '#2060b0'; ctx.fillRect(60, 708 - camY, 8, 8);
+
+  // 走廊大公佈欄 (x: 200, y: 620)
+  ctx.fillStyle = '#63442a'; ctx.fillRect(180, 615 - camY, 68, 38);
+  ctx.fillStyle = '#b8905a'; ctx.fillRect(182, 617 - camY, 64, 34);
+  ctx.fillStyle = '#fff8e2'; ctx.fillRect(188, 622 - camY, 18, 14); // 獎狀
+  ctx.fillStyle = '#ffe0e0'; ctx.fillRect(212, 624 - camY, 16, 12);
+  ctx.fillStyle = '#e2f0ff'; ctx.fillRect(194, 638 - camY, 24, 10);
+
+  // 班級門牌與走廊窗戶
+  for(let cx = 100; cx < W; cx += 110) {
+    ctx.fillStyle = '#4a3220'; ctx.fillRect(cx, 510 - camY, 28, 36);
+    ctx.fillStyle = '#6b4932'; ctx.fillRect(cx+2, 512 - camY, 24, 32);
+    ctx.fillStyle = '#e8d89a'; ctx.fillRect(cx+4, 515 - camY, 20, 8); // 8年3班
+  }
+
+  // ================= 3. 中庭花園與大樹 (900 ~ 1400) =================
+  ctx.fillStyle = '#4e8d42'; ctx.fillRect(0, 900 - camY, W, 500);
+  // 石磚人行步道
+  ctx.fillStyle = '#b89c7c'; ctx.fillRect(115, 930 - camY, 130, 440);
+  ctx.fillStyle = '#caa988';
+  for(let py = 930; py < 1370; py += 16) {
+    for(let px = 115; px < 240; px += 26) {
+      ctx.fillRect(px + ((Math.floor(py/16)%2)*13), py - camY, 24, 14);
+    }
+  }
+
+  // 大樹 (x: 80, y: 1000)
+  drawShadow(100, 1055, 30, 10);
+  ctx.fillStyle = '#4e3321'; ctx.fillRect(94, 980 - camY, 14, 70); // 樹幹
+  // 樹冠多層次像素綠
+  ctx.fillStyle = '#1c5e26'; ctx.beginPath(); ctx.arc(101, 970 - camY, 38, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2d7c38'; ctx.beginPath(); ctx.arc(97, 960 - camY, 32, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#48a855'; ctx.beginPath(); ctx.arc(105, 955 - camY, 26, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#78cf84'; ctx.beginPath(); ctx.arc(102, 950 - camY, 14, 0, Math.PI*2); ctx.fill();
+
+  // 木休閒長椅 (x: 200, y: 1050)
+  drawShadow(224, 1068, 26, 6);
+  ctx.fillStyle = '#4a2f1b'; ctx.fillRect(198, 1045 - camY, 52, 22);
+  ctx.fillStyle = '#845735'; ctx.fillRect(200, 1047 - camY, 48, 8); // 椅背
+  ctx.fillStyle = '#9b6840'; ctx.fillRect(200, 1057 - camY, 48, 7); // 椅面
+
+  // 金毛犬 (x: 260, y: 1100)
+  drawShadow(276, 1118, 16, 6);
+  ctx.fillStyle = '#de9a38'; ctx.fillRect(264, 1102 - camY, 24, 14); // 身體
+  ctx.fillStyle = '#f0b04c'; ctx.fillRect(280, 1096 - camY, 12, 12); // 頭
+  ctx.fillStyle = '#c87e22'; ctx.fillRect(278, 1102 - camY, 5, 8);  // 耳朵
+  ctx.fillStyle = '#222'; ctx.fillRect(288, 1100 - camY, 3, 3); // 眼睛與鼻子
+
+  // ================= 4. 操場與教室 (1400 ~ 1800) =================
+  ctx.fillStyle = '#3f7c32'; ctx.fillRect(0, 1400 - camY, W, 400);
+  // 紅色 PU 跑道
+  ctx.fillStyle = '#b83b32'; ctx.fillRect(30, 1440 - camY, 300, 16);
+  ctx.fillStyle = '#d4493f'; ctx.fillRect(30, 1442 - camY, 300, 12);
+  ctx.fillStyle = '#fff';
+  for(let rx = 35; rx < 330; rx += 30) ctx.fillRect(rx, 1447 - camY, 14, 2); // 分道白線
+
+  // 網球/羽球場 (x: 180, y: 1550)
+  ctx.fillStyle = '#2b6f52'; ctx.fillRect(135, 1520 - camY, 90, 60);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.strokeRect(140, 1525 - camY, 80, 50);
+
+  // 鋼琴與美術教室 (1700 ~ 1800)
+  drawShadow(124, 1775, 24, 7);
+  ctx.fillStyle = '#18181c'; ctx.fillRect(100, 1745 - camY, 48, 28);
+  ctx.fillStyle = '#fff'; ctx.fillRect(104, 1765 - camY, 40, 6); // 琴鍵
+  ctx.fillStyle = '#000';
+  for(let k = 107; k < 140; k += 5) ctx.fillRect(k, 1765 - camY, 3, 4);
+
+  // 美術畫架 (x: 260, y: 1720)
+  drawShadow(284, 1745, 16, 5);
+  ctx.fillStyle = '#8a5c36'; ctx.fillRect(282, 1715 - camY, 4, 30);
+  ctx.fillStyle = '#fff8e8'; ctx.fillRect(268, 1718 - camY, 28, 20); // 畫布
+  ctx.fillStyle = '#d44238'; ctx.fillRect(272, 1722 - camY, 8, 8);  // 顏料筆觸
+  ctx.fillStyle = '#2c78c8'; ctx.fillRect(282, 1726 - camY, 10, 6);
+
+  // ================= 5. 家裡溫馨客廳 (1800 ~ 2000) =================
+  drawWoodFloor(1800, 2000);
+  ctx.fillStyle = '#4a2f1b'; ctx.fillRect(0, 1800 - camY, W, 10); // 門口地墊
+
+  // ================= 6. 角色、NPC 與小宇繪製 =================
+  // NPCs
+  npcs.forEach(n => {
+    const ny = n.y - camY;
+    if (ny > -40 && ny < H + 40) {
+      drawShadow(n.x, n.y + 26, 10, 4);
+      ctx.fillStyle = n.color; ctx.fillRect(n.x - 9, ny, 18, 26);
+      ctx.fillStyle = '#e8c090'; ctx.fillRect(n.x - 7, ny - 12, 14, 14);
+      ctx.fillStyle = '#1a1008'; ctx.fillRect(n.x - 8, ny - 14, 16, 5);
+      // 名稱標籤
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(n.x - 18, ny - 28, 36, 13);
+      ctx.fillStyle = '#ffe080'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(n.name, n.x, ny - 18);
+      ctx.textAlign = 'left';
+    }
+  });
+
+  // 小宇
+  if (xiaoyuState >= 1) {
+    const xy = xiaoyu.y - camY;
+    drawShadow(xiaoyu.x, xiaoyu.y + 26, 10, 4);
+    ctx.fillStyle = '#2a4060'; ctx.fillRect(xiaoyu.x - 9, xy, 18, 26);
+    ctx.fillStyle = '#e8c090'; ctx.fillRect(xiaoyu.x - 7, xy - 12, 14, 14);
+    ctx.fillStyle = '#1a2030'; ctx.fillRect(xiaoyu.x - 8, xy - 14, 16, 6);
+    if (xiaoyuState >= 2) {
+      ctx.fillStyle = '#a05030'; ctx.fillRect(xiaoyu.x - 11, xy + 10, 22, 18);
+    }
+    // 小宇名牌
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(xiaoyu.x - 18, xy - 28, 36, 13);
+    ctx.fillStyle = '#70c8ff'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('小宇', xiaoyu.x, xy - 18);
+    ctx.textAlign = 'left';
+  }
+
+  // 玩家腳印粉塵粒子
+  vParticles.forEach(p => {
+    ctx.fillStyle = p.col;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - camY, p.sz * p.life, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 玩家
+  drawShadow(player.x, player.y + 26, 10, 4.5);
+  drawChar(player.x, player.y, player.frame, true);
+
+  // 中庭漂浮落葉與花瓣
+  vLeaves.forEach(l => {
+    const ly = l.y - camY;
+    if (ly > -10 && ly < H + 10) {
+      ctx.save();
+      ctx.translate(l.x, ly);
+      ctx.rotate(l.rot);
+      ctx.fillStyle = l.col;
+      ctx.fillRect(-l.sz/2, -l.sz/2, l.sz, l.sz * 1.5);
+      ctx.restore();
+    }
+  });
+
+  // ================= 7. 光影層（斜射窗光 + 灰塵微粒） =================
+  if (player.y < 650) {
+    ctx.save();
+    // 窗戶斜射進來的溫暖光柱 (God Rays)
+    const rayGrad = ctx.createLinearGradient(270, 0 - camY, 150, 420 - camY);
+    rayGrad.addColorStop(0, 'rgba(255, 230, 160, 0.28)');
+    rayGrad.addColorStop(0.5, 'rgba(255, 215, 130, 0.16)');
+    rayGrad.addColorStop(1, 'rgba(255, 200, 110, 0.0)');
+
+    ctx.fillStyle = rayGrad;
+    ctx.beginPath();
+    ctx.moveTo(260, 15 - camY);
+    ctx.lineTo(348, 15 - camY);
+    ctx.lineTo(260, 440 - camY);
+    ctx.lineTo(130, 440 - camY);
+    ctx.closePath();
+    ctx.fill();
+
+    // 光柱中的金黃微塵
+    vMotes.forEach(m => {
+      const my = m.y - camY;
+      if (my > 0 && my < H) {
+        ctx.fillStyle = `rgba(255, 245, 210, ${m.a})`;
+        ctx.beginPath();
+        ctx.arc(m.x, my, m.sz, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  // ================= 8. 電影感柔和暗角 (Cinematic Vignette) =================
+  const vigGrad = ctx.createRadialGradient(W/2, H/2, H*0.35, W/2, H/2, H*0.7);
+  vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0.0)');
+  vigGrad.addColorStop(1, 'rgba(10, 8, 16, 0.42)');
+  ctx.fillStyle = vigGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 區域指示標籤
+  ctx.fillStyle = 'rgba(14, 18, 24, 0.75)';
+  ctx.strokeStyle = '#4a5568'; ctx.lineWidth = 1;
+  ctx.strokeRect(W/2 - 42, H - 30, 84, 18);
+  ctx.fillRect(W/2 - 42, H - 30, 84, 18);
+  ctx.fillStyle = '#f0e6c8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText({counsel:'輔導室',corridor:'走廊',yard:'中庭花園',field:'運動操場',home:'溫馨的家'}[zone]||'', W/2, H - 17);
+  ctx.textAlign = 'left';
+}
+function getZone(y){if(y<500)return 'counsel';if(y<900)return 'corridor';if(y<1400)return 'yard';if(y<1800)return 'field';return 'home'}
+function update(dt){
+  let mx=0,my=0;
+  if(keys['ArrowUp']||keys['w']||touch.up)my=-1;
+  if(keys['ArrowDown']||keys['s']||touch.down)my=1;
+  if(keys['ArrowLeft']||keys['a']||touch.left)mx=-1;
+  if(keys['ArrowRight']||keys['d']||touch.right)mx=1;
+  if(mx||my){player.x+=mx*player.speed;player.y+=my*player.speed;player.x=Math.max(20,Math.min(W-20,player.x));player.y=Math.max(60,Math.min(WORLD_H-40,player.y));player.walk+=0.15;player.frame=Math.floor(player.walk)%2;if(Math.random()<0.08)sfx('step');spawnFootDust(player.x, player.y);status.toilet=Math.min(100,status.toilet+0.02);status.energy=Math.max(0,status.energy-0.005)}
   camY=player.y-H*0.45;camY=Math.max(0,Math.min(WORLD_H-H,camY));zone=getZone(player.y);status.time+=dt/60000*0.4;
   if(xiaoyuState===0&&status.time>8*60+4){xiaoyuState=1;toast('小宇往輔導室走來了。');setTask('小宇不想回教室','輔導室');phoneUnread=2;updateBadge()}
   if(xiaoyuState===1){xiaoyu.y-=0.9;if(xiaoyu.y<=380){xiaoyu.y=380;xiaoyuState=2;toast('先坐一下。')}}
