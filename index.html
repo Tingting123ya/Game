@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>校園生活大冒險：自定義角色與天災生活事件版</title>
+<title>校園生活大冒險：大師旗艦完整版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html,body{width:100%;height:100%;background:#060403;overflow:hidden;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;justify-content:center;align-items:center}
@@ -26,44 +26,72 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 .brow{display:flex;align-items:center;gap:3px;font-size:10px;color:#eee}
 .brow .v{min-width:18px;text-align:right;font-weight:700;color:#f0f0f0}
 .trk{flex:1;height:6px;background:#14100d;border:1px solid #4a3424;border-radius:3px;overflow:hidden}
-.fil{height:100%;border-radius:2px}
+.fil{height:100%;border-radius:2px;transition:width .25s}
+.en .fil{background:linear-gradient(90deg,#f09819,#edde5d)}
+.mo .fil{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.wk .fil{background:linear-gradient(90deg,#2193b0,#6dd5ed)}
+.to .fil{background:linear-gradient(90deg,#8e2de2,#4a00e0)}
+
+.task{position:absolute;top:52px;left:6px;right:48px;background:rgba(26,16,10,.96);border:1.5px solid #b8860b;border-radius:10px;padding:5px 9px;display:flex;flex-direction:column;gap:3px;pointer-events:auto;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.task-row{display:flex;align-items:center;gap:6px}
+.task .fg{color:#e84118;font-size:13px}
+.task .tt{font-size:12px;color:#fff2d6;font-weight:800;line-height:1.2}
+.task .ts{font-size:10px;color:#a8c49e}
+.task .task-pct{margin-left:auto;font-size:11px;font-weight:900;color:#ffd152}
+.runner-track{position:relative;width:100%;height:7px;background:#140e0c;border:1px solid #5a3c26;border-radius:4px;margin-top:2px}
+.runner-fill{height:100%;background:linear-gradient(90deg,#e67e22,#f1c40f);border-radius:3px;transition:width 0.4s ease}
+.runner-person{position:absolute;top:-8px;font-size:13px;transform:translateX(-50%);transition:left 0.4s ease}
+.runner-flag{position:absolute;right:-4px;top:-7px;font-size:12px}
+
+.side{position:absolute;top:54px;right:6px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
+.sb{width:36px;height:36px;background:rgba(30,20,14,.95);border:1.5px solid #845e3c;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#f5eedc;box-shadow:0 3px 8px rgba(0,0,0,.5);cursor:pointer}
+.sb:active{transform:scale(.92);background:#4a3220}
 
 .quick-tools{position:absolute;top:98px;left:6px;right:6px;display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;pointer-events:auto}
 .quick-btn{flex-shrink:0;padding:4px 9px;border-radius:14px;border:1.5px solid #555;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);white-space:nowrap}
-.qb-typhoon{background:linear-gradient(135deg,#c0392b,#e74c3c);border-color:#ff7675}
-.qb-earthquake{background:linear-gradient(135deg,#d35400,#e67e22);border-color:#f39c12}
+.qb-room1{background:linear-gradient(135deg,#e67e22,#d35400);border-color:#f39c12}
+.qb-room2{background:linear-gradient(135deg,#e74c3c,#c0392b);border-color:#ff7675}
+.qb-room3{background:linear-gradient(135deg,#8e44ad,#9b59b6);border-color:#be2edd}
+.qb-room4{background:linear-gradient(135deg,#2980b9,#1f618d);border-color:#5dade2}
+.qb-room5{background:linear-gradient(135deg,#27ae60,#2ecc71);border-color:#2ecc71}
 
 .ctrls{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;align-items:flex-end;pointer-events:none}
 .dpad{display:grid;grid-template-columns:40px 40px 40px;grid-template-rows:40px 40px 40px;gap:3px;pointer-events:auto}
-.dpad button{width:40px;height:40px;background:rgba(36,24,16,.94);border:2px solid #845e3c;border-radius:9px;color:#f5eedc;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.dpad button{width:40px;height:40px;background:rgba(36,24,16,.94);border:2px solid #845e3c;border-radius:9px;color:#f5eedc;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none}
+.dpad button:active,.dpad button.active{background:#b8860b;color:#1a1005;transform:scale(.92);border-color:#ffd700}
 .dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .r{grid-column:3;grid-row:2}.dpad .d{grid-column:2;grid-row:3}
 .dpad .mid{grid-column:2;grid-row:2;background:transparent;border:none;pointer-events:none}
 .ctx{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd700,#b8860b);border:3px solid #fff5cc;box-shadow:0 4px 18px rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;font-size:25px;color:#2a1a05;cursor:pointer;pointer-events:auto}
+.ctx:active{transform:scale(.9)}
 
-.dlg{position:absolute;bottom:88px;left:8px;right:8px;background:rgba(22,14,10,.98);border:2px solid #845e3c;border-radius:14px;padding:12px;display:none;z-index:40;max-height:55%;overflow-y:auto;pointer-events:auto}
+.dlg{position:absolute;bottom:88px;left:8px;right:8px;background:rgba(22,14,10,.98);border:2px solid #845e3c;border-radius:14px;padding:12px;display:none;z-index:40;max-height:55%;overflow-y:auto;pointer-events:auto;box-shadow:0 8px 25px rgba(0,0,0,.85)}
 .dlg.show{display:block}
-.dlg .who{font-size:13px;color:#70c0e8;font-weight:800;margin-bottom:5px}
+.dlg .who{font-size:13px;color:#70c0e8;font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:6px}
 .dlg .txt{font-size:13px;color:#f8f5ee;line-height:1.55;margin-bottom:8px}
 .dlg .opts{display:flex;flex-direction:column;gap:6px}
-.dlg .opt{background:rgba(44,30,20,.95);border:1.5px solid #845e3c;border-radius:8px;padding:8px 11px;font-size:12px;color:#f5eedc;text-align:left;cursor:pointer}
-.toast{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:rgba(28,18,12,.96);border:1.5px solid #b8860b;border-radius:10px;padding:7px 15px;font-size:12px;color:#ffd152;z-index:60;display:none}
+.dlg .opt{background:rgba(44,30,20,.95);border:1.5px solid #845e3c;border-radius:8px;padding:8px 11px;font-size:12px;color:#f5eedc;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.dlg .opt:active{background:#b8860b;color:#111;border-color:#ffd700}
+.toast{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:rgba(28,18,12,.96);border:1.5px solid #b8860b;border-radius:10px;padding:7px 15px;font-size:12px;color:#ffd152;z-index:60;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.7)}
 
 #start{position:absolute;inset:0;background:linear-gradient(180deg,#24160e,#0e0805);z-index:100;display:flex;flex-direction:column;align-items:center;padding:16px;overflow-y:auto;pointer-events:auto}
-#start h1{font-size:20px;color:#ffd152;text-align:center;margin-bottom:2px}
+#start h1{font-size:20px;color:#ffd152;text-align:center;margin-bottom:2px;text-shadow:0 2px 4px rgba(0,0,0,.8)}
 #start .sub{font-size:11px;color:#c8b090;margin-bottom:10px;text-align:center}
+
 .custom-card{width:100%;max-width:320px;background:#1e1410;border:1.5px solid #845e3c;border-radius:12px;padding:10px;margin-bottom:8px}
 .custom-title{font-size:12px;color:#ffd152;font-weight:800;margin-bottom:6px;text-align:center}
 .custom-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:#f5eedc}
-.custom-select{background:#2c1c14;color:#ffd152;border:1px solid #5a3c26;border-radius:5px;padding:3px 6px;font-weight:700}
-#startGo{margin-top:8px;padding:10px 36px;background:linear-gradient(180deg,#ffd700,#b8860b);border:none;border-radius:22px;font-size:15px;font-weight:900;color:#2a1805;cursor:pointer}
+.custom-select{background:#2c1c14;color:#ffd152;border:1px solid #5a3c26;border-radius:5px;padding:3px 6px;font-weight:700;font-size:11px}
+#startGo{margin-top:8px;padding:10px 36px;background:linear-gradient(180deg,#ffd700,#b8860b);border:none;border-radius:22px;font-size:15px;font-weight:900;color:#2a1805;box-shadow:0 4px 14px rgba(0,0,0,.6);cursor:pointer}
 </style>
 </head>
 <body>
 <div id="wrap">
 <canvas id="cv" width="360" height="640"></canvas>
+<div class="touch-indicator" id="tInd"></div>
+
 <div id="ui">
   <div class="hud">
-    <div class="timebox" id="timeBox">
+    <div class="timebox" id="timeBox" onclick="cycleWeekday()">
       <div class="day-tag" id="hudDay">週一 平日</div>
       <div class="tm" id="hudTime">08:00</div>
       <div class="lc" id="hudLoc">原木輔導室</div>
@@ -76,12 +104,39 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
     <div class="bars">
       <div class="brow en">⚡ <div class="trk"><div class="fil" id="barEn" style="width:85%"></div></div><span class="v" id="vEn">85</span></div>
       <div class="brow mo">💚 <div class="trk"><div class="fil" id="barMo" style="width:75%"></div></div><span class="v" id="vMo">75</span></div>
+      <div class="brow wk">📄 <div class="trk"><div class="fil" id="barWk" style="width:25%"></div></div><span class="v" id="vWk">25</span></div>
+      <div class="brow to" id="toRow">🚽 <div class="trk"><div class="fil" id="barTo" style="width:20%"></div></div><span class="v" id="vTo">20</span></div>
     </div>
   </div>
 
+  <div class="task" id="taskBar">
+    <div class="task-row">
+      <span class="fg">🚩</span>
+      <div>
+        <div class="tt" id="taskTitle">校園生活自律與時事觀察</div>
+        <div class="ts" id="taskSub">自由探索多重房間與長輩守護者</div>
+      </div>
+      <div class="task-pct" id="taskPct">25%</div>
+    </div>
+    <div class="runner-track">
+      <div class="runner-fill" id="runnerFill" style="width:25%"></div>
+      <div class="runner-person" id="runnerPerson" style="left:25%">🏃</div>
+      <div class="runner-flag">🏁</div>
+    </div>
+  </div>
+
+  <!-- 多房間與天災快捷切換 -->
   <div class="quick-tools">
-    <div class="quick-btn qb-typhoon" onclick="triggerTyphoonEvent()">🌀 颱風警報</div>
-    <div class="quick-btn qb-earthquake" onclick="triggerEarthquakeEvent()">⚡ 地震避難</div>
+    <div class="quick-btn qb-room1" onclick="switchRoom('counsel')">🛋️ 輔導室</div>
+    <div class="quick-btn qb-room2" onclick="switchRoom('clinic')">🏥 醫務室</div>
+    <div class="quick-btn qb-room3" onclick="switchRoom('corridor')">🏫 走廊</div>
+    <div class="quick-btn qb-room4" onclick="switchRoom('courtyard')">🌳 中庭</div>
+    <div class="quick-btn qb-room5" onclick="switchRoom('gate')">🚪 警衛室</div>
+  </div>
+
+  <div class="side">
+    <div class="sb" onclick="triggerTyphoonEvent()" title="颱風警報">🌀</div>
+    <div class="sb" onclick="triggerEarthquakeEvent()" title="地震避難">⚡</div>
   </div>
 
   <div class="ctrls">
@@ -95,7 +150,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
   </div>
 
   <div class="dlg" id="dlg">
-    <div class="who" id="dlgWho">系統</div>
+    <div class="who" id="dlgWho"><span class="av" id="dlgAv">👤</span><span id="dlgName">系統</span></div>
     <div class="txt" id="dlgTxt"></div>
     <div class="opts" id="dlgOpts"></div>
   </div>
@@ -103,20 +158,37 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 </div>
 
 <div id="start">
-  <h1>校園生活大冒險</h1>
-  <div class="sub">自定義角色與天災生活事件</div>
+  <h1>校園生活大冒險<br>大師旗艦完整版</h1>
+  <div class="sub">自定義角色・4大獨立房間・長輩守護者・天災時事</div>
+  
   <div class="custom-card">
-    <div class="custom-title">🎨 角色外觀設定</div>
+    <div class="custom-title">🎨 自定義角色外觀</div>
     <div class="custom-row">
       <span>性別：</span>
-      <select id="selGender" class="custom-select"><option value="girl">女生</option><option value="boy">男生</option></select>
+      <select id="selGender" class="custom-select"><option value="girl">女生 👧</option><option value="boy">男生 👦</option></select>
     </div>
     <div class="custom-row">
       <span>髮型：</span>
-      <select id="selHair" class="custom-select"><option value="bob">短髮</option><option value="twintail">雙馬尾</option></select>
+      <select id="selHair" class="custom-select"><option value="bob">焦糖短髮</option><option value="twintail">雙馬尾</option><option value="short">俐落短髮</option></select>
+    </div>
+    <div class="custom-row">
+      <span>服裝：</span>
+      <select id="selOutfit" class="custom-select"><option value="uniform">水手制服</option><option value="sport">體育服</option><option value="jacket">學院夾克</option></select>
     </div>
   </div>
-  <button id="startGo">進入遊戲</button>
+
+  <div class="custom-card">
+    <div class="custom-title">🎂 親友生日設定</div>
+    <div class="custom-row">
+      <span>你的生日：</span>
+      <div style="display:flex;gap:3px">
+        <input type="number" id="inBirthM" value="5" style="width:36px;background:#2c1c14;color:#ffd152;border:1px solid #5a3c26;text-align:center">月
+        <input type="number" id="inBirthD" value="8" style="width:36px;background:#2c1c14;color:#ffd152;border:1px solid #5a3c26;text-align:center">日
+      </div>
+    </div>
+  </div>
+
+  <button id="startGo">進入校園</button>
 </div>
 </div>
 
@@ -125,57 +197,150 @@ const W=360, H=640;
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 
-let status={energy:85, mood:75, time:8*60};
-let player={x:180, y:380, targetX:180, targetY:380, speed:2.2, moving:false};
+let currentRoom = 'counsel';
+let status={energy:85, mood:75, work:25, toilet:20, stars:20, coins:60, time:8*60};
+let player={x:180, y:380, targetX:180, targetY:380, frame:0, walk:0, speed:2.2, moving:false};
+let petEmoji='🐰', pet={x:198, y:395};
 let keys={}, touchDir={up:0,down:0,left:0,right:0};
-let dialogOpen=false;
+let dialogOpen=false, nearObj=null;
+let actx=null;
 
-const WEATHERS=[
+let customChar = { gender: 'girl', hair: 'bob', outfit: 'uniform' };
+
+const WEATHERS = [
   { id: 'sunny', icon: '☀️', temp: '26°C', rain: '10%', name: '晴朗豔陽' },
   { id: 'rain', icon: '🌧️', temp: '21°C', rain: '85%', name: '綿綿陣雨' },
   { id: 'typhoon', icon: '🌀', temp: '19°C', rain: '95%', name: '強烈颱風' }
 ];
-let weatherIdx=0, currentWeather=WEATHERS[0];
+let weatherIdx = 0, currentWeather = WEATHERS[0];
+let earthquakeShake = 0;
+let rainDrops = [];
+for(let i=0;i<45;i++) rainDrops.push({x:Math.random()*W, y:Math.random()*H, s:12+Math.random()*6});
+
+function initA(){if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)()}
+function tone(f, d, type='sine', v=0.08){
+  if(!actx) return;
+  const o=actx.createOscillator(), g=actx.createGain();
+  o.type=type; o.frequency.value=f;
+  g.gain.setValueAtTime(v, actx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime+d);
+  o.connect(g); g.connect(actx.destination);
+  o.start(); o.stop(actx.currentTime+d);
+}
+
+function sfx(name){
+  initA();
+  if(!actx) return;
+  if(name==='step') tone(75 + Math.random()*20, 0.05, 'triangle', 0.05);
+  else if(name==='ok') [523, 659, 784].forEach((f, i)=>setTimeout(()=>tone(f, 0.12, 'sine', 0.06), i*60));
+  else if(name==='alarm') [880, 440, 880, 440].forEach((f, i)=>setTimeout(()=>tone(f, 0.15, 'sawtooth', 0.1), i*120));
+  else if(name==='quake') tone(55, 0.5, 'sawtooth', 0.12);
+}
+
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2200); }
+
+function switchRoom(r){
+  initA(); sfx('ok');
+  currentRoom = r;
+  player.x = 180; player.y = 380; player.targetX = 180; player.targetY = 380;
+  const names = { counsel:'原木輔導室', clinic:'健康醫務室', corridor:'班級走廊', courtyard:'陽光中庭', gate:'校門警衛室' };
+  document.getElementById('hudLoc').textContent = names[r];
+  toast(`進入【${names[r]}】`);
+}
 
 function cycleWeather(){
-  weatherIdx=(weatherIdx+1)%WEATHERS.length;
-  currentWeather=WEATHERS[weatherIdx];
-  document.getElementById('hudWeatherIcon').textContent=currentWeather.icon;
-  document.getElementById('hudWeatherTemp').textContent=`${currentWeather.name} ${currentWeather.temp}`;
-  document.getElementById('hudWeatherRain').textContent=`降雨${currentWeather.rain}`;
+  weatherIdx = (weatherIdx + 1) % WEATHERS.length;
+  currentWeather = WEATHERS[weatherIdx];
+  document.getElementById('hudWeatherIcon').textContent = currentWeather.icon;
+  document.getElementById('hudWeatherTemp').textContent = `${currentWeather.name} ${currentWeather.temp}`;
+  document.getElementById('hudWeatherRain').textContent = `降雨${currentWeather.rain}`;
   toast(`氣象更新：${currentWeather.name}`);
 }
 
 function triggerTyphoonEvent(){
-  showDlg('📢 颱風警報', '中度颱風逼近，風雨加劇！', [{t: '落實防颱檢查', a:()=>{ toast('防颱安全檢查完成！'); }}]);
+  sfx('alarm');
+  currentWeather = WEATHERS[2];
+  document.getElementById('weatherCard').classList.add('typhoon');
+  showDlg('📢 颱風警報', '中度颱風逼近，風雨加劇！學校提醒注意防颱安全！', [{t: '落實門窗固定與防颱準備', a:()=>{ toast('防颱安全檢查完成！+10⭐'); status.stars+=10; }}]);
 }
 
 function triggerEarthquakeEvent(){
-  showDlg('🚨 地震警報', '發生有感地震！', [{t: '趴下、掩護、穩住', a:()=>{ toast('正確避難自救！'); }}]);
+  sfx('alarm'); sfx('quake'); earthquakeShake = 8;
+  showDlg('🚨 地震國家警報', '發生有感地震！', [{t: '趴下、掩護、穩住', a:()=>{ toast('標準防震自救！+15⭐'); status.stars+=15; }}]);
 }
 
-function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); }
+function drawChar(x, y){
+  const px=Math.floor(x), py=Math.floor(y);
+  ctx.fillStyle='rgba(15,8,5,0.45)';
+  ctx.beginPath(); ctx.ellipse(px, py+24, 10, 4.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#ffffff'; ctx.fillRect(px-5, py+16, 4, 6); ctx.fillRect(px+1, py+16, 4, 6);
+  ctx.fillStyle='#273c75'; ctx.fillRect(px-7, py+11, 14, 6);
+  ctx.fillStyle='#ffd8b3'; ctx.fillRect(px-6, py-8, 12, 12);
+  ctx.fillStyle='#9e5d32'; ctx.fillRect(px-8, py-12, 16, 6);
+  ctx.font='15px sans-serif'; ctx.fillText(petEmoji, px+10, py+10);
+}
 
 function renderScene(){
-  ctx.fillStyle='#362013'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#ffd8b3'; ctx.fillRect(player.x-6, player.y-8, 12, 12);
+  ctx.save();
+  if(earthquakeShake > 0){
+    ctx.translate((Math.random()-0.5)*earthquakeShake, (Math.random()-0.5)*earthquakeShake);
+    earthquakeShake -= 0.15;
+  }
+  ctx.clearRect(0,0,W,H);
+
+  if(currentRoom === 'counsel'){
+    ctx.fillStyle='#362013'; ctx.fillRect(0,0,W,H);
+    for(let x=-H; x<W+H; x+=24){
+      ctx.strokeStyle='rgba(26,14,8,0.45)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H*0.6, H); ctx.stroke();
+    }
+    ctx.fillStyle='#ffe8b0'; ctx.fillRect(250, 35, 95, 185);
+    ctx.fillStyle='#2d5a49'; ctx.fillRect(70, 280, 155, 95);
+  } else if(currentRoom === 'clinic'){
+    ctx.fillStyle='#eaf2f8'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#d4efdf'; ctx.fillRect(20, 30, 320, 580);
+    ctx.fillStyle='#e74c3c'; ctx.fillRect(170, 50, 20, 40); ctx.fillRect(160, 60, 40, 20);
+  } else {
+    ctx.fillStyle='#5a6858'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#768874'; ctx.fillRect(16, 20, 328, 600);
+  }
+
+  drawChar(player.x, player.y);
+  ctx.restore();
 }
 
-function update(){
-  if(dialogOpen) return;
+function update(dt){
+  if(dialogOpen){ player.targetX=player.x; player.targetY=player.y; player.moving=false; return; }
   let mx=0, my=0;
   if(keys['ArrowUp']||keys['w']||touchDir.up) my=-1;
   if(keys['ArrowDown']||keys['s']||touchDir.down) my=1;
   if(keys['ArrowLeft']||keys['a']||touchDir.left) mx=-1;
   if(keys['ArrowRight']||keys['d']||touchDir.right) mx=1;
 
+  if(player.targetX!==player.x || player.targetY!==player.y){
+    const dx=player.targetX - player.x, dy=player.targetY - player.y;
+    const dist=Math.hypot(dx, dy);
+    if(dist > 5){ mx = dx / dist; my = dy / dist; }
+    else { player.targetX = player.x; player.targetY = player.y; }
+  }
+
   if(mx!==0||my!==0){
     player.x+=mx*player.speed; player.y+=my*player.speed;
+    player.x=Math.max(35, Math.min(325, player.x));
+    player.y=Math.max(130, Math.min(560, player.y));
+    if(Math.random()<0.08) sfx('step');
   }
 }
 
+cv.addEventListener('pointerdown', e=>{
+  if(dialogOpen) return;
+  const rect=cv.getBoundingClientRect();
+  player.targetX = (e.clientX - rect.left)*(W/rect.width);
+  player.targetY = (e.clientY - rect.top)*(H/rect.height);
+});
+
 document.querySelectorAll('#dpad button').forEach(btn=>{
-  const d=btn.dataset.d; if(!d)return;
+  const d=btn.dataset.d; if(!d) return;
   btn.addEventListener('pointerdown', e=>{e.preventDefault(); touchDir[d]=1;});
   btn.addEventListener('pointerup', e=>{e.preventDefault(); touchDir[d]=0;});
 });
@@ -186,24 +351,34 @@ window.addEventListener('keyup', e=>{keys[e.key]=false;});
 function showDlg(who, txt, opts){
   dialogOpen=true;
   document.getElementById('dlg').classList.add('show');
+  document.getElementById('dlgName').textContent=who;
   document.getElementById('dlgTxt').innerHTML=txt;
   const box=document.getElementById('dlgOpts'); box.innerHTML='';
   (opts||[]).forEach((o)=>{
     const b=document.createElement('button');
     b.className='opt'; b.textContent=o.t;
-    b.onclick=()=>{ closeDlg(); if(o.a)o.a(); };
+    b.onclick=()=>{ sfx('click'); closeDlg(); if(o.a) o.a(); };
     box.appendChild(b);
   });
+  if(!opts||!opts.length){
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent='知道了'; b.onclick=closeDlg; box.appendChild(b);
+  }
 }
 function closeDlg(){ dialogOpen=false; document.getElementById('dlg').classList.remove('show'); }
 
 document.getElementById('startGo').onclick=()=>{
+  customChar.gender = document.getElementById('selGender').value;
+  customChar.hair = document.getElementById('selHair').value;
   document.getElementById('start').style.display='none';
-  toast('開始校園生活！');
+  initA(); sfx('ok');
+  toast('角色設定完成！開始校園生活！');
 };
 
-function gameLoop(){
-  update();
+let lastTime=performance.now();
+function gameLoop(now){
+  const dt=now-lastTime; lastTime=now;
+  update(dt);
   renderScene();
   requestAnimationFrame(gameLoop);
 }
@@ -211,3 +386,4 @@ requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
+
