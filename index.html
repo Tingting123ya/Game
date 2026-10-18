@@ -3,58 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>校園生活大冒險：今天也不能倒下！大師豪華版</title>
+<title>校園生活大冒險：獨立房間與精緻美學旗艦版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-html,body{width:100%;height:100%;background:#080605;overflow:hidden;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;justify-content:center;align-items:center}
-#wrap{position:relative;width:100%;max-width:430px;height:100%;max-height:100dvh;background:#111;box-shadow:0 0 50px rgba(0,0,0,0.95);overflow:hidden}
-canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;background:#1a1410}
+html,body{width:100%;height:100%;background:#060403;overflow:hidden;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;justify-content:center;align-items:center}
+#wrap{position:relative;width:100%;max-width:430px;height:100%;max-height:100dvh;background:#0d0907;box-shadow:0 0 60px rgba(0,0,0,0.95);overflow:hidden}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;background:#18100a}
 
 /* ===== HUD ===== */
 #ui{position:absolute;inset:0;pointer-events:none;z-index:20}
 .hud{position:absolute;top:6px;left:6px;right:48px;display:flex;gap:5px;align-items:flex-start;pointer-events:auto}
-.timebox{background:rgba(20,14,10,.94);border:1.5px solid #7c5432;border-radius:10px;padding:4px 8px;min-width:76px;box-shadow:0 3px 8px rgba(0,0,0,.5);cursor:pointer}
+.timebox{background:rgba(22,14,10,.95);border:1.5px solid #845e3c;border-radius:10px;padding:4px 8px;min-width:76px;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer}
 .timebox .day-tag{font-size:10px;color:#f39c12;font-weight:800;margin-bottom:1px}
 .timebox .tm{font-size:16px;font-weight:800;color:#ffd152;letter-spacing:1px;line-height:1.1}
 .timebox .lc{font-size:10px;color:#d8b888;margin-top:1px}
-.bars{flex:1;background:rgba(20,14,10,.94);border:1.5px solid #7c5432;border-radius:10px;padding:4px 7px;display:grid;grid-template-columns:1fr 1fr;gap:2px 7px;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.bars{flex:1;background:rgba(22,14,10,.95);border:1.5px solid #845e3c;border-radius:10px;padding:4px 7px;display:grid;grid-template-columns:1fr 1fr;gap:2px 7px;box-shadow:0 3px 10px rgba(0,0,0,.6)}
 .brow{display:flex;align-items:center;gap:3px;font-size:10px;color:#eee}
 .brow .v{min-width:18px;text-align:right;font-weight:700;color:#f0f0f0}
-.trk{flex:1;height:6px;background:#14100d;border:1px solid #4a3424;border-radius:3px;overflow:hidden}
+.trk{flex:1;height:6px;background:#140e0c;border:1px solid #4a3424;border-radius:3px;overflow:hidden}
 .fil{height:100%;border-radius:2px;transition:width .25s}
 .en .fil{background:linear-gradient(90deg,#f09819,#edde5d)}
 .mo .fil{background:linear-gradient(90deg,#11998e,#38ef7d)}
 .wk .fil{background:linear-gradient(90deg,#2193b0,#6dd5ed)}
 .to .fil{background:linear-gradient(90deg,#8e2de2,#4a00e0)}
-.to.warn .fil{background:linear-gradient(90deg,#eb3349,#f45c43);animation:bl .6s infinite}
-@keyframes bl{50%{opacity:.5}}
 
-.task{position:absolute;top:54px;left:6px;right:48px;background:rgba(26,18,12,.95);border:1.5px solid #b8860b;border-radius:8px;padding:5px 8px;display:flex;align-items:center;gap:6px;pointer-events:auto;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.task{position:absolute;top:52px;left:6px;right:48px;background:rgba(26,16,10,.96);border:1.5px solid #b8860b;border-radius:10px;padding:5px 9px;display:flex;flex-direction:column;gap:3px;pointer-events:auto;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.task-row{display:flex;align-items:center;gap:6px}
 .task .fg{color:#e84118;font-size:13px}
-.task .tt{font-size:12px;color:#fff2d6;font-weight:700;line-height:1.2}
+.task .tt{font-size:12px;color:#fff2d6;font-weight:800;line-height:1.2}
 .task .ts{font-size:10px;color:#a8c49e}
+.task .task-pct{margin-left:auto;font-size:11px;font-weight:900;color:#ffd152}
+.runner-track{position:relative;width:100%;height:7px;background:#140e0c;border:1px solid #5a3c26;border-radius:4px;margin-top:2px}
+.runner-fill{height:100%;background:linear-gradient(90deg,#e67e22,#f1c40f);border-radius:3px;transition:width 0.4s ease}
+.runner-person{position:absolute;top:-8px;font-size:13px;transform:translateX(-50%);transition:left 0.4s ease}
+.runner-flag{position:absolute;right:-4px;top:-7px;font-size:12px}
 
 .side{position:absolute;top:54px;right:6px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
-.sb{width:36px;height:36px;background:rgba(30,20,14,.95);border:1.5px solid #845e3c;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#f5eedc;box-shadow:0 3px 8px rgba(0,0,0,.4);cursor:pointer;position:relative}
+.sb{width:36px;height:36px;background:rgba(30,20,14,.95);border:1.5px solid #845e3c;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#f5eedc;box-shadow:0 3px 8px rgba(0,0,0,.5);cursor:pointer}
 .sb:active{transform:scale(.92);background:#4a3220}
-.sb .badge{position:absolute;top:-4px;right:-4px;background:#e84118;color:#fff;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
 
-/* 頂部快捷功能條 */
+/* 頂部切換房間快捷條 */
 .quick-tools{position:absolute;top:98px;left:6px;right:6px;display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;pointer-events:auto}
 .quick-btn{flex-shrink:0;padding:4px 9px;border-radius:14px;border:1.5px solid #555;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);white-space:nowrap}
-.qb-eng{background:linear-gradient(135deg,#e67e22,#d35400);border-color:#f39c12}
-.qb-rad{background:linear-gradient(135deg,#c0392b,#e74c3c);border-color:#ff7675}
-.qb-art{background:linear-gradient(135deg,#8e44ad,#9b59b6);border-color:#be2edd}
-.qb-puz{background:linear-gradient(135deg,#2980b9,#1f618d);border-color:#5dade2}
-.qb-fb{background:linear-gradient(135deg,#1877f2,#165ec2);border-color:#4a9ff5}
-.qb-party{background:linear-gradient(135deg,#e84393,#d63031);border-color:#ff7675}
-.qb-day{background:linear-gradient(135deg,#27ae60,#2ecc71);border-color:#2ecc71}
+.qb-room1{background:linear-gradient(135deg,#e67e22,#d35400);border-color:#f39c12}
+.qb-room2{background:linear-gradient(135deg,#8e44ad,#9b59b6);border-color:#be2edd}
+.qb-room3{background:linear-gradient(135deg,#2980b9,#1f618d);border-color:#5dade2}
+.qb-room4{background:linear-gradient(135deg,#27ae60,#2ecc71);border-color:#2ecc71}
 
-/* 來電通知條 (Incoming Call Alert Banner) */
+/* 來電通知條 (漂移修復版) */
 .incoming-call-banner{position:absolute;top:10px;left:8px;right:8px;background:linear-gradient(135deg,#2c3e50,#1a252f);border:2px solid #2ecc71;border-radius:14px;padding:10px 12px;display:none;align-items:center;gap:10px;box-shadow:0 6px 25px rgba(0,0,0,.85);z-index:90;pointer-events:auto;animation:bounceCall 1s infinite alternate}
 @keyframes bounceCall{0%{transform:translateY(0)}100%{transform:translateY(-3px)}}
-.incoming-call-banner .icon{width:40px;height:40px;border-radius:50%;background:#27ae60;display:flex;align-items:center;justify-content:center;font-size:20px;animation:ringRot 0.5s infinite}
-@keyframes ringRot{0%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}100%{transform:rotate(0)}}
+.incoming-call-banner .icon{width:40px;height:40px;border-radius:50%;background:#27ae60;display:flex;align-items:center;justify-content:center;font-size:20px}
 .incoming-call-banner .meta{flex:1}
 .incoming-call-banner .caller{color:#fff;font-weight:800;font-size:13px}
 .incoming-call-banner .desc{color:#bdc3c7;font-size:10px;margin-top:2px}
@@ -66,156 +65,29 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 /* 控制器 (D-PAD + 互動鍵) */
 .ctrls{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;align-items:flex-end;pointer-events:none}
 .dpad{display:grid;grid-template-columns:40px 40px 40px;grid-template-rows:40px 40px 40px;gap:3px;pointer-events:auto}
-.dpad button{width:40px;height:40px;background:rgba(36,26,18,.94);border:2px solid #845e3c;border-radius:9px;color:#f5eedc;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,.5);user-select:none;-webkit-user-select:none}
+.dpad button{width:40px;height:40px;background:rgba(36,24,16,.94);border:2px solid #845e3c;border-radius:9px;color:#f5eedc;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none}
 .dpad button:active,.dpad button.active{background:#b8860b;color:#1a1005;transform:scale(.92);border-color:#ffd700}
 .dpad .u{grid-column:2;grid-row:1}.dpad .l{grid-column:1;grid-row:2}.dpad .r{grid-column:3;grid-row:2}.dpad .d{grid-column:2;grid-row:3}
 .dpad .mid{grid-column:2;grid-row:2;background:transparent;border:none;pointer-events:none}
-.ctx{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd700,#b8860b);border:3px solid #fff5cc;box-shadow:0 4px 16px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:24px;color:#2a1a05;cursor:pointer;pointer-events:auto}
+.ctx{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd700,#b8860b);border:3px solid #fff5cc;box-shadow:0 4px 18px rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;font-size:25px;color:#2a1a05;cursor:pointer;pointer-events:auto}
 .ctx:active{transform:scale(.9)}
 .touch-indicator{position:absolute;width:24px;height:24px;border:2px solid #ffd700;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);transition:transform .3s,opacity .3s;opacity:0;z-index:25}
 
-/* 對話框 */
-.dlg{position:absolute;bottom:90px;left:8px;right:8px;background:rgba(22,16,12,.98);border:2px solid #845e3c;border-radius:14px;padding:12px;display:none;z-index:40;max-height:50%;overflow-y:auto;pointer-events:auto;box-shadow:0 6px 20px rgba(0,0,0,.8)}
+/* 對話與公告框 */
+.dlg{position:absolute;bottom:88px;left:8px;right:8px;background:rgba(22,14,10,.98);border:2px solid #845e3c;border-radius:14px;padding:12px;display:none;z-index:40;max-height:52%;overflow-y:auto;pointer-events:auto;box-shadow:0 8px 25px rgba(0,0,0,.85)}
 .dlg.show{display:block}
 .dlg .who{font-size:13px;color:#70c0e8;font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:6px}
 .dlg .who .av{width:24px;height:24px;border-radius:6px;background:#3a2a1a;display:flex;align-items:center;justify-content:center;font-size:13px}
 .dlg .txt{font-size:13px;color:#f8f5ee;line-height:1.5;margin-bottom:8px}
 .dlg .opts{display:flex;flex-direction:column;gap:6px}
-.dlg .opt{background:rgba(44,32,24,.95);border:1.5px solid #845e3c;border-radius:8px;padding:8px 11px;font-size:12px;color:#f5eedc;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.dlg .opt{background:rgba(44,30,20,.95);border:1.5px solid #845e3c;border-radius:8px;padding:8px 11px;font-size:12px;color:#f5eedc;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .dlg .opt:active{background:#b8860b;color:#111;border-color:#ffd700}
-.dlg .opt .cost{font-size:10px;color:#e0b070;white-space:nowrap;margin-left:8px}
+.toast{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:rgba(28,18,12,.96);border:1.5px solid #b8860b;border-radius:10px;padding:7px 15px;font-size:12px;color:#ffd152;z-index:60;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.7)}
 
-.float-txt{position:absolute;font-size:13px;font-weight:800;pointer-events:none;z-index:50;animation:up 1.2s forwards}
-@keyframes up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-45px)}}
-.toast{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:rgba(28,20,14,.96);border:1.5px solid #b8860b;border-radius:10px;padding:7px 15px;font-size:12px;color:#ffd152;z-index:60;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.7)}
-
-/* ===== 手機界面 ===== */
-.phone{position:absolute;inset:0;background:rgba(0,0,0,.82);display:none;z-index:70;align-items:center;justify-content:center;pointer-events:auto}
-.phone.show{display:flex}
-.ph-frame{width:92%;max-width:350px;height:88%;background:#181210;border-radius:32px;border:3px solid #5a3c26;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.85)}
-.ph-island{width:86px;height:18px;background:#0c0908;border-radius:9px;margin:7px auto 0}
-.ph-tabs{display:flex;background:#241812;border-bottom:1px solid #362418}
-.ph-tab{flex:1;padding:7px;text-align:center;font-size:11px;color:#aaa;cursor:pointer;font-weight:700}
-.ph-tab.active{color:#ffd152;border-bottom:2px solid #ffd152;background:#2c1e16}
-.ph-nav{display:flex;align-items:center;padding:7px 10px;gap:6px;border-bottom:1px solid #362418;background:#241812}
-.ph-nav .back{font-size:20px;color:#d8b888;cursor:pointer}
-.ph-nav .title{flex:1;text-align:center;font-size:14px;color:#fff;font-weight:700}
-.ph-body{flex:1;overflow-y:auto;background:#140e0c;min-height:0}
-.ph-input-bar{display:flex;align-items:center;gap:5px;padding:7px 8px;background:#241812;border-top:1px solid #3a2618;flex-shrink:0}
-.ph-input-bar input{flex:1;background:#120c0a;border:1px solid #5a3c26;border-radius:18px;padding:8px 11px;color:#f5eedc;font-size:13px;outline:none}
-.ph-send-btn{width:34px;height:34px;border-radius:50%;border:none;background:#27ae60;color:#fff;font-size:15px;font-weight:700}
-.ph-sticker-btn{width:34px;height:34px;border-radius:50%;border:none;background:#3a2618;font-size:17px}
-.ph-sticker-panel{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1c120e;border-top:1px solid #3a2618;justify-content:center}
-.ph-sticker-panel button{width:44px;height:44px;font-size:20px;border-radius:9px;border:1px solid #5a3c26;background:#2c1c14}
-
-/* 通話模式介面 */
-.call-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;height:100%}
-.call-avatar{width:66px;height:66px;border-radius:50%;background:#d35400;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:7px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
-.call-name{font-size:16px;color:#fff;font-weight:800;margin-bottom:2px}
-.call-status{font-size:11px;color:#a8c49e;margin-bottom:12px}
-.call-dialogue{width:100%;background:#221814;border:1.5px solid #5a3c26;border-radius:11px;padding:10px;color:#f5eedc;font-size:12px;line-height:1.55;min-height:85px;margin-bottom:12px;text-align:center}
-.call-actions{display:flex;flex-direction:column;gap:6px;width:100%}
-.call-btn{padding:8px 12px;border-radius:18px;border:none;font-size:11px;font-weight:800;cursor:pointer;text-align:center}
-.call-btn.hang{background:#e74c3c;color:#fff}
-.call-btn.talk{background:#27ae60;color:#fff}
-
-/* 訊息清單 */
-.ph-list .item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #281a14;cursor:pointer}
-.ph-list .item:active{background:#2a1c14}
-.ph-list .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
-.ph-list .info{flex:1;min-width:0}
-.ph-list .nm{font-size:13px;color:#eee;font-weight:700}
-.ph-list .pv{font-size:11px;color:#9e8a78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ph-list .tm{font-size:10px;color:#786658}
-.ph-list .dot{width:7px;height:7px;background:#27ae60;border-radius:50%;flex-shrink:0}
-
-.room-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:160px;max-height:260px}
-.bubble{max-width:82%;padding:7px 10px;border-radius:12px;font-size:12px;line-height:1.45}
-.bubble.them{background:#fff;color:#111;align-self:flex-start;border-bottom-left-radius:3px}
-.bubble.me{background:#58d68d;color:#0e3a1d;align-self:flex-end;border-bottom-right-radius:3px}
-.bubble .tm{font-size:9px;color:#888;margin-top:2px}
-.elder-card{background:linear-gradient(160deg,#ffe0f0 0%,#fff5e6 40%,#e8f8e0 100%);border:2.5px solid #e070a0;border-radius:10px;padding:10px 8px;text-align:center;margin:3px 0}
-.elder-card .sun{font-size:28px;line-height:1.1}
-.elder-card .msg{font-size:16px;color:#c02060;font-weight:900;margin:3px 0}
-.elder-card .sub{font-size:11px;color:#555;font-weight:700}
-.room-choices{padding:7px;display:flex;flex-direction:column;gap:5px}
-.room-choices button{background:#27ae60;color:#fff;border:none;border-radius:14px;padding:7px 10px;font-size:12px;text-align:left}
-.sticker-bar{display:flex;gap:5px;padding:5px 7px;overflow-x:auto;background:#241812;border-top:1px solid #3a2618}
-.sticker-bar button{flex-shrink:0;width:44px;height:44px;border-radius:9px;border:1.5px solid #5a3c26;background:#321e14;font-size:19px;cursor:pointer}
-
-/* 臉書 PixelBook 樣式 */
-.fb-post{background:#221814;border:1.5px solid #4a3424;border-radius:11px;padding:10px;margin:8px;color:#f5eedc}
-.fb-author{display:flex;align-items:center;gap:7px;margin-bottom:7px}
-.fb-author .av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
-.fb-author .name{font-weight:700;font-size:12px}
-.fb-author .time{font-size:9px;color:#888}
-.fb-content{font-size:12px;line-height:1.5;margin-bottom:7px}
-.fb-tag{display:inline-block;padding:2px 7px;background:rgba(231,76,60,.2);border:1px solid #e74c3c;border-radius:10px;color:#ff7675;font-size:10px;font-weight:700;margin-bottom:7px}
-.fb-actions{display:flex;gap:6px}
-.fb-btn{flex:1;padding:5px;border-radius:7px;border:none;font-size:10px;font-weight:700;cursor:pointer;text-align:center}
-.fb-btn.safe{background:#27ae60;color:#fff}
-.fb-btn.warn{background:#e74c3c;color:#fff}
-
-/* 拼圖面板 */
-.puzzle-board{display:grid;grid-template-columns:repeat(3,70px);grid-template-rows:repeat(3,70px);gap:3px;justify-content:center;margin:10px auto;background:#2a1c14;padding:6px;border-radius:11px;border:2px solid #5a3c26}
-.puzzle-tile{width:70px;height:70px;background:#e67e22;border:2px solid #f39c12;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;cursor:pointer;user-select:none}
-.puzzle-tile.empty{background:transparent;border:none;cursor:default}
-
-/* 通用彈出面板 */
-.panel{position:absolute;inset:0;background:rgba(0,0,0,.82);display:none;z-index:80;align-items:center;justify-content:center;pointer-events:auto}
-.panel.show{display:flex}
-.panel-box{width:90%;max-width:340px;max-height:85%;background:#1e1410;border:2px solid #845e3c;border-radius:15px;padding:14px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.8)}
-.panel-box h3{font-size:15px;color:#ffd152;margin-bottom:10px;text-align:center}
-.shop-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #382418;font-size:12px;color:#ddd}
-.shop-item button{background:#2e7d32;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer}
-.eng-word{color:#3498db;text-decoration:underline;cursor:pointer;font-weight:700}
-.eng-hint{font-size:10px;color:#f39c12;margin-top:2px}
-
-/* 自律打卡 Todo 項目 */
-.todo-check-item{display:flex;align-items:center;gap:8px;padding:8px;background:#281c14;border:1.5px solid #4a3424;border-radius:8px;margin-bottom:7px;font-size:12px}
-.todo-check-item.done{border-color:#27ae60;background:#18281a}
-.todo-check-item .box{width:18px;height:18px;border-radius:4px;border:2px solid #845e3c;display:flex;align-items:center;justify-content:center;font-size:13px;color:#2ecc71;font-weight:900}
-.todo-check-item.done .box{border-color:#2ecc71;background:#27ae60;color:#fff}
-
-/* 開始畫面 */
-#start{position:absolute;inset:0;background:linear-gradient(180deg,#241812,#0e0a08);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto;pointer-events:auto}
+#start{position:absolute;inset:0;background:linear-gradient(180deg,#24160e,#0e0805);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto;pointer-events:auto}
 #start h1{font-size:20px;color:#ffd152;text-align:center;margin-bottom:4px;text-shadow:0 2px 4px rgba(0,0,0,.8)}
 #start .sub{font-size:12px;color:#c8b090;margin-bottom:14px;text-align:center}
 #startGo{margin-top:14px;padding:11px 36px;background:linear-gradient(180deg,#ffd700,#b8860b);border:none;border-radius:22px;font-size:16px;font-weight:900;color:#2a1805;box-shadow:0 4px 14px rgba(0,0,0,.6);cursor:pointer}
-#startGo:active{transform:scale(.95)}
-
-/* ===== 俄羅斯方塊面板樣式 ===== */
-.tetris-container{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
-.tetris-header{display:flex;justify-content:space-between;width:100%;font-size:12px;color:#ffd152;font-weight:800;padding:2px 8px}
-.tetris-canvas-wrap{position:relative;background:#0d0907;border:2.5px solid #845e3c;border-radius:10px;padding:3px;box-shadow:inset 0 0 10px rgba(0,0,0,.8)}
-#tetrisCv{display:block;background:#140e0c;image-rendering:pixelated}
-.tetris-ctrls{display:grid;grid-template-columns:repeat(5, 1fr);gap:4px;width:100%;margin-top:6px}
-.tetris-btn{background:#2a1c14;border:1.5px solid #845e3c;border-radius:8px;color:#f5eedc;padding:9px 0;font-size:13px;font-weight:900;cursor:pointer;text-align:center;user-select:none;-webkit-user-select:none}
-.tetris-btn:active{background:#b8860b;color:#111;border-color:#ffd700;transform:scale(0.94)}
-.tetris-btn.hard{background:#c0392b;border-color:#e74c3c}
-
-
-/* ===== 2048 遊戲面板樣式 ===== */
-.g2048-container{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
-.g2048-header{display:flex;justify-content:space-between;width:100%;font-size:12px;color:#ffd152;font-weight:800;padding:2px 6px}
-.g2048-score-box{background:#2a1c14;border:1.5px solid #845e3c;border-radius:8px;padding:4px 10px;text-align:center}
-.g2048-board{display:grid;grid-template-columns:repeat(4, 62px);grid-template-rows:repeat(4, 62px);gap:6px;background:#1e1410;border:2.5px solid #845e3c;border-radius:12px;padding:8px;box-shadow:inset 0 0 10px rgba(0,0,0,.8);touch-action:none}
-.g2048-cell{width:62px;height:62px;background:rgba(238,228,218,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#f9f6f2;user-select:none;transition:transform 0.1s ease, background 0.1s ease}
-.g2048-cell[data-val="2"]{background:#eee4da;color:#776e65}
-.g2048-cell[data-val="4"]{background:#ede0c8;color:#776e65}
-.g2048-cell[data-val="8"]{background:#f2b179;color:#f9f6f2}
-.g2048-cell[data-val="16"]{background:#f59563;color:#f9f6f2}
-.g2048-cell[data-val="32"]{background:#f67c5f;color:#f9f6f2}
-.g2048-cell[data-val="64"]{background:#f65e3b;color:#f9f6f2}
-.g2048-cell[data-val="128"]{background:#edcf72;color:#f9f6f2;font-size:18px;box-shadow:0 0 8px #edcf72}
-.g2048-cell[data-val="256"]{background:#edcc61;color:#f9f6f2;font-size:18px;box-shadow:0 0 10px #edcc61}
-.g2048-cell[data-val="512"]{background:#edc850;color:#f9f6f2;font-size:17px;box-shadow:0 0 12px #edc850}
-.g2048-cell[data-val="1024"]{background:#edc53f;color:#f9f6f2;font-size:15px;box-shadow:0 0 14px #edc53f}
-.g2048-cell[data-val="2048"]{background:#edc22e;color:#f9f6f2;font-size:15px;box-shadow:0 0 16px #ffd700;animation:pulse 1s infinite}
-.g2048-ctrls{display:grid;grid-template-columns:repeat(4, 1fr);gap:5px;width:100%;margin-top:4px}
-.g2048-btn{background:#2a1c14;border:1.5px solid #845e3c;border-radius:8px;color:#f5eedc;padding:8px 0;font-size:14px;font-weight:900;cursor:pointer;text-align:center;user-select:none;-webkit-user-select:none}
-.g2048-btn:active{background:#b8860b;color:#111;border-color:#ffd700;transform:scale(0.93)}
-
 </style>
 </head>
 <body>
@@ -223,12 +95,12 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 <canvas id="cv" width="360" height="640"></canvas>
 <div class="touch-indicator" id="tInd"></div>
 
-<!-- 即時來電橫幅 (可接聽/可掛斷) -->
+<!-- 即時來電橫幅 (已修復人物漂移) -->
 <div class="incoming-call-banner" id="incomingBanner">
   <div class="icon">📞</div>
   <div class="meta">
     <div class="caller" id="incomingCaller">未知號碼來電</div>
-    <div class="desc" id="incomingDesc">點擊接聽實際說話對話</div>
+    <div class="desc" id="incomingDesc">點擊接聽或掛斷</div>
   </div>
   <div class="btns">
     <button class="ans-btn" id="btnAnsCall">接聽 🟢</button>
@@ -238,40 +110,48 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 
 <div id="ui">
   <div class="hud">
-    <div class="timebox" id="timeBox" onclick="cycleCalendarDay()" title="點擊切換平日/週末/節慶">
+    <div class="timebox" id="timeBox">
       <div class="day-tag" id="hudDay">週五 平日</div>
       <div class="tm" id="hudTime">08:00</div>
-      <div class="lc" id="hudLoc">輔導室・剩 9:00</div>
+      <div class="lc" id="hudLoc">原木輔導室</div>
     </div>
     <div class="bars">
       <div class="brow en">⚡ <div class="trk"><div class="fil" id="barEn" style="width:85%"></div></div><span class="v" id="vEn">85</span></div>
-      <div class="brow mo">💚 <div class="trk"><div class="fil" id="barMo" style="width:70%"></div></div><span class="v" id="vMo">70</span></div>
-      <div class="brow wk">📄 <div class="trk"><div class="fil" id="barWk" style="width:20%"></div></div><span class="v" id="vWk">20</span></div>
+      <div class="brow mo">💚 <div class="trk"><div class="fil" id="barMo" style="width:75%"></div></div><span class="v" id="vMo">75</span></div>
+      <div class="brow wk">📄 <div class="trk"><div class="fil" id="barWk" style="width:25%"></div></div><span class="v" id="vWk">25</span></div>
       <div class="brow to" id="toRow">🚽 <div class="trk"><div class="fil" id="barTo" style="width:20%"></div></div><span class="v" id="vTo">20</span></div>
     </div>
   </div>
 
-  <div class="task" id="taskBar"><span class="fg">🚩</span><div><div class="tt" id="taskTitle">個案會議紀錄</div><div class="ts" id="taskSub">輔導室・電腦</div></div></div>
+  <div class="task" id="taskBar">
+    <div class="task-row">
+      <span class="fg">🚩</span>
+      <div>
+        <div class="tt" id="taskTitle">探索校園與獨立教室</div>
+        <div class="ts" id="taskSub">靠近物件或公告欄按 ✋</div>
+      </div>
+      <div class="task-pct" id="taskPct">25%</div>
+    </div>
+    <div class="runner-track">
+      <div class="runner-fill" id="runnerFill" style="width:25%"></div>
+      <div class="runner-person" id="runnerPerson" style="left:25%">🏃</div>
+      <div class="runner-flag">🏁</div>
+    </div>
+  </div>
 
-  <!-- 頂部多功能快捷工具列 -->
+  <!-- 獨立房間快速切換傳送門 -->
   <div class="quick-tools">
-    <div class="quick-btn qb-eng" id="btnFloatEng">🎤 英文跟讀</div>
-    <div class="quick-btn qb-rad" id="btnFloatRadio">📻 英文廣播</div>
-    <div class="quick-btn qb-art" id="btnFloatArt">🎨 美感訓練</div>
-    <div class="quick-btn qb-puz" id="btnFloatPuzzle">🧩 拼圖</div>
-    <div class="quick-btn" id="btnFloat2048" style="background:linear-gradient(135deg,#e67e22,#f39c12);border-color:#f1c40f;color:#fff">🔢 2048</div>
-    <div class="quick-btn" id="btnFloatTetris" style="background:linear-gradient(135deg,#00b894,#00cec9);border-color:#55efc4;color:#fff">🧱 俄羅斯方塊</div>
-    <div class="quick-btn qb-fb" id="btnFloatFb">🌐 臉書動態</div>
-    <div class="quick-btn qb-party" id="btnFloatParty">🎂 派對</div>
-    <div class="quick-btn qb-day" id="btnCycleDay">🗓️ 換日</div>
+    <div class="quick-btn qb-room1" onclick="switchRoom('counsel')">🛋️ 原木輔導室</div>
+    <div class="quick-btn qb-room2" onclick="switchRoom('art')">🎨 美術教室</div>
+    <div class="quick-btn qb-room3" onclick="switchRoom('music')">🎹 音樂教室</div>
+    <div class="quick-btn qb-room4" onclick="switchRoom('sports')">🏟️ 室內運動場</div>
   </div>
 
   <div class="side">
-    <div class="sb" id="btnTodo" title="自律清單">📋</div>
-    <div class="sb" id="btnBag" title="背包">🎒</div>
-    <div class="sb" id="btnPhone" title="手機與電話">📱<span class="badge" id="phBadge" style="display:none">1</span></div>
-    <div class="sb" id="btnPause" title="暫停">⏸</div>
+    <div class="sb" onclick="triggerCallEvent()" title="測試來電">📞</div>
+    <div class="sb" onclick="showBoardNotice()" title="公告欄">📋</div>
   </div>
+
   <div class="ctrls">
     <div class="dpad" id="dpad">
       <button class="u" data-d="up">▲</button><div class="mid"></div>
@@ -281,222 +161,39 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
     </div>
     <button class="ctx" id="ctxBtn">✋</button>
   </div>
+
   <div class="dlg" id="dlg">
-    <div class="who" id="dlgWho"><span class="av" id="dlgAv">👤</span><span id="dlgName">我</span></div>
+    <div class="who" id="dlgWho"><span class="av" id="dlgAv">👤</span><span id="dlgName">系統</span></div>
     <div class="txt" id="dlgTxt"></div>
     <div class="opts" id="dlgOpts"></div>
   </div>
   <div class="toast" id="toast"></div>
 </div>
 
-<!-- 手機界面（分頁：訊息 / 通話 / 臉書防詐 / 英文廣播頻道） -->
-<div class="phone" id="phone">
-  <div class="ph-frame">
-    <div class="ph-island"></div>
-    <div class="ph-tabs">
-      <div class="ph-tab active" id="tabMsg" onclick="switchPhoneTab('msg')">💬 訊息</div>
-      <div class="ph-tab" id="tabCall" onclick="switchPhoneTab('call')">📞 通話</div>
-      <div class="ph-tab" id="tabFb" onclick="switchPhoneTab('fb')">🌐 臉書</div>
-      <div class="ph-tab" id="tabRadio" onclick="switchPhoneTab('radio')">📻 廣播</div>
-    </div>
-    <div class="ph-nav" id="phNavHeader"><span class="back" id="phBack">‹</span><span class="title" id="phTitle">訊息清單</span><span style="width:24px"></span></div>
-    
-    <div class="ph-body" id="phBody"></div>
-
-    <div class="ph-input-bar" id="phInputBar" style="display:none">
-      <button type="button" class="ph-sticker-btn" id="phStickerBtn" title="貼圖">😀</button>
-      <input type="text" id="phInput" placeholder="輸入訊息…" autocomplete="off" enterkeyhint="send" />
-      <button type="button" class="ph-send-btn" id="phSendBtn">➤</button>
-    </div>
-    <div class="ph-sticker-panel" id="phStickerPanel" style="display:none">
-      <button onclick="pickSticker(0)">🌸</button><button onclick="pickSticker(1)">☀️</button>
-      <button onclick="pickSticker(2)">🌈</button><button onclick="pickSticker(3)">❤️</button>
-      <button onclick="pickSticker(4)">💪</button><button onclick="pickSticker(5)">👍</button>
-      <button onclick="pickSticker(6)">😂</button><button onclick="pickSticker(7)">🙏</button>
-    </div>
-  </div>
-</div>
-
-<!-- 彈出面板 -->
-<div class="panel" id="engPanel"><div class="panel-box"><h3>📚 英文影子跟讀 Shadowing</h3><div id="engContent"></div><button onclick="closePanel('engPanel')" style="margin-top:10px;width:100%;padding:8px;background:#382418;color:#ddd;border:none;border-radius:8px">關閉</button></div></div>
-
-
-<!-- 2048 數字邏輯遊戲面板 -->
-<div class="panel" id="g2048Panel">
-  <div class="panel-box" style="max-width:350px;padding:12px">
-    <h3 style="margin-bottom:6px">🔢 2048 數字邏輯挑戰</h3>
-    <div class="g2048-container">
-      <div class="g2048-header">
-        <div class="g2048-score-box">分數: <span id="g2048Score">0</span></div>
-        <div class="g2048-score-box">最佳: <span id="g2048Best">0</span></div>
-      </div>
-      <div class="g2048-board" id="g2048Board"></div>
-      <p style="font-size:11px;color:#a8c49e;text-align:center;margin:2px 0">滑動螢幕或點擊按鈕，合併相同數字直到 2048！</p>
-      <!-- 手機觸控操作方向鈕 -->
-      <div class="g2048-ctrls">
-        <button class="g2048-btn" id="g2048Up" title="向上">▲ 上</button>
-        <button class="g2048-btn" id="g2048Down" title="向下">▼ 下</button>
-        <button class="g2048-btn" id="g2048Left" title="向左">◀ 左</button>
-        <button class="g2048-btn" id="g2048Right" title="向右">▶ 右</button>
-      </div>
-      <div style="display:flex;gap:6px;width:100%;margin-top:4px">
-        <button onclick="restart2048()" style="flex:1;padding:7px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12px">重新開始</button>
-        <button onclick="close2048()" style="flex:1;padding:7px;background:#382418;color:#ddd;border:none;border-radius:8px;font-size:12px">離開遊戲</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 俄羅斯方塊邏輯挑戰面板 -->
-<div class="panel" id="tetrisPanel">
-  <div class="panel-box" style="max-width:350px;padding:12px">
-    <h3 style="margin-bottom:6px">🧱 邏輯俄羅斯方塊挑戰</h3>
-    <div class="tetris-container">
-      <div class="tetris-header">
-        <div>分數: <span id="tetScore">0</span></div>
-        <div>消除行: <span id="tetLines">0</span></div>
-        <div>等級: <span id="tetLevel">1</span></div>
-      </div>
-      <div class="tetris-canvas-wrap">
-        <canvas id="tetrisCv" width="200" height="360"></canvas>
-      </div>
-      <!-- 手機觸控按鍵列 -->
-      <div class="tetris-ctrls">
-        <button class="tetris-btn" id="tetLeft" title="向左">◀</button>
-        <button class="tetris-btn" id="tetRotate" title="旋轉">🔄</button>
-        <button class="tetris-btn" id="tetRight" title="向右">▶</button>
-        <button class="tetris-btn" id="tetDown" title="軟降">⏬</button>
-        <button class="tetris-btn hard" id="tetDrop" title="硬降/直落">⚡</button>
-      </div>
-      <div style="display:flex;gap:6px;width:100%;margin-top:4px">
-        <button onclick="startTetris()" style="flex:1;padding:7px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-weight:800;font-size:12px">重新開始</button>
-        <button onclick="closeTetris()" style="flex:1;padding:7px;background:#382418;color:#ddd;border:none;border-radius:8px;font-size:12px">離開遊戲</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="puzzlePanel"><div class="panel-box"><h3>🧩 像素滑塊拼圖挑戰</h3><p style="text-align:center;font-size:11px;color:#d8b888">點擊空格相鄰方塊移動，拼出 1~8 順序！</p><div class="puzzle-board" id="pzBoard"></div><button onclick="initPuzzle()" style="width:100%;padding:7px;background:#2980b9;color:#fff;border:none;border-radius:8px;font-weight:700">重新洗牌</button><button onclick="closePanel('puzzlePanel')" style="margin-top:6px;width:100%;padding:7px;background:#382418;color:#ddd;border:none;border-radius:8px">關閉</button></div></div>
-<div class="panel" id="bagPanel"><div class="panel-box"><h3>🎒 我的背包</h3><div id="bagList"></div><button onclick="closePanel('bagPanel')" style="margin-top:10px;width:100%;padding:8px;background:#382418;color:#ddd;border:none;border-radius:8px">關閉</button></div></div>
-<div class="panel" id="shopPanel"><div class="panel-box"><h3>🛒 福利小舖</h3><div id="shopList"></div><button onclick="closePanel('shopPanel')" style="margin-top:10px;width:100%;padding:8px;background:#382418;color:#ddd;border:none;border-radius:8px">關閉</button></div></div>
-<div class="panel" id="todoPanel"><div class="panel-box"><h3>📋 好孩子自律常規 Todo List</h3><p style="font-size:11px;color:#a8c49e;text-align:center;margin-bottom:8px">主動分擔家務，大幅提升媽媽好感！</p><div id="todoList"></div><button onclick="closePanel('todoPanel')" style="margin-top:10px;width:100%;padding:8px;background:#382418;color:#ddd;border:none;border-radius:8px">關閉</button></div></div>
-
-<!-- 開始畫面（選角色、寵物、填寫自己與家人朋友生日） -->
 <div id="start">
-  <h1>校園生活大冒險<br>今天也不能倒下！</h1>
-  <div class="sub">美感訓練・真人說話來電・自律放學與生日派對</div>
-
-  <!-- 自由填寫親友生日 -->
-  <div style="width:100%;max-width:320px;background:#1e1410;border:1.5px solid #845e3c;border-radius:12px;padding:10px;margin-bottom:10px">
-    <div style="font-size:12px;color:#ffd152;font-weight:800;margin-bottom:6px;text-align:center">🎂 親友生日專屬設定（玩家自己填）</div>
-    
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;color:#f5eedc">
-      <span>🎂 <b>你的生日（自由填）</b>：</span>
-      <div style="display:flex;align-items:center;gap:3px">
-        <input type="number" id="inBirthM" min="1" max="12" value="5" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 月
-        <input type="number" id="inBirthD" min="1" max="31" value="8" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 日
-      </div>
-    </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;color:#f5eedc">
-      <span>👩 <b>媽媽生日（自由填）</b>：</span>
-      <div style="display:flex;align-items:center;gap:3px">
-        <input type="number" id="inMomBirthM" min="1" max="12" value="3" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 月
-        <input type="number" id="inMomBirthD" min="1" max="31" value="17" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 日
-      </div>
-    </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;color:#f5eedc">
-      <span>👨 <b>爸爸生日（自由填）</b>：</span>
-      <div style="display:flex;align-items:center;gap:3px">
-        <input type="number" id="inDadBirthM" min="1" max="12" value="8" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 月
-        <input type="number" id="inDadBirthD" min="1" max="31" value="20" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 日
-      </div>
-    </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#f5eedc">
-      <span>👭 <b>朋友 Emma（自由填）</b>：</span>
-      <div style="display:flex;align-items:center;gap:3px">
-        <input type="number" id="inEmmaBirthM" min="1" max="12" value="6" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 月
-        <input type="number" id="inEmmaBirthD" min="1" max="31" value="12" style="width:44px;background:#2c1c14;color:#ffd152;border:1.5px solid #b8860b;border-radius:5px;padding:3px 4px;text-align:center;font-weight:800"> 日
-      </div>
-    </div>
-  </div>
-
-  <!-- 8大自選寵物 -->
-  <div style="font-size:12px;color:#ffd152;margin-bottom:4px">🐾 選一隻陪伴你的寵物上學</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px" id="petSelectRow">
-    <button onclick="pickPet('🐰','小白兔')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1.5px solid #ffd700">🐰 兔</button>
-    <button onclick="pickPet('🐱','貓咪')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🐱 貓</button>
-    <button onclick="pickPet('🐶','柴犬')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🐶 狗</button>
-    <button onclick="pickPet('🦔','小刺蝟')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🦔 刺蝟</button>
-    <button onclick="pickPet('🐹','倉鼠')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🐹 倉鼠</button>
-    <button onclick="pickPet('🐊','小鱷魚')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🐊 鱷魚</button>
-    <button onclick="pickPet('🐟','熱帶魚')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🐟 魚</button>
-    <button onclick="pickPet('🦖','小恐龍')" class="p-btn" style="padding:4px 8px;border-radius:8px;background:#2a1c14;color:#fff;border:1px solid #5a3c26">🦖 恐龍</button>
-  </div>
-
-  <button id="startGo">進入輔導室</button>
+  <h1>校園生活大冒險<br>獨立房間與精緻美學版</h1>
+  <div class="sub">4大精緻獨立房間・靠近公告欄彈窗・電話不漂移</div>
+  <button id="startGo">進入校園</button>
 </div>
 </div>
 
 <script>
 // ============================================================
-// 1. 遊戲核心狀態、日曆系統與世界座標
+// 1. 遊戲核心狀態與 4 大獨立房間定義
 // ============================================================
-const W=360, H=640, WORLD_H=2100;
+const W=360, H=640;
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 
-let status={energy:85, mood:75, work:20, toilet:20, stars:20, coins:60, time:8*60};
-let player={x:180, y:300, targetX:180, targetY:300, dir:0, frame:0, walk:0, speed:2.2, moving:false};
-let petEmoji='🐰', petName='小白兔', pet={x:198, y:312, hop:0};
-let camY=0, keys={}, touchDir={up:0,down:0,left:0,right:0};
-let dialogOpen=false, phoneOpen=false, nearObj=null;
-let bag={throat:2, coffee:2, orange:2, water:3, flower:1, book:1, cookies:0, cake:0};
-let affection={chunbo:50, emma:60, mom:80, dad:80, sister:70, xiaoyu:0};
-let npcs=[], objs=[], zone='counsel';
-let xiaoyuState=0, xiaoyu={x:180, y:600};
-let phoneUnread=1;
-let familyTimeSeconds=0; // 家人陪伴時間計數
-
-// 日曆與節假日系統 (平日 / 週末 / 節慶)
-const CALENDAR_DAYS = [
-  { day: '週五 平日', type: 'weekday', task: '個案會議紀錄', loc: '輔導室・電腦', desc: '在校輔導與專科課堂學習' },
-  { day: '週六 週末', type: 'weekend', task: '同儕草地野餐出遊', loc: '中庭公園・廚房烤箱', desc: '不上學！烘焙餅乾、公園野餐、打籃球' },
-  { day: '週日 母親節', type: 'holiday', task: '母親節感恩烘焙派對', loc: '客廳・廚房烤箱', desc: '手作雙層草莓戚風蛋糕送媽媽！' }
-];
-let calIndex = 0;
-
-// 好孩子自律常規 Todo 清單狀態 (連動媽媽好感度)
-let homeDiscipline={
-  shoes: false,    // 放好書包、脫鞋排列整齊
-  dishes: false,   // 主動洗碗、清潔水槽
-  sister: false,   // 陪伴妹妹、講睡前故事
-  homework: false, // 專注寫作業與英文跟讀
-  shower: false,   // 洗熱水澡換上乾淨睡衣
-  callDad: false   // 打電話給爸爸早點回家
-};
-
-// 親友生日設定
-let birthdays = {
-  player: { m: 5, d: 8, name: '我' },
-  mom: { m: 3, d: 17, name: '媽媽' },
-  dad: { m: 8, d: 20, name: '爸爸' },
-  emma: { m: 6, d: 12, name: 'Emma' }
-};
-
-function pickPet(em, nm){
-  petEmoji=em; petName=nm;
-  document.querySelectorAll('#petSelectRow .p-btn').forEach(b=>{
-    b.style.borderColor = b.textContent.includes(em) ? '#ffd700' : '#5a3c26';
-  });
-}
-
-// ============================================================
-// 2. Web Audio API 音效引擎與真實語音合成 (TTS speakZh)
-// ============================================================
+let currentRoom = 'counsel'; // 'counsel' | 'art' | 'music' | 'sports'
+let status={energy:85, mood:75, work:25, toilet:20, stars:20, coins:60, time:8*60};
+let player={x:180, y:380, targetX:180, targetY:380, dir:0, frame:0, walk:0, speed:2.2, moving:false};
+let pet={x:198, y:395, hop:0};
+let keys={}, touchDir={up:0,down:0,left:0,right:0};
+let dialogOpen=false, callActive=false, nearObj=null;
+let boardNoticeCooldown=false;
 let actx=null;
+
 function initA(){if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)()}
 function tone(f, d, type='sine', v=0.08){
   if(!actx) return;
@@ -511,1035 +208,235 @@ function tone(f, d, type='sine', v=0.08){
 function sfx(name){
   initA();
   if(!actx) return;
-  const now=actx.currentTime;
-  if(name==='step'){
-    tone(75 + Math.random()*20, 0.05, 'triangle', 0.05);
-    tone(180 + Math.random()*30, 0.02, 'sine', 0.03);
-  } else if(name==='water'){
-    const o=actx.createOscillator(), g=actx.createGain();
-    o.type='sine';
-    o.frequency.setValueAtTime(320, now);
-    o.frequency.exponentialRampToValueAtTime(540, now+0.06);
-    o.frequency.exponentialRampToValueAtTime(260, now+0.14);
-    g.gain.setValueAtTime(0.08, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now+0.16);
-    o.connect(g); g.connect(actx.destination);
-    o.start(); o.stop(now+0.16);
-  } else if(name==='coffee'){
-    for(let i=0; i<6; i++){
-      setTimeout(()=>{ tone(120 + Math.random()*90, 0.04, 'sawtooth', 0.025); }, i*35);
-    }
-  } else if(name==='ok'){
-    const notes=[523.25, 659.25, 783.99, 1046.5];
-    notes.forEach((f, idx)=>{ setTimeout(()=>tone(f, 0.15, 'sine', 0.05), idx*50); });
-  } else if(name==='click'){
-    tone(620, 0.03, 'sine', 0.04);
-  } else if(name==='clap'){
-    const seq=[523, 659, 784, 1046, 1318];
-    seq.forEach((f, i)=>{ setTimeout(()=>tone(f, 0.18, 'triangle', 0.07), i*70); });
-  } else if(name==='flush'){
-    tone(140, 0.25, 'sawtooth', 0.06);
-    setTimeout(()=>tone(80, 0.35, 'triangle', 0.05), 180);
-  } else if(name==='ring'){
-    tone(440, 0.35, 'sine', 0.08);
-    tone(480, 0.35, 'sine', 0.08);
-  }
+  if(name==='step') tone(75 + Math.random()*20, 0.05, 'triangle', 0.05);
+  else if(name==='ok') [523, 659, 784].forEach((f, i)=>setTimeout(()=>tone(f, 0.12, 'sine', 0.06), i*60));
+  else if(name==='ring') tone(440, 0.35, 'sine', 0.08);
+  else if(name==='notice') [659, 880].forEach((f, i)=>setTimeout(()=>tone(f, 0.15, 'sine', 0.08), i*80));
 }
 
-// 實際中文說話模式 (Web Speech API)
-function speakZh(text, pitch=1.0, rate=1.0){
-  if(!window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-    const clean = text.replace(/[「」『』【】（）()…—]/g, '');
-    const u = new SpeechSynthesisUtterance(clean);
-    u.lang = 'zh-TW';
-    u.pitch = pitch;
-    u.rate = rate;
-    window.speechSynthesis.speak(u);
-  } catch(e){}
-}
+// 換房間系統
+function switchRoom(roomId){
+  initA(); sfx('ok');
+  currentRoom = roomId;
+  // 切換房間時徹底停止移動並重置目標，防止任何飄移
+  player.x = 180; player.y = 380;
+  player.targetX = 180; player.targetY = 380;
+  player.moving = false;
 
-function speak(t, rate=0.85){
-  if(!window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(t);
-    u.lang='en-US'; u.rate=rate;
-    window.speechSynthesis.speak(u);
-  } catch(e){}
-}
-
-function playBirthdaySong(){
-  initA();
-  if(!actx) return;
-  const notes = [
-    {f:392, d:0.3, t:0}, {f:392, d:0.3, t:350}, {f:440, d:0.6, t:700}, {f:392, d:0.6, t:1350},
-    {f:523.25, d:0.6, t:2000}, {f:493.88, d:1.0, t:2650},
-    {f:392, d:0.3, t:3800}, {f:392, d:0.3, t:4150}, {f:440, d:0.6, t:4500}, {f:392, d:0.6, t:5150},
-    {f:587.33, d:0.6, t:5800}, {f:523.25, d:1.2, t:6450}
-  ];
-  notes.forEach(n => {
-    setTimeout(()=>{
-      tone(n.f, n.d, 'triangle', 0.12);
-      tone(n.f*0.5, n.d, 'sine', 0.08);
-    }, n.t);
-  });
-}
-
-// ============================================================
-// 3. 圖二規格視覺特效渲染 (斜射晨光微塵、原木紋、地毯、綠植)
-// ============================================================
-let vParticles=[], vLeaves=[], vMotes=[];
-function initVisualFX(){
-  vLeaves=[];
-  for(let i=0; i<20; i++){
-    vLeaves.push({
-      x: Math.random()*W, y: 900+Math.random()*800,
-      vx: 0.35+Math.random()*0.4, vy: 0.4+Math.random()*0.5,
-      sz: 2.5, col: Math.random()>0.4 ? '#f2a0b4' : '#f0ca65', rot: Math.random()*6.28
-    });
-  }
-  vMotes=[];
-  for(let i=0; i<24; i++){
-    vMotes.push({
-      x: 180+Math.random()*160, y: 70+Math.random()*380,
-      vx: (Math.random()-0.5)*0.25, vy: -0.2-Math.random()*0.25,
-      sz: 1+Math.random()*1.5, a: 0.25+Math.random()*0.55
-    });
-  }
-}
-initVisualFX();
-
-function spawnFootDust(x, y){
-  if(vParticles.length > 30) return;
-  vParticles.push({
-    x: x+(Math.random()-0.5)*8, y: y+24,
-    vx: (Math.random()-0.5)*0.3, vy: -0.15-Math.random()*0.15,
-    sz: 2.5, life: 1.0, decay: 0.06, col: 'rgba(215, 195, 175, 0.55)'
-  });
-}
-
-function spawnCoffeeSteam(){
-  if(Math.random()<0.32 && vParticles.length < 50){
-    vParticles.push({
-      x: 52 + (Math.random()-0.5)*6, y: 245,
-      vx: (Math.random()-0.5)*0.2, vy: -0.38-Math.random()*0.25,
-      sz: 2.4, life: 1.0, decay: 0.02, col: 'rgba(255, 250, 240, 0.5)'
-    });
-  }
-}
-
-function updateVisualFX(){
-  spawnCoffeeSteam();
-  for(let i=vParticles.length-1; i>=0; i--){
-    let p=vParticles[i];
-    p.x+=p.vx; p.y+=p.vy; p.life-=p.decay;
-    if(p.life<=0) vParticles.splice(i,1);
-  }
-  vLeaves.forEach(l=>{
-    l.x+=l.vx; l.y+=l.vy; l.rot+=0.04;
-    if(l.x>W+8) l.x=-8;
-    if(l.y>1750) l.y=900;
-  });
-  vMotes.forEach(m=>{
-    m.x+=m.vx; m.y+=m.vy;
-    if(m.y<70) m.y=440;
-    if(m.x<170) m.x=345;
-    if(m.x>350) m.x=180;
-  });
-}
-
-function drawShadow(x, y, rx, ry){
-  ctx.save();
-  ctx.fillStyle='rgba(15, 10, 8, 0.35)';
-  ctx.beginPath();
-  ctx.ellipse(x, y-camY, rx, ry, 0, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawPixelPlant(x, y){
-  const py=y-camY;
-  drawShadow(x+8, y+22, 10, 4);
-  ctx.fillStyle='#94482a'; ctx.fillRect(x+2, py+12, 12, 10);
-  ctx.fillStyle='#b65835'; ctx.fillRect(x+1, py+10, 14, 3);
-  ctx.fillStyle='#682e18'; ctx.fillRect(x+3, py+20, 10, 2);
-  ctx.fillStyle='#1c542a'; ctx.fillRect(x-1, py+3, 18, 9);
-  ctx.fillStyle='#2d7c3d'; ctx.fillRect(x+1, py, 14, 10);
-  ctx.fillStyle='#48a858'; ctx.fillRect(x+3, py-3, 10, 8);
-  ctx.fillStyle='#8ae696'; ctx.fillRect(x+5, py-1, 5, 4);
-}
-
-function drawPixelRug(x, y, w, h){
-  const ry=y-camY;
-  ctx.fillStyle='#2c5445'; ctx.fillRect(x, ry, w, h);
-  ctx.fillStyle='#396b58'; ctx.fillRect(x+3, ry+3, w-6, h-6);
-  ctx.fillStyle='#eedca0';
-  for(let fx=x; fx<x+w; fx+=4){
-    ctx.fillRect(fx, ry-1, 2, 2);
-    ctx.fillRect(fx, ry+h-1, 2, 2);
-  }
-  ctx.strokeStyle='#d4b068'; ctx.lineWidth=1.5;
-  ctx.strokeRect(x+6, ry+6, w-12, h-12);
-  ctx.strokeRect(x+12, ry+12, w-24, h-24);
-  ctx.fillStyle='#d4b068'; ctx.fillRect(x+w/2-4, ry+h/2-4, 8, 8);
-}
-
-function drawWoodFloor(topY, bottomY){
-  const plankH=14;
-  const plankColors=['#865234','#935c3b','#7e4c2e','#9b6341','#8c5536'];
-  for(let py=topY; py<bottomY; py+=plankH){
-    const drawY=py-camY;
-    if(drawY<-plankH || drawY>H) continue;
-    let rowIndex=Math.floor(py/plankH);
-    ctx.fillStyle=plankColors[rowIndex%plankColors.length];
-    ctx.fillRect(0, drawY, W, plankH);
-    ctx.fillStyle='rgba(40, 20, 10, 0.35)';
-    ctx.fillRect(0, drawY+plankH-1, W, 1);
-    let offset=(rowIndex%3)*36;
-    for(let px=offset; px<W; px+=72){
-      ctx.fillRect(px, drawY, 1, plankH);
-      ctx.fillStyle='rgba(30, 15, 8, 0.45)';
-      ctx.fillRect(px+3, drawY+2, 1, 1);
-      ctx.fillStyle='rgba(40, 20, 10, 0.35)';
-    }
-  }
-}
-
-function drawChar(x, y, frame, isPlayer){
-  const px=Math.floor(x), py=Math.floor(y-camY);
-  drawShadow(px, py+24, 10, 4.5);
-  const leg=frame%2 && player.moving ? 2 : 0;
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(px-5, py+16, 4, 6-leg); ctx.fillRect(px+1, py+16+leg, 4, 6-leg);
-  ctx.fillStyle='#2b1a10';
-  ctx.fillRect(px-6, py+21-leg, 5, 4); ctx.fillRect(px+1, py+21+leg, 5, 4);
-
-  ctx.fillStyle='#273c75'; ctx.fillRect(px-7, py+11, 14, 6);
-  ctx.fillStyle='#f5f6fa'; ctx.fillRect(px-6, py+3, 12, 9);
-  ctx.fillStyle='#e84118'; ctx.fillRect(px-2, py+5, 4, 4);
-
-  ctx.fillStyle='#ffd8b3'; ctx.fillRect(px-6, py-8, 12, 12);
-  ctx.fillStyle='#1e272e'; ctx.fillRect(px-4, py-3, 2, 3); ctx.fillRect(px+2, py-3, 2, 3);
-  ctx.fillStyle='#fff'; ctx.fillRect(px-4, py-3, 1, 1); ctx.fillRect(px+2, py-3, 1, 1);
-
-  ctx.fillStyle='#9e5d32';
-  ctx.fillRect(px-8, py-12, 16, 6);
-  ctx.fillRect(px-9, py-7, 4, 11);
-  ctx.fillRect(px+5, py-7, 4, 11);
-  ctx.fillStyle='#ba7544';
-  ctx.fillRect(px-5, py-11, 10, 2);
-
-  // 隨選寵物跟隨
-  if(isPlayer && petEmoji){
-    pet.x += (player.x + 18 - pet.x) * 0.15;
-    pet.y += (player.y + 4 - pet.y) * 0.15;
-    const petX=Math.floor(pet.x), petY=Math.floor(pet.y-camY);
-    const hop = player.moving ? Math.abs(Math.sin(Date.now()/120))*4 : 0;
-    drawShadow(petX+4, petY+11, 6, 2.5);
-    ctx.font='15px sans-serif';
-    ctx.fillText(petEmoji, petX-2, petY+8-hop);
-  }
-}
-
-// ============================================================
-// 4. 世界地圖物件與教室配置 (含烘焙、美感畫架、鋼琴、中文桌)
-// ============================================================
-
-// ============================================================
-
-// ============================================================
-// 2048 數字邏輯挑戰遊戲 (2048 Game Engine)
-// ============================================================
-let grid2048 = [];
-let score2048 = 0, best2048 = 0;
-let reached2048 = false;
-
-function open2048(){
-  closePhone();
-  document.getElementById('g2048Panel').classList.add('show');
-  init2048();
-}
-
-function close2048(){
-  closePanel('g2048Panel');
-}
-
-function init2048(){
-  grid2048 = Array.from({length: 4}, () => Array(4).fill(0));
-  score2048 = 0;
-  reached2048 = false;
-  addRandom2048Tile();
-  addRandom2048Tile();
-  update2048View();
-}
-
-function restart2048(){
-  init2048();
-  sfx('ok');
-  toast('2048 遊戲已重置！');
-}
-
-function addRandom2048Tile(){
-  const empty = [];
-  for(let r=0; r<4; r++){
-    for(let c=0; c<4; c++){
-      if(grid2048[r][c] === 0) empty.push({r, c});
-    }
-  }
-  if(empty.length > 0){
-    const spot = empty[Math.floor(Math.random() * empty.length)];
-    grid2048[spot.r][spot.c] = Math.random() < 0.9 ? 2 : 4;
-  }
-}
-
-function update2048View(){
-  const board = document.getElementById('g2048Board');
-  if(!board) return;
-  board.innerHTML = '';
-  for(let r=0; r<4; r++){
-    for(let c=0; c<4; c++){
-      const val = grid2048[r][c];
-      const cell = document.createElement('div');
-      cell.className = 'g2048-cell';
-      if(val > 0){
-        cell.textContent = val;
-        cell.setAttribute('data-val', val);
-      }
-      board.appendChild(cell);
-    }
-  }
-  document.getElementById('g2048Score').textContent = score2048;
-  if(score2048 > best2048) best2048 = score2048;
-  document.getElementById('g2048Best').textContent = best2048;
-}
-
-function slide2048Row(row){
-  let arr = row.filter(val => val !== 0);
-  for(let i=0; i<arr.length-1; i++){
-    if(arr[i] === arr[i+1]){
-      arr[i] *= 2;
-      score2048 += arr[i];
-      arr[i+1] = 0;
-      // Milestone rewards
-      if(arr[i] === 128){ status.stars += 3; floatNum('+3⭐'); }
-      if(arr[i] === 512){ status.stars += 8; floatNum('+8⭐'); }
-      if(arr[i] === 1024){ status.stars += 15; floatNum('+15⭐'); }
-      if(arr[i] === 2048 && !reached2048){
-        reached2048 = true;
-        status.stars += 30; status.coins += 50;
-        sfx('clap');
-        toast('🎉 達成 2048！數學邏輯大師！+30⭐ +50🪙');
-        floatNum('+30⭐ +50🪙', '#ffd700');
-      }
-      updateHUD();
-    }
-  }
-  arr = arr.filter(val => val !== 0);
-  while(arr.length < 4) arr.push(0);
-  return arr;
-}
-
-function move2048(direction){
-  let moved = false;
-  const oldGrid = JSON.stringify(grid2048);
-
-  if(direction === 'left'){
-    for(let r=0; r<4; r++){
-      grid2048[r] = slide2048Row(grid2048[r]);
-    }
-  } else if(direction === 'right'){
-    for(let r=0; r<4; r++){
-      let row = [...grid2048[r]].reverse();
-      row = slide2048Row(row).reverse();
-      grid2048[r] = row;
-    }
-  } else if(direction === 'up'){
-    for(let c=0; c<4; c++){
-      let col = [grid2048[0][c], grid2048[1][c], grid2048[2][c], grid2048[3][c]];
-      col = slide2048Row(col);
-      for(let r=0; r<4; r++) grid2048[r][c] = col[r];
-    }
-  } else if(direction === 'down'){
-    for(let c=0; c<4; c++){
-      let col = [grid2048[3][c], grid2048[2][c], grid2048[1][c], grid2048[0][c]];
-      col = slide2048Row(col);
-      for(let r=0; r<4; r++) grid2048[3-r][c] = col[r];
-    }
-  }
-
-  if(JSON.stringify(grid2048) !== oldGrid){
-    sfx('click');
-    addRandom2048Tile();
-    update2048View();
-    check2048GameOver();
-  }
-}
-
-function check2048GameOver(){
-  // Check empty
-  for(let r=0; r<4; r++){
-    for(let c=0; c<4; c++){
-      if(grid2048[r][c] === 0) return;
-    }
-  }
-  // Check neighbors
-  for(let r=0; r<4; r++){
-    for(let c=0; c<4; c++){
-      if(r < 3 && grid2048[r][c] === grid2048[r+1][c]) return;
-      if(c < 3 && grid2048[r][c] === grid2048[r][c+1]) return;
-    }
-  }
-  sfx('flush');
-  toast(`遊戲結束！獲得總分: ${score2048}！+${Math.min(25, Math.floor(score2048/100))}⭐`);
-  status.stars += Math.min(25, Math.floor(score2048/100));
+  const roomNames = {
+    counsel: '原木輔導室',
+    art: '美術美學教室',
+    music: '音樂大鋼琴室',
+    sports: '室內綜合運動場'
+  };
+  document.getElementById('hudLoc').textContent = roomNames[roomId];
+  toast(`進入【${roomNames[roomId]}】`);
   updateHUD();
 }
 
-function bind2048Controls(){
-  const bindBtn = (id, dir) => {
-    const el = document.getElementById(id);
-    if(el){
-      el.onpointerdown = (e) => { e.preventDefault(); move2048(dir); };
-    }
-  };
-  bindBtn('g2048Up', 'up');
-  bindBtn('g2048Down', 'down');
-  bindBtn('g2048Left', 'left');
-  bindBtn('g2048Right', 'right');
-
-  // Touch Swipe on 2048 Board
-  let touchStartX = 0, touchStartY = 0;
-  const board = document.getElementById('g2048Board');
-  if(board){
-    board.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }, {passive: true});
-
-    board.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      if(Math.abs(dx) > Math.abs(dy)){
-        if(Math.abs(dx) > 25){
-          move2048(dx > 0 ? 'right' : 'left');
-        }
-      } else {
-        if(Math.abs(dy) > 25){
-          move2048(dy > 0 ? 'down' : 'up');
-        }
-      }
-    }, {passive: true});
-  }
-
-  // Keyboard navigation when 2048 panel is active
-  window.addEventListener('keydown', (e) => {
-    if(document.getElementById('g2048Panel').classList.contains('show')){
-      if(e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); move2048('left'); }
-      else if(e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); move2048('right'); }
-      else if(e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); move2048('up'); }
-      else if(e.key === 'ArrowDown' || e.key === 's') { e.preventDefault(); move2048('down'); }
-    }
-  });
-}
-
-// 經典像素俄羅斯方塊 (Tetris - 空間邏輯思考訓練)
 // ============================================================
-const T_COLS = 10, T_ROWS = 18, T_SIZE = 20;
-let tBoard = [];
-let tCurrent = null;
-let tScore = 0, tLines = 0, tLevel = 1;
-let tDropInterval = 800, tLastDrop = 0;
-let tRunning = false, tAnimId = null;
-
-const TETROMINOES = {
-  I: { shape: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], color: '#00d2d3' },
-  J: { shape: [[1,0,0],[1,1,1],[0,0,0]], color: '#54a0ff' },
-  L: { shape: [[0,0,1],[1,1,1],[0,0,0]], color: '#ff9f43' },
-  O: { shape: [[1,1],[1,1]], color: '#feca57' },
-  S: { shape: [[0,1,1],[1,1,0],[0,0,0]], color: '#1dd1a1' },
-  T: { shape: [[0,1,0],[1,1,1],[0,0,0]], color: '#5f27cd' },
-  Z: { shape: [[1,1,0],[0,1,1],[0,0,0]], color: '#ff6b6b' }
-};
-const TET_KEYS = ['I','J','L','O','S','T','Z'];
-
-function openTetris(){
-  closePhone();
-  document.getElementById('tetrisPanel').classList.add('show');
-  startTetris();
-}
-
-function closeTetris(){
-  tRunning = false;
-  if(tAnimId) cancelAnimationFrame(tAnimId);
-  closePanel('tetrisPanel');
-}
-
-function startTetris(){
-  tBoard = Array.from({length: T_ROWS}, () => Array(T_COLS).fill(0));
-  tScore = 0; tLines = 0; tLevel = 1; tDropInterval = 800;
-  updateTetrisUI();
-  spawnTetromino();
-  tRunning = true;
-  tLastDrop = performance.now();
-  if(tAnimId) cancelAnimationFrame(tAnimId);
-  tAnimId = requestAnimationFrame(tetrisLoop);
-}
-
-function updateTetrisUI(){
-  document.getElementById('tetScore').textContent = tScore;
-  document.getElementById('tetLines').textContent = tLines;
-  document.getElementById('tetLevel').textContent = tLevel;
-}
-
-function spawnTetromino(){
-  const k = TET_KEYS[Math.floor(Math.random() * TET_KEYS.length)];
-  const tet = TETROMINOES[k];
-  tCurrent = {
-    shape: tet.shape.map(row => [...row]),
-    color: tet.color,
-    x: Math.floor((T_COLS - tet.shape[0].length) / 2),
-    y: 0
-  };
-  if(checkTetCollision(tCurrent.x, tCurrent.y, tCurrent.shape)){
-    // Game Over
-    tRunning = false;
-    sfx('flush');
-    toast(`遊戲結束！獲得總分：${tScore}！+${Math.min(30, Math.floor(tScore/50))}⭐`);
-    status.stars += Math.min(30, Math.floor(tScore/50));
-    updateHUD();
-  }
-}
-
-function checkTetCollision(x, y, shape){
-  for(let r = 0; r < shape.length; r++){
-    for(let c = 0; c < shape[r].length; c++){
-      if(shape[r][c]){
-        const nx = x + c;
-        const ny = y + r;
-        if(nx < 0 || nx >= T_COLS || ny >= T_ROWS) return true;
-        if(ny >= 0 && tBoard[ny][nx]) return true;
-      }
-    }
-  }
-  return false;
-}
-
-function rotateTetShape(matrix){
-  const N = matrix.length;
-  const result = matrix.map((row, i) =>
-    row.map((val, j) => matrix[N - 1 - j][i])
-  );
-  return result;
-}
-
-function moveTetLeft(){
-  if(!tRunning || !tCurrent) return;
-  if(!checkTetCollision(tCurrent.x - 1, tCurrent.y, tCurrent.shape)){
-    tCurrent.x--;
-    sfx('step');
-  }
-}
-
-function moveTetRight(){
-  if(!tRunning || !tCurrent) return;
-  if(!checkTetCollision(tCurrent.x + 1, tCurrent.y, tCurrent.shape)){
-    tCurrent.x++;
-    sfx('step');
-  }
-}
-
-function rotateTet(){
-  if(!tRunning || !tCurrent) return;
-  const rotated = rotateTetShape(tCurrent.shape);
-  if(!checkTetCollision(tCurrent.x, tCurrent.y, rotated)){
-    tCurrent.shape = rotated;
-    sfx('click');
-  } else if(!checkTetCollision(tCurrent.x - 1, tCurrent.y, rotated)){
-    tCurrent.x--;
-    tCurrent.shape = rotated;
-    sfx('click');
-  } else if(!checkTetCollision(tCurrent.x + 1, tCurrent.y, rotated)){
-    tCurrent.x++;
-    tCurrent.shape = rotated;
-    sfx('click');
-  }
-}
-
-function dropTetSoft(){
-  if(!tRunning || !tCurrent) return;
-  if(!checkTetCollision(tCurrent.x, tCurrent.y + 1, tCurrent.shape)){
-    tCurrent.y++;
-    tScore += 1;
-    updateTetrisUI();
+// 2. 房間獨立場景繪製 (復刻參考圖 2.5D 精緻畫風)
+// ============================================================
+function drawPlant(x, y, isTall){
+  ctx.save();
+  ctx.fillStyle='rgba(15,8,5,0.45)';
+  ctx.beginPath(); ctx.ellipse(x+8, y+16, isTall?12:9, 4, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#9c4928'; ctx.fillRect(x+2, y+6, 12, 10);
+  ctx.fillStyle='#b85c35'; ctx.fillRect(x+1, y+4, 14, 3);
+  if(isTall){
+    ctx.fillStyle='#5c341b'; ctx.fillRect(x+7, y-12, 3, 18);
+    ctx.fillStyle='#1d632f'; ctx.beginPath(); ctx.arc(x+8, y-16, 14, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2e8b42'; ctx.beginPath(); ctx.arc(x+6, y-19, 11, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#52c468'; ctx.beginPath(); ctx.arc(x+9, y-21, 7, 0, Math.PI*2); ctx.fill();
   } else {
-    lockTetromino();
+    ctx.fillStyle='#1d632f'; ctx.fillRect(x-2, y-2, 20, 8);
+    ctx.fillStyle='#2e8b42'; ctx.fillRect(x, y-5, 16, 8);
+    ctx.fillStyle='#52c468'; ctx.fillRect(x+3, y-7, 10, 6);
   }
+  ctx.restore();
 }
 
-function dropTetHard(){
-  if(!tRunning || !tCurrent) return;
-  let drops = 0;
-  while(!checkTetCollision(tCurrent.x, tCurrent.y + 1, tCurrent.shape)){
-    tCurrent.y++;
-    drops++;
-  }
-  tScore += drops * 2;
-  updateTetrisUI();
-  sfx('ok');
-  lockTetromino();
-}
+function renderCurrentRoom(){
+  const drawList = [];
 
-function lockTetromino(){
-  for(let r = 0; r < tCurrent.shape.length; r++){
-    for(let c = 0; c < tCurrent.shape[r].length; c++){
-      if(tCurrent.shape[r][c]){
-        const by = tCurrent.y + r;
-        const bx = tCurrent.x + c;
-        if(by >= 0 && by < T_ROWS && bx >= 0 && bx < T_COLS){
-          tBoard[by][bx] = tCurrent.color;
-        }
-      }
+  if(currentRoom === 'counsel'){
+    // --- 1. 原木輔導室 (復刻參考圖) ---
+    ctx.fillStyle='#362013'; ctx.fillRect(0,0,W,H);
+    for(let x=-H; x<W+H; x+=24){
+      ctx.strokeStyle='rgba(26,14,8,0.45)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H*0.6, H); ctx.stroke();
     }
-  }
-  clearTetLines();
-  spawnTetromino();
-}
+    // 左牆護牆板與公告欄
+    ctx.fillStyle='#4c2d18'; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(190,0); ctx.lineTo(0,180); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#8c5e38'; ctx.fillRect(14, 30, 28, 38);
+    ctx.fillStyle='#fdfaf2'; ctx.fillRect(16, 32, 24, 34); // 公告欄
+    ctx.fillStyle='#c84b31'; ctx.fillRect(18, 36, 8, 8);
 
-function clearTetLines(){
-  let cleared = 0;
-  for(let r = T_ROWS - 1; r >= 0; r--){
-    if(tBoard[r].every(cell => cell !== 0)){
-      tBoard.splice(r, 1);
-      tBoard.unshift(Array(T_COLS).fill(0));
-      cleared++;
-      r++; // Check same row again
-    }
-  }
-  if(cleared > 0){
-    tLines += cleared;
-    const pts = [0, 100, 300, 600, 1000][cleared] || 100;
-    tScore += pts * tLevel;
-    tLevel = Math.floor(tLines / 5) + 1;
-    tDropInterval = Math.max(150, 800 - (tLevel - 1) * 70);
-    updateTetrisUI();
-    
-    // Reward in main game!
-    const addStars = cleared === 4 ? 15 : cleared * 3;
-    status.stars += addStars;
-    if(cleared === 4){
-      sfx('clap');
-      toast('💥 TETRIS 四行全消！邏輯力爆發！+15⭐');
-      floatNum('+15⭐', '#ffd700');
-    } else {
-      sfx('ok');
-      toast(`消除 ${cleared} 行！邏輯思維提升 +${addStars}⭐`);
-    }
-    updateHUD();
-  }
-}
+    // 右側落地窗金黃陽光
+    const wx=250, wy=35, ww=95, wh=185;
+    ctx.fillStyle='#ffe8b0'; ctx.fillRect(wx, wy, ww, wh);
+    ctx.fillStyle='#fff6d8'; ctx.fillRect(wx+3, wy+3, ww-6, wh-6);
+    ctx.fillStyle='#61381c'; ctx.fillRect(wx, wy, ww, 4); ctx.fillRect(wx, wy+wh-4, ww, 4); ctx.fillRect(wx, wy, 4, wh); ctx.fillRect(wx+ww-4, wy, 4, wh);
 
-function renderTetris(){
-  const tcv = document.getElementById('tetrisCv');
-  if(!tcv) return;
-  const tctx = tcv.getContext('2d');
-  tctx.fillStyle = '#140e0c';
-  tctx.fillRect(0, 0, tcv.width, tcv.height);
+    // 地毯
+    ctx.fillStyle='#2d5a49'; ctx.fillRect(70, 280, 155, 95);
+    ctx.fillStyle='#3c725d'; ctx.fillRect(74, 284, 147, 87);
+    ctx.strokeStyle='#d4b068'; ctx.lineWidth=1.5; ctx.strokeRect(80, 290, 135, 75);
 
-  // Draw grid background
-  tctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  tctx.lineWidth = 1;
-  for(let r = 0; r < T_ROWS; r++){
-    for(let c = 0; c < T_COLS; c++){
-      tctx.strokeRect(c * T_SIZE, r * T_SIZE, T_SIZE, T_SIZE);
-    }
-  }
-
-  // Draw placed board blocks
-  for(let r = 0; r < T_ROWS; r++){
-    for(let c = 0; c < T_COLS; c++){
-      if(tBoard[r][c]){
-        drawTetBlock(tctx, c * T_SIZE, r * T_SIZE, tBoard[r][c]);
-      }
-    }
-  }
-
-  // Draw ghost piece (projection)
-  if(tCurrent){
-    let gy = tCurrent.y;
-    while(!checkTetCollision(tCurrent.x, gy + 1, tCurrent.shape)){
-      gy++;
-    }
-    tctx.save();
-    tctx.globalAlpha = 0.25;
-    for(let r = 0; r < tCurrent.shape.length; r++){
-      for(let c = 0; c < tCurrent.shape[r].length; c++){
-        if(tCurrent.shape[r][c]){
-          tctx.fillStyle = tCurrent.color;
-          tctx.fillRect((tCurrent.x + c) * T_SIZE + 1, (gy + r) * T_SIZE + 1, T_SIZE - 2, T_SIZE - 2);
-        }
-      }
-    }
-    tctx.restore();
-
-    // Draw active falling piece
-    for(let r = 0; r < tCurrent.shape.length; r++){
-      for(let c = 0; c < tCurrent.shape[r].length; c++){
-        if(tCurrent.shape[r][c]){
-          drawTetBlock(tctx, (tCurrent.x + c) * T_SIZE, (tCurrent.y + r) * T_SIZE, tCurrent.color);
-        }
-      }
-    }
-  }
-}
-
-function drawTetBlock(tctx, x, y, col){
-  tctx.fillStyle = col;
-  tctx.fillRect(x + 1, y + 1, T_SIZE - 2, T_SIZE - 2);
-  // Highlight
-  tctx.fillStyle = 'rgba(255,255,255,0.4)';
-  tctx.fillRect(x + 1, y + 1, T_SIZE - 2, 2);
-  tctx.fillRect(x + 1, y + 1, 2, T_SIZE - 2);
-  // Shadow
-  tctx.fillStyle = 'rgba(0,0,0,0.35)';
-  tctx.fillRect(x + 1, y + T_SIZE - 3, T_SIZE - 2, 2);
-  tctx.fillRect(x + T_SIZE - 3, y + 1, 2, T_SIZE - 2);
-}
-
-function tetrisLoop(now){
-  if(tRunning){
-    if(now - tLastDrop > tDropInterval){
-      dropTetSoft();
-      tLastDrop = now;
-    }
-    renderTetris();
-    tAnimId = requestAnimationFrame(tetrisLoop);
-  }
-}
-
-// Bind Tetris touch and keyboard controls
-function bindTetrisControls(){
-  const bindBtn = (id, fn) => {
-    const el = document.getElementById(id);
-    if(el){
-      el.onpointerdown = (e) => { e.preventDefault(); fn(); };
-    }
-  };
-  bindBtn('tetLeft', moveTetLeft);
-  bindBtn('tetRight', moveTetRight);
-  bindBtn('tetRotate', rotateTet);
-  bindBtn('tetDown', dropTetSoft);
-  bindBtn('tetDrop', dropTetHard);
-
-  window.addEventListener('keydown', (e) => {
-    if(document.getElementById('tetrisPanel').classList.contains('show') && tRunning){
-      if(e.key === 'ArrowLeft' || e.key === 'a') { e.preventDefault(); moveTetLeft(); }
-      else if(e.key === 'ArrowRight' || e.key === 'd') { e.preventDefault(); moveTetRight(); }
-      else if(e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); rotateTet(); }
-      else if(e.key === 'ArrowDown' || e.key === 's') { e.preventDefault(); dropTetSoft(); }
-      else if(e.key === ' ' || e.key === 'Enter') { e.preventDefault(); dropTetHard(); }
-    }
-  });
-}
-
-function initWorld(){
-  objs=[
-    // 輔導室道具 (0~500)
-    {id:'desk', x:90, y:150, w:75, h:40, icon:'🖥️', label:'個案電腦桌'},
-    {id:'sofa', x:240, y:390, w:80, h:32, icon:'🛋️', label:'沙發'},
-    {id:'chairs', x:160, y:330, w:80, h:48, icon:'🪑', label:'會談椅'},
-    {id:'water', x:300, y:340, w:24, h:40, icon:'🚰', label:'透亮飲水機'},
-    {id:'coffee', x:40, y:240, w:40, h:32, icon:'☕', label:'手沖咖啡吧'},
-    {id:'shelf_left', x:16, y:95, w:36, h:56, icon:'📚', label:'雙層左書架'},
-    {id:'shelf_right', x:296, y:95, w:42, h:56, icon:'📖', label:'雙層右書架'},
-    {id:'plant_counsel', x:20, y:165, w:24, h:30, icon:'🪴', label:'觀葉盆栽'},
-    {id:'toilet', x:40, y:700, w:48, h:48, icon:'🚽', label:'洗手間'},
-    // 走廊與專科教室 (500~900)
-    {id:'art_easel', x:120, y:580, w:42, h:36, icon:'🎨', label:'美術美感畫架'},
-    {id:'chinese_desk', x:220, y:580, w:46, h:36, icon:'✍️', label:'中文造句桌'},
-    {id:'piano_room', x:280, y:700, w:50, h:40, icon:'🎹', label:'音樂大鋼琴'},
-    {id:'board', x:180, y:650, w:48, h:32, icon:'📋', label:'公佈欄'},
-    {id:'field_ball', x:180, y:1520, w:50, h:40, icon:'🎾', label:'接高飛球場'},
-    // 家裡好孩子自律道具與烘焙 (1800~2100)
-    {id:'home_shoes', x:50, y:1860, w:40, h:30, icon:'👟', label:'玄關鞋櫃'},
-    {id:'home_sink', x:80, y:1980, w:45, h:34, icon:'🥣', label:'廚房洗碗槽'},
-    {id:'home_oven', x:135, y:1980, w:45, h:34, icon:'🍰', label:'烘焙烤箱吧台'},
-    {id:'home_mom', x:180, y:1930, w:32, h:36, icon:'👩', label:'媽媽'},
-    {id:'home_sister', x:270, y:1930, w:30, h:36, icon:'👧', label:'可愛妹妹'},
-    {id:'home_desk', x:210, y:1860, w:60, h:36, icon:'✏️', label:'自律書桌'},
-    {id:'home_bath', x:50, y:2020, w:50, h:40, icon:'🛁', label:'溫暖浴室'}
-  ];
-  npcs=[
-    {id:'chunbo', name:'春伯', x:120, y:750, color:'#6080a0', talkCount:0, talk:talkChunbo},
-    {id:'emma', name:'Emma', x:220, y:1080, color:'#e080a0', talkCount:0, talk:talkEmma},
-    {id:'teacher', name:'林老師', x:280, y:200, color:'#50a070', talkCount:0, talk:talkTeacher}
-  ];
-}
-
-// 繪製世界地圖
-function drawWorld(){
-  updateVisualFX();
-
-  // 1. 輔導室 (0 ~ 500)
-  drawWoodFloor(0, 500);
-
-  const wallH=46;
-  ctx.fillStyle='#5c381e'; ctx.fillRect(0, -camY, W, wallH);
-  ctx.fillStyle='#73482a';
-  for(let wx=0; wx<W; wx+=22) ctx.fillRect(wx+2, -camY+2, 18, wallH-4);
-  ctx.fillStyle='#3a200f'; ctx.fillRect(0, wallH-2-camY, W, 3);
-
-  // 大採光窗
-  const winX=260, winY=4-camY, winW=88, winH=38;
-  ctx.fillStyle='#ffeed0'; ctx.fillRect(winX, winY, winW, winH);
-  ctx.fillStyle='#ffd888'; ctx.fillRect(winX+3, winY+3, winW-6, winH-6);
-  ctx.fillStyle='#5c381e';
-  ctx.fillRect(winX, winY, winW, 2); ctx.fillRect(winX, winY+winH-2, winW, 2);
-  ctx.fillRect(winX, winY, 2, winH); ctx.fillRect(winX+winW-2, winY, 2, winH);
-  ctx.fillRect(winX+winW/2-1, winY, 2, winH);
-
-  // 海報白板
-  ctx.fillStyle='#85522c'; ctx.fillRect(16, 8-camY, 32, 28);
-  ctx.fillStyle='#fffcf4'; ctx.fillRect(18, 10-camY, 28, 24);
-  ctx.fillStyle='#3498db'; ctx.fillRect(20, 12-camY, 24, 12);
-  ctx.fillStyle='#2ecc71'; ctx.fillRect(20, 22-camY, 24, 6);
-
-  ctx.fillStyle='#85522c'; ctx.fillRect(56, 8-camY, 40, 28);
-  ctx.fillStyle='#f5e6ca'; ctx.fillRect(58, 10-camY, 36, 24);
-  ctx.fillStyle='#fff'; ctx.fillRect(62, 14-camY, 12, 14);
-
-  // 雙層精緻書架
-  function drawShelf(sx, sy, sw, sh){
-    ctx.fillStyle='#462511'; ctx.fillRect(sx, sy-camY, sw, sh);
-    ctx.fillStyle='#5c341b'; ctx.fillRect(sx+2, sy+2-camY, sw-4, sh-4);
-    const cols=['#c0392b','#2980b9','#27ae60','#f1c40f','#8e44ad','#d35400'];
-    for(let r=sy+4; r<sy+sh-8; r+=16){
-      ctx.fillStyle='#2c1508'; ctx.fillRect(sx+2, r+14-camY, sw-4, 2);
-      let bx=sx+4, bIdx=0;
-      while(bx<sx+sw-7){
-        let bw=3+(bIdx%3);
-        ctx.fillStyle=cols[(bx+bIdx)%cols.length];
-        ctx.fillRect(bx, r+14-11-camY, bw, 11);
-        ctx.fillStyle='rgba(255,255,255,0.45)';
-        ctx.fillRect(bx, r+14-11-camY, 1, 11);
-        bx+=bw+1; bIdx++;
-      }
-    }
-  }
-  drawShelf(16, 95, 36, 56);
-  drawShelf(296, 95, 42, 56);
-
-  // 主管電腦桌
-  drawShadow(115, 175, 42, 10);
-  ctx.fillStyle='#5a351c'; ctx.fillRect(72, 140-camY, 80, 36);
-  ctx.fillStyle='#784827'; ctx.fillRect(74, 142-camY, 76, 32);
-  ctx.fillStyle='#fefefe'; ctx.fillRect(80, 148-camY, 16, 12);
-  ctx.fillStyle='#2c3e50'; ctx.fillRect(116, 134-camY, 24, 18);
-  ctx.fillStyle='#3498db'; ctx.fillRect(118, 136-camY, 20, 14);
-  ctx.fillStyle='#74b9ff'; ctx.fillRect(120, 138-camY, 16, 3);
-  ctx.fillStyle='#1a252f'; ctx.fillRect(126, 152-camY, 4, 6);
-
-  // 手沖咖啡吧
-  drawShadow(55, 260, 20, 8);
-  ctx.fillStyle='#5a351c'; ctx.fillRect(35, 238-camY, 40, 24);
-  ctx.fillStyle='#784827'; ctx.fillRect(37, 240-camY, 36, 20);
-  ctx.fillStyle='#2c3e50'; ctx.fillRect(45, 228-camY, 16, 16);
-  ctx.fillStyle='#d35400'; ctx.fillRect(48, 236-camY, 10, 6);
-
-  // 透亮飲水機
-  drawShadow(310, 370, 14, 6);
-  ctx.fillStyle='#ecf0f1'; ctx.fillRect(300, 335-camY, 20, 38);
-  ctx.fillStyle='#bdc3c7'; ctx.fillRect(302, 337-camY, 16, 34);
-  ctx.fillStyle='#2980b9'; ctx.fillRect(304, 322-camY, 12, 14);
-  ctx.fillStyle='#6dd5fa'; ctx.fillRect(306, 323-camY, 4, 11);
-  ctx.fillStyle='#e74c3c'; ctx.fillRect(305, 350-camY, 3, 4);
-  ctx.fillStyle='#3498db'; ctx.fillRect(312, 350-camY, 3, 4);
-
-  // 墨綠色流蘇地毯
-  drawPixelRug(120, 305, 175, 100);
-
-  // 長沙發
-  drawShadow(265, 420, 42, 10);
-  ctx.fillStyle='#7a5234'; ctx.fillRect(225, 395-camY, 80, 28);
-  ctx.fillStyle='#a6744d'; ctx.fillRect(228, 397-camY, 74, 22);
-  ctx.fillStyle='#eedbc5'; ctx.fillRect(232, 400-camY, 32, 16); ctx.fillRect(266, 400-camY, 32, 16);
-  ctx.fillStyle='#d35400'; ctx.fillRect(230, 402-camY, 8, 12);
-
-  // 扶手椅與茶几
-  drawShadow(148, 355, 14, 7);
-  ctx.fillStyle='#5a351c'; ctx.fillRect(138, 332-camY, 20, 24);
-  ctx.fillStyle='#eedbc5'; ctx.fillRect(141, 336-camY, 14, 12);
-
-  drawShadow(200, 355, 14, 7);
-  ctx.fillStyle='#5a351c'; ctx.fillRect(190, 332-camY, 20, 24);
-  ctx.fillStyle='#eedbc5'; ctx.fillRect(193, 336-camY, 14, 12);
-
-  drawShadow(174, 350, 18, 7);
-  ctx.fillStyle='#6b4224'; ctx.fillRect(163, 338-camY, 22, 14);
-  ctx.fillStyle='#85532d'; ctx.fillRect(164, 339-camY, 20, 11);
-
-  // 觀葉植物
-  drawPixelPlant(20, 165);
-  drawPixelPlant(275, 78);
-  drawPixelPlant(25, 430);
-  drawPixelPlant(325, 430);
-
-  // 2. 走廊與專科教室 (500 ~ 900)
-  ctx.fillStyle='#8fa38c'; ctx.fillRect(0, 500-camY, W, 400);
-
-  // 美術畫架 (x:120, y:580)
-  drawShadow(141, 605, 18, 6);
-  ctx.fillStyle='#8e5830'; ctx.fillRect(138, 570-camY, 6, 32);
-  ctx.fillStyle='#fff9ea'; ctx.fillRect(122, 575-camY, 38, 24);
-  ctx.fillStyle='#e74c3c'; ctx.fillRect(126, 580-camY, 8, 8);
-  ctx.fillStyle='#3498db'; ctx.fillRect(138, 585-camY, 10, 6);
-
-  // 中文造句桌 (x:220, y:580)
-  drawShadow(243, 605, 20, 7);
-  ctx.fillStyle='#5c381e'; ctx.fillRect(220, 575-camY, 46, 26);
-  ctx.fillStyle='#fefefe'; ctx.fillRect(226, 580-camY, 16, 12);
-  ctx.fillStyle='#ffd152'; ctx.fillRect(246, 582-camY, 14, 8);
-
-  // 音樂大鋼琴 (x:280, y:700)
-  drawShadow(305, 735, 25, 8);
-  ctx.fillStyle='#111'; ctx.fillRect(280, 700-camY, 50, 32);
-  ctx.fillStyle='#fff'; ctx.fillRect(285, 722-camY, 40, 8);
-  ctx.fillStyle='#000';
-  for(let pk=288; pk<322; pk+=6) ctx.fillRect(pk, 722-camY, 3, 5);
-
-  // 3. 中庭與操場 (900 ~ 1800)
-  ctx.fillStyle='#3e8e41'; ctx.fillRect(0, 900-camY, W, 500);
-  ctx.fillStyle='#c8aa88'; ctx.fillRect(115, 920-camY, 130, 440);
-  ctx.fillStyle='#2e7d32'; ctx.fillRect(0, 1400-camY, W, 400);
-  ctx.fillStyle='#c0392b'; ctx.fillRect(30, 1440-camY, 300, 14);
-
-  // 4. 家裡 (1800 ~ 2100)
-  drawWoodFloor(1800, 2100);
-  ctx.fillStyle='#5c381e'; ctx.fillRect(0, 1800-camY, W, 8);
-
-  // 玄關鞋櫃 (x:50, y:1860)
-  drawShadow(70, 1880, 20, 8);
-  ctx.fillStyle='#6b4224'; ctx.fillRect(50, 1850-camY, 40, 28);
-  ctx.fillStyle='#d35400'; ctx.fillRect(55, 1858-camY, 12, 6); ctx.fillRect(72, 1858-camY, 12, 6);
-
-  // 廚房洗碗槽 (x:80, y:1980)
-  drawShadow(102, 2005, 22, 7);
-  ctx.fillStyle='#7f8c8d'; ctx.fillRect(80, 1970-camY, 45, 34);
-  ctx.fillStyle='#3498db'; ctx.fillRect(90, 1978-camY, 22, 18);
-
-  // 烘焙烤箱吧台 (x:135, y:1980)
-  drawShadow(157, 2005, 22, 7);
-  ctx.fillStyle='#34495e'; ctx.fillRect(135, 1970-camY, 45, 34);
-  ctx.fillStyle='#e67e22'; ctx.fillRect(142, 1978-camY, 30, 18);
-  ctx.fillStyle='#fff'; ctx.fillRect(146, 1984-camY, 8, 6); ctx.fillRect(158, 1984-camY, 8, 6);
-
-  // 媽媽 NPC (x:180, y:1930)
-  drawShadow(196, 1954, 12, 4.5);
-  ctx.fillStyle='#8e44ad'; ctx.fillRect(188, 1932-camY, 16, 22);
-  ctx.fillStyle='#ffd8b3'; ctx.fillRect(190, 1923-camY, 12, 11);
-  ctx.fillStyle='#5a3010'; ctx.fillRect(188, 1920-camY, 16, 6);
-  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(180, 1906-camY, 32, 13);
-  ctx.fillStyle='#ffd152'; ctx.font='10px sans-serif'; ctx.textAlign='center';
-  ctx.fillText('媽媽', 196, 1916-camY);
-
-  // 妹妹 (x:270, y:1930)
-  drawShadow(282, 1954, 10, 4);
-  ctx.fillStyle='#ff7675'; ctx.fillRect(274, 1935-camY, 16, 18);
-  ctx.fillStyle='#ffd8b3'; ctx.fillRect(276, 1926-camY, 12, 11);
-  ctx.fillStyle='#fdcb6e'; ctx.fillRect(274, 1924-camY, 16, 5);
-  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(266, 1910-camY, 32, 13);
-  ctx.fillStyle='#fff'; ctx.font='10px sans-serif'; ctx.textAlign='center';
-  ctx.fillText('妹妹', 282, 1920-camY);
-
-  // 浴室 (x:50, y:2020)
-  drawShadow(75, 2050, 26, 8);
-  ctx.fillStyle='#34495e'; ctx.fillRect(50, 2010-camY, 50, 40);
-  ctx.fillStyle='#ecf0f1'; ctx.fillRect(56, 2020-camY, 38, 24);
-
-  // NPCs
-  npcs.forEach(n=>{
-    const ny=n.y-camY;
-    if(ny>-40 && ny<H+40){
-      drawShadow(n.x, n.y+24, 10, 4);
-      ctx.fillStyle=n.color; ctx.fillRect(n.x-8, ny, 16, 24);
-      ctx.fillStyle='#ffd8b3'; ctx.fillRect(n.x-6, ny-10, 12, 12);
-      ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(n.x-18, ny-26, 36, 13);
-      ctx.fillStyle='#ffd152'; ctx.font='10px sans-serif'; ctx.textAlign='center';
-      ctx.fillText(n.name, n.x, ny-16);
-      ctx.textAlign='left';
-    }
-  });
-
-  if(xiaoyuState>=1){
-    const xy=xiaoyu.y-camY;
-    drawShadow(xiaoyu.x, xiaoyu.y+24, 10, 4);
-    ctx.fillStyle='#2c3e50'; ctx.fillRect(xiaoyu.x-8, xy, 16, 24);
-    ctx.fillStyle='#ffd8b3'; ctx.fillRect(xiaoyu.x-6, xy-10, 12, 12);
-    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(xiaoyu.x-16, xy-26, 32, 13);
-    ctx.fillStyle='#74b9ff'; ctx.font='10px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('小宇', xiaoyu.x, xy-16);
-    ctx.textAlign='left';
-  }
-
-  // 粒子
-  vParticles.forEach(p=>{
-    ctx.fillStyle=p.col;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y-camY, p.sz*p.life, 0, Math.PI*2);
-    ctx.fill();
-  });
-
-  drawChar(player.x, player.y, player.frame, true);
-
-  // 心情隨口哼唱短句特效
-  if(status.mood >= 80 && player.moving && Math.random()<0.015){
-    ctx.fillStyle='#f1c40f'; ctx.font='13px sans-serif';
-    ctx.fillText('♪ Golden ~', player.x+12, player.y-camY-25);
-  }
-
-  vLeaves.forEach(l=>{
-    const ly=l.y-camY;
-    if(ly>-10 && ly<H+10){
-      ctx.save(); ctx.translate(l.x, ly); ctx.rotate(l.rot);
-      ctx.fillStyle=l.col; ctx.fillRect(-l.sz/2, -l.sz/2, l.sz, l.sz*1.5);
-      ctx.restore();
-    }
-  });
-
-  // 晨光
-  if(player.y < 650){
-    ctx.save();
-    const rayGrad=ctx.createLinearGradient(260, 10-camY, 130, 440-camY);
-    rayGrad.addColorStop(0, 'rgba(255, 235, 170, 0.35)');
-    rayGrad.addColorStop(0.5, 'rgba(255, 215, 130, 0.2)');
-    rayGrad.addColorStop(1, 'rgba(255, 190, 90, 0.0)');
-    ctx.fillStyle=rayGrad;
-    ctx.beginPath();
-    ctx.moveTo(255, 15-camY); ctx.lineTo(348, 15-camY);
-    ctx.lineTo(260, 440-camY); ctx.lineTo(130, 440-camY);
-    ctx.closePath(); ctx.fill();
-
-    vMotes.forEach(m=>{
-      const my=m.y-camY;
-      if(my>0 && my<H){
-        ctx.fillStyle=`rgba(255, 245, 210, ${m.a})`;
-        ctx.beginPath(); ctx.arc(m.x, my, m.sz, 0, Math.PI*2); ctx.fill();
+    // 家具深度排序
+    drawList.push({
+      y: 110,
+      draw: ()=>{
+        ctx.fillStyle='#4c2a16'; ctx.fillRect(105, 30, 80, 82);
+        ctx.fillStyle='#61381c'; ctx.fillRect(107, 32, 76, 78);
+        drawPlant(115, 24, false); drawPlant(155, 24, false);
       }
     });
-    ctx.restore();
+    drawList.push({
+      y: 135,
+      draw: ()=>{
+        ctx.fillStyle='#e8ecef'; ctx.fillRect(188, 92, 18, 42); // 飲水機
+        ctx.fillStyle='#2980b9'; ctx.fillRect(191, 76, 12, 16);
+        drawPlant(212, 128, true);
+      }
+    });
+    drawList.push({
+      y: 180,
+      draw: ()=>{
+        ctx.fillStyle='#5a341b'; ctx.fillRect(36, 126, 72, 42); // 辦公桌
+        ctx.fillStyle='#2c3e50'; ctx.fillRect(80, 118, 22, 18);
+        ctx.fillStyle='#3498db'; ctx.fillRect(82, 120, 18, 14);
+      }
+    });
+    drawList.push({
+      y: 240,
+      draw: ()=>{
+        ctx.fillStyle='#855a3c'; ctx.fillRect(230, 200, 80, 36); // 靠窗長沙發
+        ctx.fillStyle='#d8be9b'; ctx.fillRect(232, 202, 76, 32);
+        drawPlant(314, 215, true);
+      }
+    });
+    drawList.push({
+      y: 335,
+      draw: ()=>{
+        ctx.fillStyle='#6b4224'; ctx.fillRect(115, 318, 46, 18); // 茶几
+        ctx.fillStyle='#8c5832'; ctx.fillRect(117, 319, 42, 14);
+      }
+    });
+  } else if(currentRoom === 'art'){
+    // --- 2. 美術教室 ---
+    ctx.fillStyle='#4a4238'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#6b6154'; ctx.fillRect(20, 40, 320, 560); // 畫室木地板
+    // 牆面色彩色相環
+    ctx.fillStyle='#e74c3c'; ctx.beginPath(); ctx.arc(60, 80, 18, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#3498db'; ctx.beginPath(); ctx.arc(100, 80, 18, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#f1c40f'; ctx.beginPath(); ctx.arc(140, 80, 18, 0, Math.PI*2); ctx.fill();
+    
+    drawList.push({
+      y: 220,
+      draw: ()=>{
+        ctx.fillStyle='#8e5830'; ctx.fillRect(70, 160, 8, 60); // 畫架
+        ctx.fillStyle='#fff'; ctx.fillRect(50, 170, 48, 36);
+        ctx.fillStyle='#e74c3c'; ctx.fillRect(56, 176, 12, 12);
+        ctx.fillStyle='#3498db'; ctx.fillRect(72, 182, 14, 10);
+      }
+    });
+    drawList.push({
+      y: 260,
+      draw: ()=>{
+        ctx.fillStyle='#5c381e'; ctx.fillRect(170, 200, 120, 50); // 調色長桌
+        ctx.fillStyle='#ecf0f1'; ctx.fillRect(180, 210, 24, 16);
+      }
+    });
+  } else if(currentRoom === 'music'){
+    // --- 3. 音樂教室 ---
+    ctx.fillStyle='#2c3e50'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#34495e'; ctx.fillRect(20, 40, 320, 560);
+    // 五線譜牆面
+    ctx.strokeStyle='#7f8c8d'; ctx.lineWidth=1;
+    for(let i=0;i<5;i++){ ctx.beginPath(); ctx.moveTo(40, 60+i*8); ctx.lineTo(320, 60+i*8); ctx.stroke(); }
+    
+    drawList.push({
+      y: 240,
+      draw: ()=>{
+        ctx.fillStyle='#111'; ctx.fillRect(120, 180, 120, 60); // 三角大鋼琴
+        ctx.fillStyle='#fff'; ctx.fillRect(130, 225, 100, 12);
+        ctx.fillStyle='#000';
+        for(let k=134; k<226; k+=8) ctx.fillRect(k, 225, 4, 8);
+      }
+    });
+  } else if(currentRoom === 'sports'){
+    // --- 4. 室內運動場 ---
+    ctx.fillStyle='#85522c'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#d39e5e'; ctx.fillRect(20, 40, 320, 560); // 楓木運動地板
+    // 球場白線
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+    ctx.strokeRect(40, 80, 280, 480);
+    ctx.beginPath(); ctx.moveTo(40, 320); ctx.lineTo(320, 320); ctx.stroke();
+
+    drawList.push({
+      y: 200,
+      draw: ()=>{
+        ctx.fillStyle='#e74c3c'; ctx.fillRect(150, 150, 60, 40); // 射箭靶位
+        ctx.fillStyle='#f1c40f'; ctx.beginPath(); ctx.arc(180, 170, 12, 0, Math.PI*2); ctx.fill();
+      }
+    });
+    drawList.push({
+      y: 320,
+      draw: ()=>{
+        ctx.fillStyle='#ecf0f1'; ctx.fillRect(38, 318, 284, 4); // 排球中網
+      }
+    });
   }
 
-  const vig=ctx.createRadialGradient(W/2, H/2, H*0.35, W/2, H/2, H*0.75);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(15,8,4,0.38)');
-  ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+  // 玩家與白兔加入深度排序清單
+  drawList.push({
+    y: player.y,
+    draw: ()=>{
+      drawChar(player.x, player.y, player.frame, true);
+    }
+  });
+
+  // Y-Sorting 深度繪製
+  drawList.sort((a,b)=>a.y - b.y);
+  drawList.forEach(item => item.draw());
+}
+
+function drawChar(x, y, frame, isPlayer){
+  const px=Math.floor(x), py=Math.floor(y);
+  // 角色本體
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(px-5, py+16, 4, 6); ctx.fillRect(px+1, py+16, 4, 6);
+  ctx.fillStyle='#2b1a10';
+  ctx.fillRect(px-6, py+21, 5, 4); ctx.fillRect(px+1, py+21, 5, 4);
+  ctx.fillStyle='#273c75'; ctx.fillRect(px-7, py+11, 14, 6);
+  ctx.fillStyle='#f5f6fa'; ctx.fillRect(px-6, py+3, 12, 9);
+  ctx.fillStyle='#ffd8b3'; ctx.fillRect(px-6, py-8, 12, 12);
+  ctx.fillStyle='#9e5d32'; ctx.fillRect(px-8, py-12, 16, 6);
+  
+  // 白兔寵物
+  if(isPlayer){
+    pet.x += (player.x + 18 - pet.x) * 0.15;
+    pet.y += (player.y + 4 - pet.y) * 0.15;
+    const petX=Math.floor(pet.x), petY=Math.floor(pet.y);
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(petX, petY+2, 9, 8);
+    ctx.fillRect(petX+6, petY-2, 6, 6);
+  }
 }
 
 // ============================================================
-// 5. 遊戲主循環與移動邏輯 (雙軌觸控 + 鍵盤)
+// 3. 遊戲更新循環與飄移防止機制
 // ============================================================
 function update(dt){
+  // 當來電橫幅跳出或對話框開啟時，完全凍結座標移動，修復飄移 Bug
+  if(callActive || dialogOpen){
+    player.targetX = player.x;
+    player.targetY = player.y;
+    player.moving = false;
+    return;
+  }
+
   let mx=0, my=0;
   if(keys['ArrowUp'] || keys['w'] || touchDir.up) my=-1;
   if(keys['ArrowDown'] || keys['s'] || touchDir.down) my=1;
@@ -1547,8 +444,7 @@ function update(dt){
   if(keys['ArrowRight'] || keys['d'] || touchDir.right) mx=1;
 
   if(player.targetX!==player.x || player.targetY!==player.y){
-    const dx=player.targetX - player.x;
-    const dy=player.targetY - player.y;
+    const dx=player.targetX - player.x, dy=player.targetY - player.y;
     const dist=Math.hypot(dx, dy);
     if(dist > 5){
       mx = dx / dist; my = dy / dist;
@@ -1561,277 +457,111 @@ function update(dt){
     player.moving=true;
     player.x += mx * player.speed;
     player.y += my * player.speed;
-    player.x = Math.max(25, Math.min(W-25, player.x));
-    player.y = Math.max(60, Math.min(WORLD_H-40, player.y));
+    player.x = Math.max(35, Math.min(325, player.x));
+    player.y = Math.max(130, Math.min(560, player.y));
     player.walk += 0.16;
     player.frame = Math.floor(player.walk) % 2;
-    if(Math.random()<0.1) sfx('step');
-    spawnFootDust(player.x, player.y);
-    status.toilet = Math.min(100, status.toilet+0.012);
-    status.energy = Math.max(0, status.energy-0.0035);
+    if(Math.random()<0.08) sfx('step');
   } else {
     player.moving=false;
   }
 
-  camY = player.y - H*0.45;
-  camY = Math.max(0, Math.min(WORLD_H-H, camY));
-  zone = player.y<500 ? 'counsel' : (player.y<900 ? 'corridor' : (player.y<1750 ? 'yard' : 'home'));
-  status.time += dt/60000 * 0.35;
-
-  // 家人陪伴時間加分機制：在客廳（y > 1800）陪伴時間久時自動加親情好感度！
-  if(zone === 'home'){
-    familyTimeSeconds += dt/1000;
-    if(familyTimeSeconds >= 45){
-      familyTimeSeconds = 0;
-      affection.mom = Math.min(100, affection.mom + 5);
-      status.mood = Math.min(100, status.mood + 6);
-      toast('溫馨陪伴加分！全家在一起好幸福！+5💖');
-      updateHUD();
-    }
-  } else {
-    familyTimeSeconds = 0;
-  }
-
-  if(xiaoyuState===0 && status.time>8*60+3 && calIndex===0){
-    xiaoyuState=1;
-    toast('小宇正往輔導室走來……');
-    setTask('小宇不想回教室', '輔導室');
-    phoneUnread=2; updateBadge();
-  }
-  if(xiaoyuState===1){
-    xiaoyu.y -= 0.8;
-    if(xiaoyu.y <= 360){ xiaoyu.y=360; xiaoyuState=2; toast('小宇拉開椅子坐下了。'); }
-  }
-
-  nearObj=null; let best=46;
-  objs.forEach(o=>{
-    const d=Math.hypot(o.x+o.w/2 - player.x, o.y+o.h/2 - player.y);
-    if(d<best){ best=d; nearObj=o; }
-  });
-  npcs.forEach(n=>{
-    const d=Math.hypot(n.x - player.x, n.y - player.y);
-    if(d<best){ best=d; nearObj={id:'npc_'+n.id, npc:n, icon:'💬', label:n.name}; }
-  });
-  if(xiaoyuState>=2 && xiaoyuState<4){
-    const d=Math.hypot(xiaoyu.x - player.x, xiaoyu.y - player.y);
-    if(d<55){ nearObj={id:'xiaoyu', icon:'💬', label:'小宇'}; }
-  }
-  document.getElementById('ctxBtn').textContent = nearObj ? (nearObj.icon||'💬') : '✋';
+  // 靠近公告欄自動跳出公告事件檢測
+  checkProximityToBoard();
   updateHUD();
-
-  triggerRandomIncomingCall();
 }
+
+// 靠近公告欄即彈出公告事項
+function checkProximityToBoard(){
+  if(currentRoom === 'counsel'){
+    const distToBoard = Math.hypot(player.x - 28, player.y - 48);
+    if(distToBoard < 45 && !boardNoticeCooldown && !dialogOpen){
+      boardNoticeCooldown = true;
+      sfx('notice');
+      showBoardNotice();
+      setTimeout(()=>{ boardNoticeCooldown = false; }, 8000);
+    }
+  }
+}
+
+function showBoardNotice(){
+  const notices = [
+    '【今日校園公告】<br>狂賀！本校榮獲全市美感教育特優獎！下午 14:00 請各班班代至美術教室領取觀展手冊。',
+    '【資安與防詐宣導】<br>提醒全校同學：凡接獲簡訊要求提供「驗證碼」或「補繳包裹運費」者，一律為詐騙，請立刻向輔導室或 165 專線查證！',
+    '【體育週特別活動】<br>室內運動場今日開放排球扣殺與射箭體驗，歡迎同學們放學後組隊參加！',
+    '【心靈小補帖】<br>感到疲憊時，記得深呼吸。自律不是束縛，而是掌控人生的自信起點。'
+  ];
+  const msg = notices[Math.floor(Math.random()*notices.length)];
+  showDlg('📋 校園公佈欄即時公告', msg, [
+    {t:'收到，我會遵守並提醒同學！', a:()=>{ status.stars+=3; toast('閱讀校園公告 +3⭐'); updateHUD(); }}
+  ]);
+}
+
+// 測試來電觸發 (展示修復後的無飄移接聽機制)
+function triggerCallEvent(){
+  callActive = true;
+  // 鎖定人物
+  player.targetX = player.x; player.targetY = player.y; player.moving = false;
+  sfx('ring');
+  const banner = document.getElementById('incomingBanner');
+  banner.style.display = 'flex';
+  document.getElementById('incomingCaller').textContent = '媽媽 ❤️ 來電中';
+  document.getElementById('incomingDesc').textContent = '外面降溫了，提醒你加件外套！';
+}
+
+document.getElementById('btnAnsCall').onclick = ()=>{
+  document.getElementById('incomingBanner').style.display = 'none';
+  callActive = false;
+  sfx('ok');
+  showDlg('媽媽 ❤️', '「寶貝～外面天氣變涼了，出門有沒有記得多帶一件外套？午餐有沒有吃飽飽呀？」', [
+    {t:'「有喔媽媽！我有吃飽穿暖，您也要照顧好身體！」', a:()=>{ status.mood=Math.min(100, status.mood+12); toast('親情好感提升！+12💖'); updateHUD(); }}
+  ]);
+};
+
+document.getElementById('btnRejCall').onclick = ()=>{
+  document.getElementById('incomingBanner').style.display = 'none';
+  callActive = false;
+  toast('已掛斷電話');
+};
 
 function updateHUD(){
   const h=Math.floor(status.time/60), m=Math.floor(status.time%60);
   document.getElementById('hudTime').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-  const remain=Math.max(0, 9*60 - (status.time-8*60));
-  const zName = {counsel:'輔導室', corridor:'專科教室', yard:'中庭操場', home:'溫馨的家'}[zone]||'校園';
-  document.getElementById('hudLoc').textContent=zName+'・剩 '+Math.floor(remain/60)+':'+String(Math.floor(remain%60)).padStart(2,'0');
-  document.getElementById('hudDay').textContent=CALENDAR_DAYS[calIndex].day;
   document.getElementById('barEn').style.width=status.energy+'%'; document.getElementById('vEn').textContent=Math.round(status.energy);
   document.getElementById('barMo').style.width=status.mood+'%'; document.getElementById('vMo').textContent=Math.round(status.mood);
   document.getElementById('barWk').style.width=status.work+'%'; document.getElementById('vWk').textContent=Math.round(status.work);
   document.getElementById('barTo').style.width=status.toilet+'%'; document.getElementById('vTo').textContent=Math.round(status.toilet);
-  document.getElementById('toRow').className='brow to'+(status.toilet>75?' warn':'');
 }
 
-function cycleCalendarDay(){
-  calIndex = (calIndex + 1) % CALENDAR_DAYS.length;
-  const cur = CALENDAR_DAYS[calIndex];
-  setTask(cur.task, cur.loc);
-  toast(`切換為：【${cur.day}】！${cur.desc}`);
-  sfx('clap');
-  if(cur.type === 'weekend' || cur.type === 'holiday'){
-    player.x = 180; player.y = 1880; player.targetX = 180; player.targetY = 1880;
-  } else {
-    player.x = 180; player.y = 300; player.targetX = 180; player.targetY = 300;
-  }
-  updateHUD();
-}
-
-function setTask(t, s){
-  document.getElementById('taskTitle').textContent=t;
-  document.getElementById('taskSub').textContent=s;
-}
-function updateBadge(){
-  const b=document.getElementById('phBadge');
-  b.style.display = phoneUnread>0 ? 'flex' : 'none';
-  b.textContent = phoneUnread;
-}
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', 2400);
-}
-function floatNum(txt, col='#ffd152'){
-  const el=document.createElement('div');
-  el.className='float-txt'; el.textContent=txt; el.style.color=col;
-  el.style.left=(W/2-20)+'px'; el.style.top=(H/2-30)+'px';
-  document.getElementById('ui').appendChild(el);
-  setTimeout(()=>el.remove(), 1200);
-}
-
-// 觸控尋路
-function handleCanvasPointer(e){
-  if(dialogOpen || phoneOpen) return;
+// ============================================================
+// 4. 輸入監聽與初始化
+// ============================================================
+cv.addEventListener('pointerdown', e=>{
+  if(dialogOpen || callActive) return;
   const rect=cv.getBoundingClientRect();
   const scaleX=W / rect.width, scaleY=H / rect.height;
-  const clientX=e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY=e.touches ? e.touches[0].clientY : e.clientY;
-  player.targetX=(clientX - rect.left) * scaleX;
-  player.targetY=(clientY - rect.top) * scaleY + camY;
-
+  player.targetX = (e.clientX - rect.left) * scaleX;
+  player.targetY = (e.clientY - rect.top) * scaleY;
   const ind=document.getElementById('tInd');
-  ind.style.left=(clientX - rect.left)+'px';
-  ind.style.top=(clientY - rect.top)+'px';
-  ind.style.opacity='1';
-  ind.style.transform='translate(-50%,-50%) scale(1.4)';
+  ind.style.left=(e.clientX - rect.left)+'px'; ind.style.top=(e.clientY - rect.top)+'px';
+  ind.style.opacity='1'; ind.style.transform='translate(-50%,-50%) scale(1.4)';
   setTimeout(()=>{ ind.style.opacity='0'; ind.style.transform='translate(-50%,-50%) scale(0)'; }, 300);
-}
-cv.addEventListener('pointerdown', handleCanvasPointer);
-cv.addEventListener('pointermove', e=>{ if(e.buttons===1) handleCanvasPointer(e); });
+});
 
 document.querySelectorAll('#dpad button').forEach(btn=>{
-  const d=btn.dataset.d;
-  if(!d) return;
-  const press=(e)=>{
-    e.preventDefault(); initA(); touchDir[d]=1;
-    btn.classList.add('active');
-    player.targetX=player.x; player.targetY=player.y;
-  };
-  const release=(e)=>{
-    e.preventDefault(); touchDir[d]=0;
-    btn.classList.remove('active');
-  };
+  const d=btn.dataset.d; if(!d) return;
+  const press=e=>{ e.preventDefault(); initA(); touchDir[d]=1; btn.classList.add('active'); player.targetX=player.x; player.targetY=player.y; };
+  const release=e=>{ e.preventDefault(); touchDir[d]=0; btn.classList.remove('active'); };
   btn.addEventListener('pointerdown', press);
   btn.addEventListener('pointerup', release);
-  btn.addEventListener('pointercancel', release);
   btn.addEventListener('pointerleave', release);
 });
 
 window.addEventListener('keydown', e=>{
   keys[e.key]=true; player.targetX=player.x; player.targetY=player.y;
-  if(e.key===' ' || e.key==='Enter') tryInteract();
-  if(e.key==='Escape'){ closeDlg(); closePhone(); }
 });
 window.addEventListener('keyup', e=>keys[e.key]=false);
 
-// ============================================================
-// 6. 生活來電系統 (實際真人說話語音 TTS)
-// ============================================================
-let incomingCallActive = null;
-let lastCallTriggerTime = 0;
-
-const INCOMING_CALL_POOL = [
-  {
-    id: 'scam_stock',
-    caller: '【未知來電】飆股投資顧問部',
-    desc: '來電顯示：0982-xxx-xxx (理財推銷)',
-    intro: '「喂您好！我們是國際頂級投顧，保證每週獲利30%！現在加LINE就送飆股名牌，機會稍縱即逝！」',
-    voicePitch: 1.25, voiceRate: 1.15,
-    opts: [
-      { t: '掛斷並向 165 反詐檢舉（正確）', ok: true, msg: '非常警覺！這是典型的飆股釣魚陷阱！+10⭐', reward: 10 },
-      { t: '心動詢問：「真的穩賺不賠嗎？」', ok: false, msg: '危險！高報酬往往伴隨詐騙陷阱，險些洩漏帳戶！', reward: -5 }
-    ]
-  },
-  {
-    id: 'scam_game',
-    caller: '【可疑來電】遊戲客服儲值中心',
-    desc: '聲稱免費贈送限定傳說造型',
-    intro: '「親愛的玩家！恭喜您抽中限定傳奇外觀！請提供遊戲帳號密碼與簡訊驗證碼，以便客服代為領取入庫！」',
-    voicePitch: 1.1, voiceRate: 1.05,
-    opts: [
-      { t: '拒絕透露密碼並掛斷通話（正確）', ok: true, msg: '很棒！官方人員絕不會索取密碼與驗證碼！+10⭐', reward: 10 },
-      { t: '照著念出收到的驗證碼', ok: false, msg: '糟糕！驗證碼給出後帳號被盜了！心情大跌！', reward: -15 }
-    ]
-  },
-  {
-    id: 'insurance',
-    caller: '【生活來電】安心人壽理財專員',
-    desc: '電話推銷儲蓄分紅保險',
-    intro: '「同學您好！耽誤您兩分鐘，我們推出這款年化分紅儲蓄險，現在投保還送精美禮品喔！」',
-    voicePitch: 1.0, voiceRate: 1.0,
-    opts: [
-      { t: '禮貌委婉拒絕：「謝謝，我目前未成年，會與家長討論。」', ok: true, msg: '應對得體！理財保險需與家人審慎評估。+5⭐', reward: 5 },
-      { t: '不耐煩大罵掛斷', ok: false, msg: '情緒有些急躁，心情稍有起伏。', reward: 0 }
-    ]
-  },
-  {
-    id: 'call_mom_check',
-    caller: '媽媽 ❤️',
-    desc: '溫暖的家庭日常關懷來電',
-    intro: '「寶貝～外面天氣好像變涼了，出門有沒有記得多帶一件外套？午餐有沒有吃飽飽呀？」',
-    voicePitch: 1.15, voiceRate: 0.95,
-    opts: [
-      { t: '「有喔媽媽！我有吃飽穿暖，您也要照顧好身體！」', ok: true, msg: '媽媽好感度暴增！感受到了家的溫暖！', reward: 8, momAff: 15 },
-      { t: '「哎呀好啦我知道啦，在忙先掛了。」', ok: false, msg: '媽媽在電話那頭輕輕嘆了口氣……', reward: 0, momAff: -5 }
-    ]
-  },
-  {
-    id: 'call_friend_play',
-    caller: '死黨 小傑 🏀',
-    desc: '好友課後熱情來電',
-    intro: '「喂！放學後體育館有空檔！要不要一起來練投三分球？我帶了新買的籃球！」',
-    voicePitch: 1.05, voiceRate: 1.0,
-    opts: [
-      { t: '「好啊！放學球場集合，順便找大家一起！」', ok: true, msg: '友誼萬歲！熱血沸騰！精力+10！', reward: 5 },
-      { t: '「今天想先回輔導室完成跟讀與自律任務，改天約！」', ok: true, msg: '自律堅持！小傑說明天再約！+5⭐', reward: 5 }
-    ]
-  }
-];
-
-function triggerRandomIncomingCall(){
-  const now = Date.now();
-  if(now - lastCallTriggerTime < 50000 || incomingCallActive || dialogOpen || phoneOpen) return;
-  if(Math.random() < 0.003){
-    lastCallTriggerTime = now;
-    const callData = INCOMING_CALL_POOL[Math.floor(Math.random()*INCOMING_CALL_POOL.length)];
-    incomingCallActive = callData;
-    sfx('ring');
-    const banner = document.getElementById('incomingBanner');
-    document.getElementById('incomingCaller').textContent = callData.caller;
-    document.getElementById('incomingDesc').textContent = callData.desc;
-    banner.style.display = 'flex';
-  }
-}
-
-document.getElementById('btnAnsCall').onclick = ()=>{
-  if(!incomingCallActive) return;
-  document.getElementById('incomingBanner').style.display = 'none';
-  const c = incomingCallActive;
-  incomingCallActive = null;
-  sfx('ok');
-  // 真正真人說話朗讀！
-  speakZh(c.intro, c.voicePitch, c.voiceRate);
-
-  showDlg(c.caller, c.intro, c.opts.map(o=>({
-    t: o.t,
-    a: ()=>{
-      if(o.ok){
-        sfx('clap'); toast(o.msg);
-        if(o.reward > 0) floatNum(`+${o.reward}⭐`, '#ffd700');
-        status.stars += Math.max(0, o.reward);
-        if(o.momAff) affection.mom += o.momAff;
-      } else {
-        sfx('flush'); toast(o.msg);
-        status.mood = Math.max(0, status.mood - 10);
-      }
-      updateHUD();
-    }
-  })));
-};
-
-document.getElementById('btnRejCall').onclick = ()=>{
-  document.getElementById('incomingBanner').style.display = 'none';
-  incomingCallActive = null;
-  sfx('click');
-  toast('已掛斷通話。');
-};
-
-// ============================================================
-// 7. 互動系統 (美感訓練六大核心、造句、鋼琴、烘焙、NPC多版本)
-// ============================================================
 function showDlg(who, txt, opts){
   dialogOpen=true;
   document.getElementById('dlg').classList.add('show');
@@ -1841,7 +571,7 @@ function showDlg(who, txt, opts){
   (opts||[]).forEach((o, i)=>{
     const b=document.createElement('button');
     b.className='opt';
-    b.innerHTML=`<span>${o.letter||String.fromCharCode(65+i)}. ${o.t}</span>${o.cost?`<span class="cost">⏱ ${o.cost}</span>`:''}`;
+    b.innerHTML=`<span>${String.fromCharCode(65+i)}. ${o.t}</span>`;
     b.onclick=()=>{ sfx('click'); closeDlg(); if(o.a) o.a(); };
     box.appendChild(b);
   });
@@ -1851,1354 +581,19 @@ function showDlg(who, txt, opts){
   }
 }
 function closeDlg(){ dialogOpen=false; document.getElementById('dlg').classList.remove('show'); }
-
-function tryInteract(){
-  if(dialogOpen) return;
-  initA(); sfx('click');
-  if(!nearObj){ showDlg('【心聲】', '深呼吸，校園生活今天也要元氣滿滿！'); return; }
-  const id=nearObj.id;
-  if(id==='xiaoyu') return talkXiaoyu();
-  if(id.startsWith('npc_')) return nearObj.npc.talk();
-  if(id==='desk') return interactDesk();
-  if(id==='coffee') return interactCoffee();
-  if(id==='water') return interactWater();
-  if(id==='sofa') return interactSofa();
-  if(id==='shelf_left' || id==='shelf_right') return interactShelf();
-  if(id==='plant_counsel') return interactPlant();
-  if(id==='toilet') return interactToilet();
-  if(id==='field_ball') return miniCatch();
-
-  // 專科教室
-  if(id==='art_easel') return interactArt();
-  if(id==='chinese_desk') return interactChinese();
-  if(id==='piano_room') return interactPiano();
-
-  // 家裡放學自律 + 烘焙
-  if(id==='home_shoes') return habitShoes();
-  if(id==='home_sink') return habitSink();
-  if(id==='home_oven') return interactOven();
-  if(id==='home_mom') return interactMom();
-  if(id==='home_sister') return habitSister();
-  if(id==='home_desk') return habitDesk();
-  if(id==='home_bath') return habitBath();
-
-  showDlg(nearObj.label||'物件', `你正在查看 ${nearObj.label}。`);
-}
-
-// 專科 1: 美術教室（美感訓練六大核心元素 + 調色盤挑戰）
-function interactArt(){
-  showDlg('美術教室・美感調色畫架', 
-    '畫架上標註著<b>【美感訓練六大核心面向】</b>：<br>' +
-    '1. <b>形狀（Shape）</b>：輪廓與結構比例<br>' +
-    '2. <b>色彩（Color）</b>：色調搭配與冷暖平衡<br>' +
-    '3. <b>質感（Texture）</b>：木紋、織理與觸覺對應<br>' +
-    '4. <b>構圖（Composition）</b>：平衡、留白與節奏<br>' +
-    '5. <b>結構與構造</b>：秩序與組織支撐<br>' +
-    '6. <b>日常實踐 4 步驟</b>：觀察 ➔ 蒐集 ➔ 模仿 ➔ 創造', [
-    {
-      t: '🎨 進行「三原色混色與互補色測驗」', letter: 'A',
-      a: () => {
-        showDlg('色彩學測驗', '【題目】若將「鈷藍色」與「檸檬黃」在畫布上等比例混合，會調配出什麼色彩？', [
-          {t: '生機盎然的「草綠色」', a:()=>{
-            status.stars+=6; status.mood+=5; sfx('clap');
-            toast('答對了！藍加黃調出綠色！+6⭐'); floatNum('+6⭐'); updateHUD();
-          }},
-          {t: '沉靜優雅的「深紫色」', a:()=>{ toast('那是藍加紅喔，再想想！'); }},
-          {t: '明亮溫暖的「柑橘橙」', a:()=>{ toast('那是紅加黃喔！'); }}
-        ]);
-      }
-    },
-    {
-      t: '🖼️ 探索「四步驟日常美感練習」說明', letter: 'B',
-      a: () => {
-        showDlg('美感刻意練習框架', 
-          '① <b>觀察</b>：主動分析平衡、對比與和諧元素<br>' +
-          '② <b>蒐集</b>：隨手拍照記錄色彩與排版靈感<br>' +
-          '③ <b>模仿</b>：將欣賞的色調放進穿搭與房間佈置<br>' +
-          '④ <b>創造</b>：收斂出專屬自我的獨特美感風格！', [
-          {t: '記住了！領取美感勳章 +5⭐', a:()=>{ status.stars+=5; sfx('ok'); updateHUD(); }}
-        ]);
-      }
-    }
-  ]);
-}
-
-// 專科 2: 中文教室（造句修辭與關聯詞組裝）
-function interactChinese(){
-  showDlg('語文研究室・造句黑板', '黑板上寫著精選的中文修辭與複句邏輯。', [
-    {t:'✍️ 挑戰「雖然……但是……」轉折句型', letter:'A', a:()=>{
-      showDlg('詞卡排序組句', '請組合出最通順通情達理的句子：', [
-        {t:'雖然外面的雨下得很大，但是我們依然充滿熱情準時到校。', a:()=>{
-          status.stars+=5; status.work+=5; sfx('clap');
-          toast('造句流暢且富有自律精神！+5⭐'); floatNum('+5⭐'); updateHUD();
-        }},
-        {t:'雖然我吃了早餐，但是肚子覺得很飽。', a:()=>{ toast('語意轉折邏輯稍顯不通，再想想喔！'); }}
-      ]);
-    }},
-    {t:'✍️ 挑戰「不僅……而且……」遞進句型', letter:'B', a:()=>{
-      showDlg('遞進造句', '請選出語意最優美的句子：', [
-        {t:'小宇在輔導室不僅解開了心結，而且主動開口朗讀英文跟讀！', a:()=>{
-          status.stars+=5; status.work+=5; sfx('clap');
-          toast('非常優秀的遞進佳句！+5⭐'); floatNum('+5⭐'); updateHUD();
-        }}
-      ]);
-    }}
-  ]);
-}
-
-// 專科 3: 音樂大鋼琴（自由彈奏、絕對音感、旋律唱）
-function interactPiano(){
-  const freqs = {C4:261.6, D4:293.7, E4:329.6, F4:349.2, G4:392.0, A4:440.0, B4:493.9, C5:523.3};
-  showDlg('音樂教室・大鋼琴', '琴鍵在陽光下泛著純黑與象牙白光澤。', [
-    {t:'🎹 自由彈奏 8 音鍵盤', letter:'A', a:()=>{
-      showDlg('鋼琴演奏', '點選琴鍵發聲：', Object.keys(freqs).map(k=>({
-        t: `♪ ${k}`,
-        a: ()=>{ initA(); tone(freqs[k], 0.35, 'sine', 0.12); toast(`彈奏了 ${k}`); }
-      })).concat([{t:'完成練習 +3⭐', a:()=>{ status.stars+=3; status.mood+=4; sfx('clap'); toast('+3⭐'); }}]));
-    }},
-    {t:'👂 絕對音感聽音測驗', letter:'B', a:()=>{
-      const notes=['C','D','E','F','G','A','B'];
-      const ans=notes[Math.floor(Math.random()*notes.length)];
-      const fMap={C:261,D:293,E:329,F:349,G:392,A:440,B:493};
-      initA(); tone(fMap[ans], 0.55, 'sine', 0.12);
-      showDlg('聽音測驗', '剛才響起的是哪個音名？', notes.map(n=>({
-        t: `音名 ${n}`,
-        a: ()=>{
-          if(n===ans){ status.stars+=6; sfx('clap'); toast('太神了！完全聽對！+6⭐'); floatNum('+6⭐'); }
-          else { toast(`答案是 ${ans} 喔，再接再厲！`); sfx('click'); }
-          updateHUD();
-        }
-      })));
-    }}
-  ]);
-}
-
-// 操場接高飛球
-function miniCatch(){
-  showDlg('操場外野接高飛球', '遠方擊出一記高飛球，在空中劃出拋物線！', [
-    {t:'精準預判落點，向左快跑接球！', a:()=>{
-      status.stars+=5; status.energy=Math.max(20, status.energy-5);
-      sfx('clap'); toast('美技接殺！滿場歡呼！+5⭐'); floatNum('+5⭐'); updateHUD();
-    }},
-    {t:'原地不動等待落點', a:()=>{ toast('球掉在身旁，差一點！'); }}
-  ]);
-}
-
-// 廚房烘焙
-function interactOven(){
-  showDlg('廚房烘焙烤箱吧台', '烤箱裡亮著溫暖的橙黃烘烤光芒，料理台上放著麵粉與奶油。', [
-    {t:'🍪 烘焙「酥脆蔓越莓手工餅乾」', letter:'A', cost:'5分', a:()=>{
-      status.time+=5; status.energy-=3; sfx('coffee');
-      toast('攪拌麵粉奶油、加入蔓越莓，放入烤箱烘烤……');
-      setTimeout(()=>{
-        bag.cookies = (bag.cookies||0) + 3;
-        status.mood+=8; sfx('clap'); toast('叮！烤好了！獲得 3 份蔓越莓手工餅乾！');
-        floatNum('獲得 🍪×3', '#f39c12'); updateHUD();
-      }, 900);
-    }},
-    {t:'🍰 烘焙「草莓鮮奶油戚風蛋糕」', letter:'B', cost:'10分', a:()=>{
-      status.time+=10; status.energy-=5; sfx('coffee');
-      toast('打發蛋白霜、烘烤戚風蛋糕體、抹上香濃鮮奶油……');
-      setTimeout(()=>{
-        bag.cake = (bag.cake||0) + 1;
-        status.mood+=12; sfx('clap'); toast('太香了！獲得 1 份草莓戚風蛋糕！');
-        floatNum('獲得 🍰×1', '#e84393'); updateHUD();
-      }, 1000);
-    }}
-  ]);
-}
-
-// 客廳媽媽 (多組輪流對話 + 好感度)
-function interactMom(){
-  const momLines = [
-    `媽媽溫柔地摸摸你的頭：「放學累不累？今天在學校過得好嗎？」（好感度：${affection.mom}）`,
-    `媽媽笑瞇瞇地看著你：「今天玄關收拾得真乾淨，你越來越懂事了！」`,
-    `媽媽正在摺衣服：「今天有想吃的晚餐嗎？媽媽多準備你喜歡的菜！」`
-  ];
-  const greeting = momLines[Math.floor(Math.random()*momLines.length)];
-
-  showDlg('媽媽 ❤️', greeting, [
-    {t:'🎁 送媽媽剛烤好的草莓戚風蛋糕（好感+25）', letter:'A', a:()=>{
-      if((bag.cake||0) < 1){ toast('背包裡還沒有烤好的蛋糕喔！快去烤箱做！'); return; }
-      bag.cake--; affection.mom+=25; status.mood+=15; sfx('clap');
-      speakZh('天哪！這是你親手為媽媽做的蛋糕嗎？太好吃了……媽媽真的好幸福好感動！', 1.15, 0.95);
-      showDlg('媽媽（感動落淚）', '「天哪！這是你親手為媽媽做的蛋糕嗎？太好吃了……媽媽真的好幸福好感動！」');
-      floatNum('媽媽好感+25💖', '#e84393'); updateHUD();
-    }},
-    {t:'🎁 送媽媽手工蔓越莓餅乾（好感+15）', letter:'B', a:()=>{
-      if((bag.cookies||0) < 1){ toast('背包裡沒有餅乾喔，快去烤箱烘烤！'); return; }
-      bag.cookies--; affection.mom+=15; status.mood+=10; sfx('ok');
-      speakZh('好酥脆的餅乾！謝謝寶貝，真貼心！', 1.15, 0.95);
-      showDlg('媽媽', '「好酥脆的餅乾！謝謝寶貝，真貼心！」');
-      floatNum('媽媽好感+15💖', '#e84393'); updateHUD();
-    }},
-    {t:'抱抱媽媽：「媽媽辛苦了，我愛您！」', letter:'C', a:()=>{
-      affection.mom+=10; status.mood+=10; sfx('ok');
-      speakZh('乖孩子，媽媽只要看到你健康快樂、懂事自律，就是最大的欣慰！', 1.15, 0.95);
-      showDlg('媽媽', '「乖孩子，媽媽只要看到你健康快樂、懂事自律，就是最大的欣慰！」');
-      updateHUD();
-    }}
-  ]);
-}
-
-// 輔導室道具 (細節獨白)
-function interactCoffee(){
-  showDlg('手沖咖啡吧', '手沖壺騰著裊裊熱氣，深烘焙香氣令人心曠神怡。', [
-    {t:'細心沖煮一杯品嚐（精力+18）', letter:'A', a:()=>{
-      sfx('coffee'); status.energy=Math.min(100, status.energy+18);
-      floatNum('+18⚡', '#f39c12'); toast('好香的咖啡！整個人精神百倍！'); updateHUD();
-    }},
-    {t:'手沖一整壺分享給老師同學（咖啡包+3）', letter:'B', cost:'5分', a:()=>{
-      bag.coffee+=3; status.time+=5; toast('獲得 3 杯手沖咖啡！可贈送 NPC'); sfx('coffee');
-    }},
-    {t:'欣賞咖啡濾泡的滴漏水滴（心情+6）', letter:'C', a:()=>{
-      status.mood=Math.min(100, status.mood+6); sfx('water'); toast('看著咖啡慢慢滴落，心靈好療癒……'); updateHUD();
-    }}
-  ]);
-}
-
-function interactWater(){
-  showDlg('透亮飲水機', '透亮水藍色桶身泛著清澈光澤，冷熱雙龍頭隨時能出水。', [
-    {t:'按壓藍色龍頭喝一杯冰水', letter:'A', a:()=>{
-      sfx('water'); status.energy=Math.min(100, status.energy+6); status.toilet+=6;
-      floatNum('+6⚡', '#3498db'); toast('咕嚕咕嚕～沁涼透心脾！'); updateHUD();
-    }},
-    {t:'按壓紅色龍頭泡熱茶（心情+8）', letter:'B', a:()=>{
-      sfx('water'); status.mood=Math.min(100, status.mood+8); toast('暖呼呼的熱茶，整個人都溫暖起來。'); updateHUD();
-    }},
-    {t:'將隨身水壺裝滿（備用 5/5）', letter:'C', a:()=>{ bag.water=5; toast('水壺已裝滿！'); sfx('water'); }}
-  ]);
-}
-
-function interactShelf(){
-  showDlg('雙層精緻書架', '書架上整齊陳列著紅、藍、綠、金多色彩書，書脊泛著光澤。', [
-    {t:'抽出一本《自律心理學》閱讀（學力+8）', letter:'A', a:()=>{
-      status.work=Math.min(100, status.work+8); status.stars+=2;
-      sfx('ok'); toast('自律不是約束，而是掌控人生的能力！+2⭐'); updateHUD();
-    }},
-    {t:'借走一本故事繪本（準備回家唸給妹妹聽）', letter:'B', a:()=>{
-      bag.book = (bag.book||0) + 1; sfx('ok'); toast('獲得 1 本精裝繪本！');
-    }},
-    {t:'開啟英文散文跟讀練習', letter:'C', a:()=>openEng()}
-  ]);
-}
-
-function interactPlant(){
-  showDlg('多層次觀葉盆栽', '赤陶紅盆上深綠、翠綠、嫩綠三層葉片蓬鬆茂盛。', [
-    {t:'用小噴壺替葉片澆水', letter:'A', a:()=>{
-      sfx('water'); status.mood=Math.min(100, status.mood+6);
-      floatNum('+6💚', '#2ecc71'); toast('水滴在綠葉上晶瑩剔透，心情大好！'); updateHUD();
-    }},
-    {t:'細心修剪老葉、鬆土照料', letter:'B', a:()=>{
-      status.work+=3; status.mood+=4; sfx('ok'); toast('盆栽被整理得非常健康！'); updateHUD();
-    }}
-  ]);
-}
-
-function interactDesk(){
-  showDlg('輔導室主管電腦', '螢幕顯示個案行程、跟讀系統與行政紀錄。', [
-    {t:'查閱個案會議紀錄', letter:'A', a:()=>{
-      status.work=Math.min(100, status.work+6); floatNum('+6📄');
-      showDlg('系統紀錄', '八年三班小宇因家庭衝突常感疲倦，請給予溫暖包容與耐心。');
-    }},
-    {t:'開啟英文影子跟讀 Shadowing 練習', letter:'B', a:()=>openEng()},
-    {t:'下班打卡完成紀錄', letter:'C', a:()=>{ toast('今日工時紀錄完成！'); sfx('ok'); }}
-  ]);
-}
-
-function interactSofa(){
-  showDlg('溫暖長沙發', '柔軟的米色坐墊，適合暫時小憩補給。', [
-    {t:'躺下閉目養神 5 分鐘', letter:'A', a:()=>{
-      status.mood=Math.min(100, status.mood+12); status.energy=Math.min(100, status.energy+8);
-      floatNum('+12💚'); sfx('ok'); toast('深呼吸放鬆，身心重獲平靜！'); updateHUD();
-    }}
-  ]);
-}
-
-function interactToilet(){
-  if(status.toilet<12){ toast('目前不需要使用洗手間'); return; }
-  status.toilet=0; sfx('flush'); status.mood+=3; toast('通體舒暢！'); updateHUD();
-}
-
-// 好孩子自律打卡
-function habitShoes(){
-  showDlg('玄關鞋櫃', '放學回到家，先將鞋子脫下並將書包定位。', [
-    {t:'【好習慣】把鞋子擺放整齊、書包掛在書桌旁（媽媽好感+10）', letter:'A', a:()=>{
-      homeDiscipline.shoes = true; status.stars+=3; status.work+=5; affection.mom+=10;
-      sfx('ok'); toast('書包與鞋子歸位整齊！媽媽看在眼裡好欣慰！+10💖');
-      floatNum('媽媽好感+10💖', '#e84393'); updateHUD(); checkGoodHabitAll();
-    }}
-  ]);
-}
-
-function habitSink(){
-  showDlg('廚房洗碗水槽', '水槽裡有吃完的午餐便當盒與晚餐碗盤。', [
-    {t:'【主動分擔】打開水龍頭，細心清洗碗盤與便當盒（媽媽好感+15）', letter:'A', a:()=>{
-      sfx('water'); homeDiscipline.dishes = true;
-      status.stars+=5; status.energy-=4; status.mood+=8; affection.mom+=15;
-      floatNum('+5⭐', '#ffd700'); toast('碗盤洗得亮晶晶！媽媽直誇懂事貼心！+15💖');
-      floatNum('媽媽好感+15💖', '#e84393'); updateHUD(); checkGoodHabitAll();
-    }}
-  ]);
-}
-
-function habitSister(){
-  showDlg('可愛妹妹', '妹妹抱著玩具跑過來：「哥哥／姐姐～你回來了！」', [
-    {t:'【好兄姐】拿出繪本，溫柔講故事給妹妹聽（媽媽好感+10）', letter:'A', a:()=>{
-      homeDiscipline.sister = true; status.mood+=12; status.stars+=4; affection.sister+=15; affection.mom+=10;
-      sfx('ok'); toast('妹妹開心地咯咯笑！媽媽在旁露出慈祥微笑！+10💖');
-      updateHUD(); checkGoodHabitAll();
-    }},
-    {t:'陪妹妹一起玩積木與拼圖遊戲', letter:'B', a:()=>openPuzzle()}
-  ]);
-}
-
-function habitDesk(){
-  showDlg('自律書桌', '乾淨的桌面，檯燈柔和地亮著。', [
-    {t:'【專注學習】立刻打開書本寫作業與進行英文跟讀（媽媽好感+10）', letter:'A', a:()=>{
-      homeDiscipline.homework = true; status.work=Math.min(100, status.work+15); status.stars+=6; affection.mom+=10;
-      sfx('clap'); toast('今日功課全數完成！自律自強！媽媽超驕傲！+10💖');
-      updateHUD(); openEng(); checkGoodHabitAll();
-    }}
-  ]);
-}
-
-function habitBath(){
-  showDlg('溫暖浴室', '熱氣騰騰的熱水澡，能洗去一整天的疲憊。', [
-    {t:'【生活自理】洗熱水澡，換上乾淨舒服的睡衣（媽媽好感+5）', letter:'A', a:()=>{
-      sfx('water'); homeDiscipline.shower = true; status.energy=Math.min(100, status.energy+15); status.mood=Math.min(100, status.mood+15); affection.mom+=5;
-      floatNum('+15💚'); toast('洗完澡香噴噴、一身乾淨舒爽！+5💖'); updateHUD(); checkGoodHabitAll();
-    }}
-  ]);
-}
-
-function checkGoodHabitAll(){
-  const all = Object.values(homeDiscipline).every(v=>v);
-  if(all){
-    setTimeout(()=>{
-      showDlg('🌟【好孩子模範生榮譽】🌟', '恭喜你！今天完成了所有放學自律常規！媽媽給了你一個大大的擁抱，並給予零用錢獎勵！', [
-        {t:'我是自律自強的好孩子！領取 20⭐ + 50🪙', a:()=>{
-          status.stars+=20; status.coins+=50; status.mood=100; affection.mom+=20;
-          sfx('clap'); floatNum('+20⭐', '#ffd700'); toast('全自律成就達成！媽媽好感度大突破！'); updateHUD();
-        }}
-      ]);
-    }, 600);
-  }
-}
-
-// 多組輪流 NPC 互動版本
-function talkXiaoyu(){
-  showDlg('小宇 八年三班', '……老師，我今天真的不想進教室。', [
-    {t:'先在這裡坐下，喝杯熱茶或吃塊剛烤好的蔓越莓餅乾。', letter:'A', a:()=>{
-      status.mood+=4; affection.xiaoyu+=10; sfx('ok');
-      setTimeout(()=>{
-        showDlg('小宇', '……昨天家裡又吵到很晚，我好累好害怕。', [
-          {t:'這裡很安全，你想待多久都可以，老師陪你。', a:()=>{
-            setTimeout(()=>{
-              showDlg('小宇（抬起頭）', '……謝謝老師，我現在感覺好多了。第二節我會試著回教室。', [
-                {t:'我們約定好，午休後再來找我聊聊。', a:()=>{
-                  xiaoyuState=4; status.stars+=10; floatNum('+10⭐', '#ffd700'); sfx('clap');
-                  toast('個案成功建立信任！+10⭐');
-                }}
-              ]);
-            }, 400);
-          }},
-          {t:'那我們一起唸句英文放鬆心情好嗎？', a:()=>openEng()}
-        ]);
-      }, 400);
-    }},
-    {t:'送他一瓶冰水與水果喉糖', letter:'B', a:()=>{
-      if(bag.throat<1){ toast('背包喉糖不足'); return; }
-      bag.throat--; affection.xiaoyu+=12; sfx('ok'); toast('小宇接過喉糖點點頭。');
-    }}
-  ]);
-}
-
-function talkChunbo(){
-  const chunboVersions = [
-    {
-      intro: '「年輕人，今天工作順利嗎？學校巡邏一切正常，有空來喝杯茶！」',
-      optA: '春伯早！送您手沖熱咖啡',
-      optB: '請教春伯校園周邊安全防詐觀念'
-    },
-    {
-      intro: '「剛才有可疑的陌生人在校門口徘徊發廣告傳單，我已經把他勸離了，大家一定要保護好自己！」',
-      optA: '謝謝春伯保護我們！送上喉糖潤潤喉',
-      optB: '聽春伯分享如何防範校園陌生人'
-    },
-    {
-      intro: '「今天天氣真好啊！看你們年輕人充滿活力，我也覺得心情年輕了好幾歲！」',
-      optA: '春伯今天也神采奕奕！送上新鮮橘子',
-      optB: '跟春伯聊聊最近校園花草'
-    }
-  ];
-  const cur = chunboVersions[npcs[0].talkCount % chunboVersions.length];
-  npcs[0].talkCount++;
-
-  showDlg('警衛春伯', cur.intro, [
-    {t: cur.optA, letter:'A', a:()=>{
-      if(bag.coffee>0){ bag.coffee--; affection.chunbo+=15; toast('春伯喝了熱咖啡，笑得合不攏嘴！'); sfx('ok'); }
-      else if(bag.throat>0){ bag.throat--; affection.chunbo+=10; toast('春伯吃了喉糖好舒服！'); sfx('ok'); }
-      else { toast('給了春伯一個熱情的早安問候！'); }
-    }},
-    {t: cur.optB, letter:'B', a:()=>{
-      status.stars+=3; sfx('clap');
-      showDlg('春伯的經驗談', '出門在外面對陌生人，不隨意搭訕、不拿來路不明的零食飲料，安全第一！', [
-        {t:'記住了！+3⭐', a:()=>{ updateHUD(); }}
-      ]);
-    }}
-  ]);
-}
-
-function talkEmma(){
-  const emmaVersions = [
-    {
-      intro: 'Hey! Let us practice English pronunciation and plan our weekend hangout!',
-      act: () => startWeekendHangout('picnic')
-    },
-    {
-      intro: 'Hi there! Did you listen to the YouTube English Radio today? The music was awesome!',
-      act: () => openYouTubeRadio()
-    },
-    {
-      intro: 'Good morning! Have you finished your homework? We can study together!',
-      act: () => openEng()
-    }
-  ];
-  const cur = emmaVersions[npcs[1].talkCount % emmaVersions.length];
-  npcs[1].talkCount++;
-
-  showDlg('Emma', cur.intro, [
-    {t:'Sure! 打開英文影子跟讀本', a:()=>openEng()},
-    {t:'討論週末活動／收聽廣播', a: cur.act},
-    {t:'送她手作蔓越莓餅乾（好感+15）', a:()=>{
-      if((bag.cookies||0)<1){ toast('背包裡沒有餅乾喔，快去廚房烤！'); return; }
-      bag.cookies--; affection.emma+=15; sfx('ok');
-      speak('Wow, homemade cookies! They smell incredible! Thank you so much!');
-      showDlg('Emma', 'Wow, homemade cookies! They smell incredible! Thank you so much!');
-    }}
-  ]);
-}
-
-function talkTeacher(){
-  showDlg('林老師', '小宇今天狀況如何？他早上沒有進班，我很替他擔心。', [
-    {t:'報告林老師：小宇已在輔導室安頓，第二節回教室', a:()=>{
-      status.work+=10; status.stars+=4; sfx('clap');
-      showDlg('林老師', '太感謝你了！有輔導室在真的讓人安心許多。');
-    }}
-  ]);
-}
-
-// 假日出遊事件
-function startWeekendHangout(type){
-  if(type==='picnic'){
-    showDlg('🏖️ 假日活動：草地野餐音樂會', '你與 Emma、小雨在週末帶著野餐墊、剛烤好的餅乾蛋糕與收音機，在草地上享受陽光！', [
-      {t:'分送自己親手烤的餅乾與蛋糕給大家享用', a:()=>{
-        status.mood=100; status.stars+=8; affection.emma+=20;
-        sfx('clap'); toast('野餐好成功！同學們讚不絕口！好感度大增！'); floatNum('+8⭐'); updateHUD();
-      }},
-      {t:'一起用收音機收聽英文廣播學新歌', a:()=>openYouTubeRadio()}
-    ]);
-  }
-}
-
-// ============================================================
-// 8. 英文廣播頻道與 YouTube 學習資源
-// ============================================================
-function openYouTubeRadio(){
-  showDlg('📻 英文廣播與音樂頻道', '選擇你想收聽的優質英語學習廣播：', [
-    {
-      t: '📻 推薦頻道：mebook888 每日英語廣播',
-      letter: 'A',
-      a: ()=>{
-        window.open('https://youtube.com/@mebook888', '_blank');
-        status.mood=Math.min(100, status.mood+5); status.stars+=2;
-        toast('已為您開啟廣播學習頻道！+2⭐'); updateHUD();
-      }
-    },
-    {
-      t: '🎵 精選英語音樂歌單（放鬆心情）',
-      letter: 'B',
-      a: ()=>{
-        window.open('https://youtube.com/playlist?list=PLB1PuqtbwVQnYd1AOnvVARNmJGgV5K4_-', '_blank');
-        status.mood=100; toast('聽著輕快旋律，心情回滿！'); updateHUD();
-      }
-    },
-    {
-      t: '🔬 兒少科普知識英文頻道',
-      letter: 'C',
-      a: ()=>{
-        window.open('https://youtube.com/channel/UCWdigI7S6VaNPs6ooIBbiwg', '_blank');
-        status.stars+=3; toast('開啟科普英文！學力+3⭐'); updateHUD();
-      }
-    }
-  ]);
-}
-
-// ============================================================
-// 9. 生日派對與 3x3 拼圖系統
-// ============================================================
-function openBirthdayPartyMenu(){
-  showDlg('🎂 歡樂生日派對主題', '選擇你想要舉辦或參加的生日派對：', [
-    {
-      t: `🎉 舉辦【我的生日派對】（${birthdays.player.m}月${birthdays.player.d}日）`,
-      letter: 'A',
-      a: () => startBirthdayParty('me')
-    },
-    {
-      t: `💐 籌辦【媽媽的生日派對】（${birthdays.mom.m}月${birthdays.mom.d}日）`,
-      letter: 'B',
-      a: () => startBirthdayParty('mom')
-    },
-    {
-      t: `👔 慶祝【爸爸的生日派對】（${birthdays.dad.m}月${birthdays.dad.d}日）`,
-      letter: 'C',
-      a: () => startBirthdayParty('dad')
-    },
-    {
-      t: `👭 參加【朋友 Emma 的生日慶祝會】（${birthdays.emma.m}月${birthdays.emma.d}日）`,
-      letter: 'D',
-      a: () => startBirthdayParty('emma')
-    }
-  ]);
-}
-
-function startBirthdayParty(who){
-  playBirthdaySong();
-  if(who === 'me'){
-    sfx('clap');
-    speak('Happy Birthday to you!');
-    setTimeout(() => {
-      speakZh('寶貝生日快樂！願你平安健康，快許願吹蠟燭吧！', 1.15, 0.95);
-    }, 1200);
-
-    showDlg('🎂【我的專屬生日派對】🎂', 
-      '全家人（爸爸、媽媽、妹妹）與死黨（Emma、小傑）全都齊聚客廳！<br>' +
-      '桌上擺著點燃蠟燭的特製草莓戚風大蛋糕，大家一齊為你拍手合唱生日快樂歌！🎶', 
-      [
-        {
-          t: '🌟 閉上眼睛許願：「希望全家平平安安、學業順利自律！」',
-          letter: 'A',
-          a: () => {
-            status.stars += 30; status.coins += 100; status.mood = 100;
-            sfx('clap'); floatNum('+30⭐ +100🪙', '#ffd700');
-            showDlg('吹熄蠟燭！呼～ 🎂', 
-              '你用力吹熄了蠟燭！大家齊聲歡呼！<br>' +
-              '媽媽送上精美禮物袋，爸爸笑著摸摸你的頭，妹妹開心地搶著要吃第一口草莓蛋糕！<br>' +
-              '獲得爸爸媽媽的生日祝福紅包 🪙+100 與學力星 ⭐+30！心情值全滿！', 
-              [{ t: '謝謝大家！我好幸福！💖', a: () => { toast('生日派對圓滿成功！'); updateHUD(); } }]
-            );
-          }
-        }
-      ]
-    );
-  } else if(who === 'mom'){
-    sfx('clap');
-    setTimeout(() => {
-      speakZh('謝謝寶貝！這是媽媽收過最棒的生日禮物！媽媽好感動！', 1.15, 0.95);
-    }, 1500);
-
-    showDlg(`💐【媽媽的感恩生日派對（${birthdays.mom.m}月${birthdays.mom.d}日）】💐`, 
-      '你悄悄在廚房烤箱烤好了雙層愛心草莓戚風蛋糕，並點上溫暖的蠟燭！<br>' +
-      '全家為辛苦的媽媽唱生日快樂歌，送上手寫感謝卡片：「媽媽，生日快樂！謝謝您一直照顧我們！」',
-      [
-        {
-          t: '親手切第一塊蛋糕餵媽媽吃（媽媽好感度直衝滿分 💖）',
-          letter: 'A',
-          a: () => {
-            affection.mom = 100; status.stars += 20; status.mood = 100;
-            sfx('clap'); floatNum('媽媽好感度100💖', '#e84393');
-            toast('媽媽感動得眼角泛淚，給你一個溫暖的深情擁抱！');
-            updateHUD();
-          }
-        }
-      ]
-    );
-  } else if(who === 'dad'){
-    sfx('clap');
-    setTimeout(() => {
-      speakZh('哈哈！謝謝我的懂事寶貝！爸爸再忙都值得了！', 0.85, 0.9);
-    }, 1500);
-
-    showDlg(`👔【爸爸的溫馨生日派對（${birthdays.dad.m}月${birthdays.dad.d}日）】👔`, 
-      '這天爸爸放下一整天的疲憊，準時開門回家！<br>' +
-      '看到餐桌上熱騰騰的家常菜、全家戴著生日帽，還有你親手烘焙的手工蔓越莓餅乾！',
-      [
-        {
-          t: '給爸爸一個大擁抱：「爸爸生日快樂！工作辛苦了！」',
-          letter: 'A',
-          a: () => {
-            affection.dad = 100; status.stars += 20; status.mood = 100;
-            sfx('clap'); floatNum('爸爸好感度100💖', '#3498db');
-            toast('爸爸感動得開懷大笑！家庭凝聚力爆表！');
-            updateHUD();
-          }
-        }
-      ]
-    );
-  } else {
-    sfx('clap');
-    speak('Thank you so much! You are my best friend forever!');
-    showDlg('👭【Emma 的野餐生日會】👭', 
-      '週末草地上陽光燦爛，你帶上野餐墊、自製烘焙小點心，大家一起為 Emma 慶祝生日！<br>' +
-      '歡笑聲傳遍整個公園！',
-      [
-        {
-          t: '送上親手烤的餅乾與賀卡',
-          letter: 'A',
-          a: () => {
-            affection.emma = 100; status.stars += 15; status.mood = 100;
-            sfx('clap'); toast('Emma 超級開心！同儕友誼更加深厚！');
-            updateHUD();
-          }
-        }
-      ]
-    );
-  }
-}
-
-// 3x3 拼圖
-let pzTiles=[1,2,3,4,5,6,7,8,0];
-function openPuzzle(){
-  closePhone();
-  document.getElementById('puzzlePanel').classList.add('show');
-  initPuzzle();
-}
-function initPuzzle(){
-  pzTiles=[1,2,3,4,5,6,7,8,0];
-  for(let i=0; i<30; i++){
-    const emptyIdx=pzTiles.indexOf(0);
-    const validMoves=[];
-    const r=Math.floor(emptyIdx/3), c=emptyIdx%3;
-    if(r>0) validMoves.push(emptyIdx-3);
-    if(r<2) validMoves.push(emptyIdx+3);
-    if(c>0) validMoves.push(emptyIdx-1);
-    if(c<2) validMoves.push(emptyIdx+1);
-    const m=validMoves[Math.floor(Math.random()*validMoves.length)];
-    pzTiles[emptyIdx]=pzTiles[m]; pzTiles[m]=0;
-  }
-  renderPuzzle();
-}
-function renderPuzzle(){
-  const b=document.getElementById('pzBoard'); b.innerHTML='';
-  pzTiles.forEach((val, idx)=>{
-    const d=document.createElement('div');
-    d.className='puzzle-tile'+(val===0?' empty':'');
-    d.textContent=val===0?'':val;
-    d.onclick=()=>movePuzzleTile(idx);
-    b.appendChild(d);
-  });
-}
-function movePuzzleTile(idx){
-  const emptyIdx=pzTiles.indexOf(0);
-  const r1=Math.floor(idx/3), c1=idx%3;
-  const r2=Math.floor(emptyIdx/3), c2=emptyIdx%3;
-  if(Math.abs(r1-r2)+Math.abs(c1-c2)===1){
-    pzTiles[emptyIdx]=pzTiles[idx];
-    pzTiles[idx]=0;
-    sfx('click');
-    renderPuzzle();
-    checkPuzzleWin();
-  }
-}
-function checkPuzzleWin(){
-  const win=[1,2,3,4,5,6,7,8,0];
-  if(pzTiles.every((v,i)=>v===win[i])){
-    status.stars+=10; status.coins+=20; status.mood+=10;
-    sfx('clap'); toast('🎉 拼圖成功！獎勵 +10⭐ +20🪙！'); floatNum('+10⭐', '#ffd700');
-    setTimeout(()=>closePanel('puzzlePanel'), 800);
-  }
-}
-
-// ============================================================
-// 10. 國小四年級~國中 2000~4500 單字跟讀
-// ============================================================
-const VOCAB=[
-  {w:'responsibility', ph:'/rɪˌspɒnsəˈbɪləti/', zh:'責任', ex:'I have taken responsibility for my decisions.'},
-  {w:'empathize', ph:'/ˈempəθaɪz/', zh:'同理', ex:'We should empathize with people who are struggling.'},
-  {w:'discipline', ph:'/ˈdɪsəplɪn/', zh:'自律', ex:'Self-discipline will lead you to freedom.'},
-  {w:'resilient', ph:'/rɪˈzɪliənt/', zh:'有韌性的', ex:'She remained resilient despite all difficulties.'},
-  {w:'boundary', ph:'/ˈbaʊndri/', zh:'個人界限', ex:'It is healthy to set a clear personal boundary.'},
-  {w:'procrastinate', ph:'/prəˈkræstɪneɪt/', zh:'拖延', ex:'You must not procrastinate on your daily homework.'},
-  {w:'cyberbullying', ph:'/ˈsaɪbərbʊliɪŋ/', zh:'網路霸凌', ex:'Never take part in cyberbullying online.'}
-];
-
-function openEng(){
-  closePhone();
-  document.getElementById('engPanel').classList.add('show');
-  let html='<p style="font-size:11px;color:#d8b888;margin-bottom:8px;text-align:center">🔊 點單字聽示範 ➔ 🎤 開口跟讀 ➔ ✅ 確認獎勵 ⭐</p>';
-  VOCAB.forEach(v=>{
-    html+=`<div style="margin:7px 0;padding:9px;background:#281a14;border:1.5px solid #5a3c26;border-radius:9px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span class="eng-word" style="font-size:15px" onclick="speak('${v.w}')">${v.w}</span>
-        <button onclick="speak('${v.w}',0.75)" style="background:#2980b9;color:#fff;border:none;border-radius:5px;padding:3px 7px;font-size:10px">🔊 發音</button>
-      </div>
-      <div class="eng-hint">${v.ph}　${v.zh}</div>
-      <div style="font-size:11px;color:#f0e4d4;margin:5px 0">${v.ex}</div>
-      <button onclick="startShadowWord('${v.w}')" style="width:100%;padding:5px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:800">🎤 跟讀練習本句</button>
-    </div>`;
-  });
-  document.getElementById('engContent').innerHTML=html;
-}
-
-function startShadowWord(w){
-  speak(w, 0.75);
-  setTimeout(()=>{
-    showDlg('影子跟讀 Shadowing', `請清楚大聲念出：<b style="color:#ffd700;font-size:17px">${w}</b>`, [
-      {t:'✅ 我認真念完了！發音標準（+3⭐）', a:()=>{
-        status.stars+=3; status.mood+=3; floatNum('+3⭐', '#ffd700'); sfx('clap'); toast('太棒了！練習非常有成果！');
-      }},
-      {t:'再聽一次正確發音示範', a:()=>startShadowWord(w)}
-    ]);
-  }, 700);
-}
-
-// ============================================================
-// 11. 手機模式 (訊息多輪、通話語音、臉書社群、廣播)
-// ============================================================
-let currentPhoneTab='msg';
-function switchPhoneTab(tab){
-  currentPhoneTab=tab;
-  document.getElementById('tabMsg').classList.toggle('active', tab==='msg');
-  document.getElementById('tabCall').classList.toggle('active', tab==='call');
-  document.getElementById('tabFb').classList.toggle('active', tab==='fb');
-  document.getElementById('tabRadio').classList.toggle('active', tab==='radio');
-
-  if(tab==='msg'){
-    document.getElementById('phNavHeader').style.display='flex';
-    showPhoneList();
-  } else if(tab==='call'){
-    document.getElementById('phNavHeader').style.display='none';
-    document.getElementById('phInputBar').style.display='none';
-    document.getElementById('phStickerPanel').style.display='none';
-    showCallList();
-  } else if(tab==='fb'){
-    document.getElementById('phNavHeader').style.display='flex';
-    document.getElementById('phTitle').textContent='臉書社群動態牆';
-    document.getElementById('phInputBar').style.display='none';
-    document.getElementById('phStickerPanel').style.display='none';
-    showFacebookFeed();
-  } else {
-    document.getElementById('phNavHeader').style.display='flex';
-    document.getElementById('phTitle').textContent='英文廣播與音樂';
-    document.getElementById('phInputBar').style.display='none';
-    document.getElementById('phStickerPanel').style.display='none';
-    showRadioTab();
-  }
-}
-
-function showRadioTab(){
-  document.getElementById('phBody').innerHTML=`
-    <div style="padding:14px">
-      <div style="color:#ffd152;font-size:13px;font-weight:800;margin-bottom:10px;text-align:center">📻 線上學習廣播電台</div>
-      <div onclick="window.open('https://youtube.com/@mebook888','_blank')" style="display:flex;align-items:center;gap:10px;padding:12px;background:#241812;border-radius:10px;margin-bottom:8px;cursor:pointer">
-        <div style="font-size:24px">📻</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700;font-size:12px">mebook888 每日英語廣播</div><div style="color:#888;font-size:10px">生活會話與英聽練習</div></div>
-      </div>
-      <div onclick="window.open('https://youtube.com/playlist?list=PLB1PuqtbwVQnYd1AOnvVARNmJGgV5K4_-','_blank')" style="display:flex;align-items:center;gap:10px;padding:12px;background:#241812;border-radius:10px;margin-bottom:8px;cursor:pointer">
-        <div style="font-size:24px">🎵</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700;font-size:12px">精選英語流行樂清單</div><div style="color:#888;font-size:10px">輕快旋律、隨口哼唱</div></div>
-      </div>
-    </div>
-  `;
-}
-
-// 臉書模式
-let fbPosts = [
-  {
-    id: 1,
-    author: '陌生人「遊戲神豪」',
-    avBg: '#e74c3c',
-    time: '5分鐘前',
-    tag: '⚠️ 陌生加好友警示',
-    content: '「哈囉！加我好友免費送你 5000 遊戲點數，快私訊我帳號密碼截圖喔！」',
-    warn: true, solved: false
-  },
-  {
-    id: 2,
-    author: '好康社團「免費送 iPhone」',
-    avBg: '#f39c12',
-    time: '25分鐘前',
-    tag: '⚠️ 釣魚詐騙警示',
-    content: '「限時特惠！點擊下方超連結填寫家長電話與信用卡號即可免費抽獎直送到府！」',
-    warn: true, solved: false
-  },
-  {
-    id: 3,
-    author: '死黨 小雨 📚',
-    avBg: '#2ecc71',
-    time: '1小時前',
-    tag: '🌿 校園日常動態',
-    content: '「今天在圖書館複習英文單字好充實！週末大家要一起去草地野餐嗎？🥪」',
-    warn: false, liked: false
-  }
-];
-
-function showFacebookFeed(){
-  const body = document.getElementById('phBody');
-  let html = `
-    <div style="background:#1877f2;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;color:#fff">
-      <div style="font-weight:900;font-size:15px">PixelBook 臉書</div>
-      <div style="font-size:11px;opacity:.9">兒少網路隱私防護</div>
-    </div>
-    
-    <div style="display:flex;gap:5px;padding:7px 8px;background:#241812;border-bottom:1px solid #3a2618">
-      <button onclick="openFbPostPhotoModal()" style="flex:1;padding:7px;background:linear-gradient(135deg,#e67e22,#d35400);border:none;border-radius:16px;color:#fff;font-size:11px;font-weight:800;cursor:pointer">
-        📷 發照片貼文
-      </button>
-      <button onclick="openChildSafetyRulesModal()" style="flex:1;padding:7px;background:linear-gradient(135deg,#2980b9,#1f618d);border:none;border-radius:16px;color:#fff;font-size:11px;font-weight:800;cursor:pointer">
-        🛡️ 自我保護守則
-      </button>
-    </div>
-
-    <div style="padding:4px">
-  `;
-
-  fbPosts.forEach(post => {
-    html += `
-      <div class="fb-post" id="fbPost_${post.id}">
-        <div class="fb-author">
-          <div class="av" style="background:${post.avBg}">${post.author.slice(0,1)}</div>
-          <div><div class="name">${post.author}</div><div class="time">${post.time}</div></div>
-        </div>
-        <div class="fb-tag" style="${post.warn?'':'background:rgba(46,204,113,.15);border-color:#2ecc71;color:#2ecc71'}">${post.tag}</div>
-        <div class="fb-content">${post.content}</div>
-        <div class="fb-actions">
-    `;
-
-    if (post.warn) {
-      if (post.solved) {
-        html += `<button class="fb-btn safe" style="cursor:default">✅ 已成功處置並檢舉</button>`;
-      } else {
-        html += `
-          <button class="fb-btn warn" onclick="handleFbAction(${post.id}, true)">🔒 檢舉並封鎖（保護自己）</button>
-          <button class="fb-btn safe" onclick="handleFbAction(${post.id}, false)">點擊互動</button>
-        `;
-      }
-    } else {
-      html += `
-        <button class="fb-btn safe" onclick="toggleFbLike(${post.id})">${post.liked?'❤️ 已按讚':'👍 按讚'}</button>
-        <button class="fb-btn safe" onclick="toast('已在留言區回覆小雨！');sfx('ok')">💬 留言</button>
-      `;
-    }
-
-    html += `</div></div>`;
-  });
-
-  html += `</div>`;
-  body.innerHTML = html;
-}
-
-function toggleFbLike(id){
-  const p = fbPosts.find(x => x.id === id);
-  if (p) {
-    p.liked = !p.liked;
-    status.mood = Math.min(100, status.mood + 4);
-    sfx('ok'); toast(p.liked ? '已按讚！朋友間感情更加溫馨！' : '取消按讚');
-    updateHUD(); showFacebookFeed();
-  }
-}
-
-function openFbPostPhotoModal(){
-  showDlg('📷 發布社群照片貼文', '選擇你想分享的照片情境（注意個人隱私保護喔！）：', [
-    {
-      t: '🍰 分享「剛烤好的草莓戚風蛋糕日常照」',
-      letter: 'A',
-      a: () => {
-        status.mood = Math.min(100, status.mood + 8); status.stars += 3;
-        sfx('clap'); floatNum('+3⭐');
-        fbPosts.unshift({
-          id: Date.now(),
-          author: '我（今天也很自律）',
-          avBg: '#e67e22',
-          time: '剛剛',
-          tag: '🍰 美食烘焙日常',
-          content: '「放學自己動手烤的草莓戚風蛋糕出爐囉！全家吃得好開心，下次帶去野餐跟大家分享～」',
-          warn: false, liked: true
-        });
-        toast('發布成功！朋友們紛紛為你點讚！+3⭐');
-        updateHUD(); showFacebookFeed();
-      }
-    },
-    {
-      t: '🏠 拍攝「我家大門口與清楚門牌地址照片」',
-      letter: 'B',
-      a: () => {
-        showDlg('⚠️ 兒童自我保護安全警告！', '打卡貼文請【絕對不要】拍攝到自家門牌地址、社區大門或鑰匙！有心人士可能藉此追蹤到住址，造成危險！', [
-          {
-            t: '【正確做法】重新遮蔽門牌號碼，只拍校園風景照',
-            letter: 'A',
-            a: () => {
-              status.stars += 5; sfx('clap'); floatNum('+5⭐');
-              toast('太棒了！學會遮蔽住址個資，保護自己隱私！+5⭐');
-              updateHUD();
-            }
-          }
-        ]);
-      }
-    }
-  ]);
-}
-
-function openChildSafetyRulesModal(){
-  showDlg('🛡️ 兒少網路安全護身符 🛡️', 
-    '<b>1. 不隨意加好友</b>：網路上陌生人的帳號可能是假的，絕不隨意同意好友邀請。<br><br>' +
-    '<b>2. 絕不洩漏個資</b>：真實姓名、電話、住家地址、就讀學校班級絕不可公開在網路上。<br><br>' +
-    '<b>3. 帳號密碼是祕密</b>：任何「免費送虛寶、代練帳號」索取密碼驗證碼的都是詐騙！<br><br>' +
-    '<b>4. 感覺怪怪立刻求助</b>：如果遇到令人不舒服的言詞或要求拍照，立刻告訴爸爸媽媽或老師！',
-    [
-      {
-        t: '我已經熟讀並記住自我保護守則！（領取 +5⭐）',
-        letter: 'A',
-        a: () => {
-          status.stars += 5; status.mood += 5; sfx('clap');
-          floatNum('+5⭐'); toast('牢記安全守則，成為聰明的數位好公民！');
-          updateHUD();
-        }
-      }
-    ]
-  );
-}
-
-function handleFbAction(postId, isCorrect){
-  const p = fbPosts.find(x => x.id === postId);
-  if(isCorrect){
-    if (p) p.solved = true;
-    status.stars += 5; sfx('clap');
-    toast('正確！成功保護自己與朋友的隱私安全！+5⭐');
-    floatNum('+5⭐'); updateHUD(); showFacebookFeed();
-  } else {
-    status.mood = Math.max(0, status.mood - 10); sfx('flush');
-    toast('危險行為！在社群上隨意點擊可疑連結極易受騙！');
-    updateHUD();
-  }
-}
-
-// 主動通話清單 (真人說話語音)
-function showCallList(){
-  document.getElementById('phBody').innerHTML=`
-    <div style="padding:14px">
-      <div style="color:#ffd152;font-size:13px;font-weight:800;margin-bottom:10px;text-align:center">📞 快捷真人語音通訊錄</div>
-      <div class="item" onclick="makePhoneCall('mom')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#241812;border-radius:10px;margin-bottom:7px;cursor:pointer">
-        <div class="av" style="background:#e74c3c">媽</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700">媽媽</div><div style="color:#888;font-size:10px">家庭溫馨通話</div></div>
-        <div style="color:#2ecc71;font-size:18px">📞</div>
-      </div>
-      <div class="item" onclick="makePhoneCall('dad')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#241812;border-radius:10px;margin-bottom:7px;cursor:pointer">
-        <div class="av" style="background:#3498db">爸</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700">爸爸</div><div style="color:#888;font-size:10px">提醒早點回家吃晚飯</div></div>
-        <div style="color:#2ecc71;font-size:18px">📞</div>
-      </div>
-      <div class="item" onclick="makePhoneCall('friend')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#241812;border-radius:10px;margin-bottom:7px;cursor:pointer">
-        <div class="av" style="background:#27ae60">友</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700">死黨 小傑</div><div style="color:#888;font-size:10px">相約假日出遊打球</div></div>
-        <div style="color:#2ecc71;font-size:18px">📞</div>
-      </div>
-      <div class="item" onclick="makePhoneCall('165')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#241812;border-radius:10px;margin-bottom:7px;cursor:pointer">
-        <div class="av" style="background:#f39c12">警</div>
-        <div style="flex:1"><div style="color:#fff;font-weight:700">165 反詐騙諮詢專線</div><div style="color:#888;font-size:10px">詐騙求證專線</div></div>
-        <div style="color:#2ecc71;font-size:18px">📞</div>
-      </div>
-    </div>
-  `;
-}
-
-function makePhoneCall(who){
-  sfx('ring');
-  const body=document.getElementById('phBody');
-  const names={mom:'媽媽', dad:'爸爸', friend:'死黨 小傑', '165':'165 反詐專線'};
-  body.innerHTML=`
-    <div class="call-panel">
-      <div class="call-avatar">${who==='mom'?'👩':(who==='dad'?'👨':(who==='165'?'👮':'🏀'))}</div>
-      <div class="call-name">${names[who]}</div>
-      <div class="call-status">通話中 00:08...</div>
-      <div class="call-dialogue" id="callDlgTxt">接通中……</div>
-      <div class="call-actions" id="callActions">
-        <button class="call-btn hang" onclick="switchPhoneTab('call')">🔴 掛斷電話</button>
-      </div>
-    </div>
-  `;
-  setTimeout(()=>{
-    sfx('ok');
-    if(who==='mom'){
-      speakZh('喂？寶貝呀，今天放學路上注意安全，晚餐媽媽準備了你最愛吃的菜喔！', 1.15, 0.95);
-      document.getElementById('callDlgTxt').innerHTML='「喂？寶貝呀，今天放學路上注意安全，晚餐媽媽準備了你最愛吃的菜喔！」';
-      document.getElementById('callActions').innerHTML=`
-        <button class="call-btn talk" onclick="replyCallMom(1)">「媽媽，我已經在回家路上了！」</button>
-        <button class="call-btn talk" onclick="replyCallMom(2)">「媽媽我愛您，等等回去幫忙擺碗盤洗碗！」</button>
-      `;
-    } else if(who==='dad'){
-      speakZh('喂？寶貝呀，爸爸剛開完會，有什麼事嗎？', 0.85, 0.9);
-      document.getElementById('callDlgTxt').innerHTML='「喂？寶貝呀，爸爸剛開完會，有什麼事嗎？」';
-      document.getElementById('callActions').innerHTML=`
-        <button class="call-btn talk" onclick="replyCallDad(1)">「爸，今天準時回來跟我們一起吃晚餐喔！」</button>
-        <button class="call-btn talk" onclick="replyCallDad(2)">「爸爸辛苦了，工作別太累早點休息！」</button>
-      `;
-    } else if(who==='friend'){
-      speakZh('喂！週末大家說要去草地野餐和打球，你有沒有準備你的拿手烘焙點心？', 1.05, 1.0);
-      document.getElementById('callDlgTxt').innerHTML='「喂！週末大家說要去草地野餐和打球，你有沒有準備你的拿手烘焙點心？」';
-      document.getElementById('callActions').innerHTML=`
-        <button class="call-btn talk" onclick="replyCallFriend(1)">「當然有！我已經在廚房烤好蔓越莓餅乾了！」</button>
-        <button class="call-btn talk" onclick="replyCallFriend(2)">「沒問題，週末球場不見不散！」</button>
-      `;
-    } else {
-      speakZh('您好，這裡是165反詐諮詢專線。凡是包裹異常扣款、或陌生交友要求提供帳密，皆為詐騙手法！', 0.95, 0.95);
-      document.getElementById('callDlgTxt').innerHTML='「您好，這裡是 165 反詐諮詢專線。凡是包裹異常扣款、或陌生交友要求提供帳密，皆為詐騙手法！」';
-      document.getElementById('callActions').innerHTML=`
-        <button class="call-btn talk" onclick="replyCall165()">「收到，我會時刻提高警覺！謝謝警察叔叔」</button>
-      `;
-    }
-  }, 900);
-}
-
-function replyCallMom(n){
-  status.mood+=8; affection.mom+=12; sfx('ok');
-  const t = n===1 ? '好～媽媽等你回來，路上慢點走喔！' : '哇真是個懂事的好孩子！媽媽好欣慰！';
-  speakZh(t, 1.15, 0.95);
-  document.getElementById('callDlgTxt').innerHTML=`「${t}」`;
-  toast('親情好感度提升！+12💖'); updateHUD();
-}
-function replyCallDad(n){
-  homeDiscipline.callDad = true;
-  status.mood+=10; affection.dad+=15; affection.mom+=10; sfx('ok');
-  speakZh('好！聽到你打來催，爸爸這就收拾公事包回家吃晚餐！', 0.85, 0.9);
-  document.getElementById('callDlgTxt').innerHTML='「好！聽到你打來催，爸爸這就收拾公事包回家吃晚餐！」';
-  toast('爸爸答應準時回家！全家好感度大增！'); updateHUD(); checkGoodHabitAll();
-}
-function replyCallFriend(n){
-  status.mood+=8; affection.emma+=10; sfx('ok');
-  speakZh('太讚了！大家都在群組等著你，週末嗨起來！', 1.05, 1.0);
-  document.getElementById('callDlgTxt').innerHTML='「太讚了！大家都在群組等著你，週末嗨起來！」';
-  toast('假日出遊約定成功！'); updateHUD();
-}
-function replyCall165(){
-  status.stars+=5; sfx('clap');
-  speakZh('非常棒的防詐素養！祝您一天平安順心！', 0.95, 0.95);
-  document.getElementById('callDlgTxt').innerHTML='「非常棒的防詐素養！祝您一天平安順心！」';
-  toast('防詐意識良好 +5⭐！'); updateHUD();
-}
-
-// 訊息聊天室清單
-const ELDER_CARDS=[
-  {sun:'🌸😊🌸', msg:'早　安', sub:'以微笑打開每一天<br>平安健康好運天天來'},
-  {sun:'☀️🌻✨', msg:'早安　平安喜樂', sub:'願你今天事事順心<br>元氣滿滿　充滿力量'}
-];
-function elderHTML(s){
-  return `<div class="elder-card"><div class="sun">${s.sun}</div><div class="msg">${s.msg}</div><div class="sub">${s.sub}</div></div>`;
-}
-
-function openPhone(){
-  phoneOpen=true; phoneUnread=0; updateBadge();
-  document.getElementById('phone').classList.add('show');
-  switchPhoneTab('msg');
-}
-function closePhone(){
-  phoneOpen=false; document.getElementById('phone').classList.remove('show');
-}
-
-function showPhoneList(){
-  document.getElementById('phNavHeader').style.display='flex';
-  document.getElementById('phTitle').textContent='訊息清單';
-  document.getElementById('phInputBar').style.display='none';
-  document.getElementById('phStickerPanel').style.display='none';
-  document.getElementById('phBody').innerHTML=`<div class="ph-list">
-    <div class="item" onclick="openChat('family')"><div class="av" style="background:#e67e22">家</div><div class="info"><div class="nm">相親相愛一家人 (4)</div><div class="pv">爸爸傳了早安長輩圖</div></div><div class="tm">08:02</div><div class="dot"></div></div>
-    <div class="item" onclick="openChat('friends')"><div class="av" style="background:#27ae60">群</div><div class="info"><div class="nm">死黨群組 (3)</div><div class="pv">小傑：週末打球與野餐！</div></div><div class="tm">07:50</div><div class="dot"></div></div>
-    <div class="item" onclick="openChat('mom')"><div class="av" style="background:#e74c3c">媽</div><div class="info"><div class="nm">媽媽 ❤️</div><div class="pv">記得喝水吃早餐</div></div><div class="tm">08:01</div></div>
-    <div class="item" onclick="openChat('emma')"><div class="av" style="background:#3498db">E</div><div class="info"><div class="nm">Emma</div><div class="pv">Shadowing practice?</div></div><div class="tm">昨天</div></div>
-  </div>`;
-}
-
-let activeChat=null;
-function openChat(id){
-  activeChat=id;
-  document.getElementById('phInputBar').style.display='flex';
-  const body=document.getElementById('phBody');
-  if(id==='family'){
-    document.getElementById('phTitle').textContent='相親相愛一家人';
-    body.innerHTML=`<div class="room-msgs">
-      <div class="bubble them"><div style="font-size:11px;color:#888">爸爸</div>${elderHTML(ELDER_CARDS[0])}<div class="tm">08:02</div></div>
-      <div class="bubble them"><div style="font-size:11px;color:#888">媽媽</div>出門在外注意安全，今天大家也要順心喔！<div class="tm">08:03</div></div>
-      <div class="bubble them"><div style="font-size:11px;color:#888">弟弟</div>哥／姐早安！晚上回來要不要一起玩遊戲？<div class="tm">08:05</div></div>
-    </div>
-    <div class="room-choices" id="chatChoices">
-      <button onclick="familyBranch(1)">回覆：早安！今天下班準時回家吃晚飯</button>
-      <button onclick="familyBranch(2)">回傳長輩圖 ☀️🌸 祝爸媽順心</button>
-      <button onclick="familyBranch(3)">回覆弟弟：晚上等我，陪你讀繪本玩拼圖！</button>
-    </div>
-    <div class="sticker-bar">
-      <button onclick="sendElderSticker()">🌸</button><button onclick="sendElderSticker()">☀️</button>
-      <button onclick="appendBubble('me','❤️ 愛你們');sfx('ok')">❤️</button><button onclick="appendBubble('me','💪 今天也要一起加油！');sfx('ok')">💪</button>
-    </div>`;
-  } else if(id==='friends'){
-    document.getElementById('phTitle').textContent='死黨群組';
-    body.innerHTML=`<div class="room-msgs">
-      <div class="bubble them"><div style="font-size:11px;color:#888">小傑</div>週末到底要去草地野餐還是打球啊？🏀<div class="tm">07:50</div></div>
-      <div class="bubble them"><div style="font-size:11px;color:#888">小雨</div>我想去野餐吃點心！有人會帶好吃的嗎？🍰<div class="tm">07:52</div></div>
-      <div class="bubble them"><div style="font-size:11px;color:#888">阿明</div>大家別忘了先去關心八年三班小宇喔！<div class="tm">08:00</div></div>
-    </div>
-    <div class="room-choices" id="chatChoices">
-      <button onclick="friendsBranch(1)">回覆小雨：我親手烤了蔓越莓餅乾帶去野餐！</button>
-      <button onclick="friendsBranch(2)">回覆阿明：小宇在輔導室安頓，別擔心！</button>
-      <button onclick="friendsBranch(3)">回覆小傑：野餐完去球場三對三打球！</button>
-    </div>`;
-  } else if(id==='mom'){
-    document.getElementById('phTitle').textContent='媽媽 ❤️';
-    body.innerHTML=`<div class="room-msgs">
-      <div class="bubble them">天冷記得穿外套，午餐要吃飽喔。<div class="tm">08:01</div></div>
-      <div class="bubble them">放學如果晚回家，傳個訊息跟媽媽說一聲。<div class="tm">08:02</div></div>
-    </div>
-    <div class="room-choices" id="chatChoices">
-      <button onclick="momBranch(1)">回覆：好的媽媽 ❤️ 我會乖乖吃飽，放學準時回家！</button>
-      <button onclick="momBranch(2)">回傳長輩圖 🌸 祝媽媽天天好心情</button>
-    </div>`;
-  } else if(id==='emma'){
-    document.getElementById('phTitle').textContent='Emma';
-    body.innerHTML=`<div class="room-msgs">
-      <div class="bubble them">Hey! Are you ready for shadowing English practice?<div class="tm">08:15</div></div>
-    </div>
-    <div class="room-choices" id="chatChoices">
-      <button onclick="emmaBranch(1)">Yes! Let's practice right now.</button>
-      <button onclick="emmaBranch(2)">Can you give me a difficult word?</button>
-    </div>`;
-  }
-}
-
-function appendBubble(side, html, sender){
-  const box=document.querySelector('#phBody .room-msgs');
-  if(!box) return;
-  const d=document.createElement('div');
-  d.className='bubble '+side;
-  d.innerHTML=(sender?`<div style="font-size:11px;color:#888">${sender}</div>`:'')+html+'<div class="tm">剛剛</div>';
-  box.appendChild(d);
-  box.scrollTop=box.scrollHeight;
-}
-
-function familyBranch(choice){
-  if(choice===1){
-    appendBubble('me', '早安！今天下班我會準時回家吃晚飯！'); sfx('ok'); status.mood+=3; updateHUD();
-    setTimeout(()=>{
-      appendBubble('them', '好～媽媽多煮一道你愛吃的菜！', '媽媽');
-      setTimeout(()=>{
-        appendBubble('them', '爸爸也開完會準時回家！', '爸爸');
-        document.getElementById('chatChoices').innerHTML=`
-          <button onclick="appendBubble('me','太棒了，好期待晚上的家常菜！');sfx('ok')">回覆：太棒了，好期待晚上的家常菜！</button>
-          <button onclick="sendElderSticker()">再傳一張長輩圖 🌸</button>
-        `;
-      }, 700);
-    }, 600);
-  } else if(choice===2){
-    sendElderSticker();
-  } else {
-    appendBubble('me', '弟弟等我，晚上我讀繪本故事給你聽，再陪你拼拼圖！'); sfx('ok'); status.mood+=4; updateHUD();
-    setTimeout(()=>{
-      appendBubble('them', '好耶！最喜歡哥哥／姐姐了！🎉', '弟弟');
-      setTimeout(()=>{
-        appendBubble('them', '你們感情真好，真懂事！', '媽媽');
-      }, 700);
-    }, 600);
-  }
-}
-
-function sendElderSticker(){
-  appendBubble('me', elderHTML(ELDER_CARDS[1])); sfx('ok'); status.mood+=3; updateHUD();
-  setTimeout(()=>{
-    appendBubble('them', '哈哈！這張圖好漂亮～願你今天充滿元氣！', '爸爸');
-  }, 750);
-}
-
-function friendsBranch(choice){
-  if(choice===1){
-    appendBubble('me', '我親手烤了酥脆蔓越莓餅乾，週末帶去野餐給大家分著吃！'); sfx('ok'); status.stars+=3; updateHUD();
-    setTimeout(()=>{
-      appendBubble('them', '哇！太期待了！你是最棒的烘焙大師！🍰', '小雨');
-      setTimeout(()=>{
-        appendBubble('them', '吃飽再去打球，完美的週末計畫！', '小傑');
-      }, 600);
-    }, 600);
-  } else if(choice===2){
-    appendBubble('me', '阿明別擔心，小宇剛在輔導室跟我聊過，心情很穩定！'); sfx('ok');
-    setTimeout(()=>{ appendBubble('them', '太感謝你了！有你在輔導室真可靠！', '阿明'); }, 600);
-  } else {
-    appendBubble('me', '沒問題，野餐完大家一起去球場揮灑汗水！🏀'); sfx('ok');
-    setTimeout(()=>{ appendBubble('them', '太棒了，這週末充實極了！', '小傑'); }, 600);
-  }
-}
-
-function momBranch(n){
-  if(n===1){
-    appendBubble('me', '好的媽媽 ❤️ 我會乖乖吃飽，放學準時回家！'); sfx('ok');
-    setTimeout(()=>{ appendBubble('them', '乖孩子！路上小心喔！', '媽媽'); }, 650);
-  } else {
-    sendElderSticker();
-  }
-}
-
-function emmaBranch(n){
-  if(n===1){
-    appendBubble('me', 'Yes! I am opening the shadowing notebook now!'); sfx('ok');
-    setTimeout(()=>{
-      appendBubble('them', 'Awesome! Let us aim for perfection! 💪', 'Emma');
-      openEng();
-    }, 650);
-  } else {
-    appendBubble('me', 'Can you give me a challenging word to practice?'); sfx('ok');
-    setTimeout(()=>{
-      appendBubble('them', 'Try "responsibility" and "resilient"! They are great words! 🌟', 'Emma');
-    }, 650);
-  }
-}
-
-document.getElementById('phSendBtn').onclick=()=>{
-  const inp=document.getElementById('phInput');
-  const val=(inp.value||'').trim();
-  if(!val || !activeChat) return;
-  inp.value='';
-  appendBubble('me', val); sfx('ok');
-  const lower=val.toLowerCase();
-  setTimeout(()=>{
-    let reply='收到你的訊息了！今天也要加油喔！';
-    if(activeChat==='mom'){
-      if(lower.includes('早')||lower.includes('吃')) reply='早安！記得多喝溫水吃早餐喔！';
-      else if(lower.includes('愛')) reply='媽媽也愛你！晚上早點回家喔 ❤️';
-      else reply='好～媽媽知道了，在學校好好照顧自己！';
-    } else if(activeChat==='family'){
-      reply=['收到！今天全家都要平安健康！','好～大家都要開心度過這一天！'][Math.floor(Math.random()*2)];
-    } else if(activeChat==='emma'){
-      reply=['Got your message! Let us keep learning!','Awesome! Practice makes perfect!'][Math.floor(Math.random()*2)];
-    }
-    appendBubble('them', reply);
-  }, 700);
-};
-
-// ============================================================
-// 12. 背包、清單與介面按鈕綁定
-// ============================================================
-function openBag(){
-  document.getElementById('bagPanel').classList.add('show');
-  document.getElementById('bagList').innerHTML=`
-    <div class="shop-item"><span>⭐ 學力星 ${status.stars}</span></div>
-    <div class="shop-item"><span>🪙 榮譽金幣 ${status.coins}</span></div>
-    <div class="shop-item"><span>🍪 手工蔓越莓餅乾 ×${bag.cookies||0}</span></div>
-    <div class="shop-item"><span>🍰 草莓戚風蛋糕 ×${bag.cake||0}</span></div>
-    <div class="shop-item"><span>☕ 手沖咖啡包 ×${bag.coffee}</span></div>
-    <div class="shop-item"><span>🍊 新鮮蜜柑 ×${bag.orange}</span></div>
-    <div class="shop-item"><span>🍬 水果喉糖 ×${bag.throat}</span></div>
-    <div class="shop-item"><span>📖 精裝繪本故事 ×${bag.book||1}</span></div>
-    <div class="shop-item"><span>💧 隨身水壺 ${bag.water}/5</span></div>
-  `;
-}
-function openShop(){
-  document.getElementById('shopPanel').classList.add('show');
-  document.getElementById('shopList').innerHTML=`
-    <div class="shop-item"><span>☕ 咖啡包 (3⭐)</span><button onclick="buyItem('coffee',3)">兌換</button></div>
-    <div class="shop-item"><span>🍊 蜜柑 (2⭐)</span><button onclick="buyItem('orange',2)">兌換</button></div>
-    <div class="shop-item"><span>🍬 喉糖 (2⭐)</span><button onclick="buyItem('throat',2)">兌換</button></div>
-  `;
-}
-function buyItem(k, c){
-  if(status.stars<c){ toast('星星不夠哦！快去跟讀賺取星星！'); return; }
-  status.stars-=c; bag[k]=(bag[k]||0)+1;
-  sfx('ok'); toast('兌換成功！'); openShop();
-}
-
-function openTodo(){
-  document.getElementById('todoPanel').classList.add('show');
-  const d=homeDiscipline;
-  document.getElementById('todoList').innerHTML=`
-    <div class="todo-check-item ${d.shoes?'done':''}">
-      <div class="box">${d.shoes?'✓':''}</div>
-      <div><b>玄關自律</b>：書包鞋子歸位整齊（媽媽好感+10💖）</div>
-    </div>
-    <div class="todo-check-item ${d.dishes?'done':''}">
-      <div class="box">${d.dishes?'✓':''}</div>
-      <div><b>主動家務</b>：清洗便當盒與洗碗（媽媽好感+15💖）</div>
-    </div>
-    <div class="todo-check-item ${d.sister?'done':''}">
-      <div class="box">${d.sister?'✓':''}</div>
-      <div><b>手足關愛</b>：陪伴妹妹讀繪本講故事（媽媽好感+10💖）</div>
-    </div>
-    <div class="todo-check-item ${d.homework?'done':''}">
-      <div class="box">${d.homework?'✓':''}</div>
-      <div><b>專注學習</b>：完成作業與英文跟讀（媽媽好感+10💖）</div>
-    </div>
-    <div class="todo-check-item ${d.shower?'done':''}">
-      <div class="box">${d.shower?'✓':''}</div>
-      <div><b>生活自理</b>：洗溫水澡換上乾淨睡衣（媽媽好感+5💖）</div>
-    </div>
-    <div class="todo-check-item ${d.callDad?'done':''}">
-      <div class="box">${d.callDad?'✓':''}</div>
-      <div><b>孝順體貼</b>：打電話催爸爸回家吃晚餐（媽媽好感+15💖）</div>
-    </div>
-  `;
-}
-function closePanel(id){ document.getElementById(id).classList.remove('show'); }
-
-document.getElementById('btnFloatEng').onclick=()=>openEng();
-document.getElementById('btnFloatRadio').onclick=()=>openYouTubeRadio();
-document.getElementById('btnFloatArt').onclick=()=>interactArt();
-document.getElementById('btnFloatPuzzle').onclick=()=>openPuzzle();
-document.getElementById('btnFloatParty').onclick=()=>openBirthdayPartyMenu();
-document.getElementById('btnFloatFb').onclick=()=>{ openPhone(); switchPhoneTab('fb'); };
-document.getElementById('btnCycleDay').onclick=()=>cycleCalendarDay();
-document.getElementById('btnPhone').onclick=()=>openPhone();
-document.getElementById('btnBag').onclick=()=>openBag();
-document.getElementById('btnTodo').onclick=()=>openTodo();
-document.getElementById('btnFloat2048').onclick=()=>open2048();
-document.getElementById('btnFloatTetris').onclick=()=>openTetris();
-document.getElementById('btnPause').onclick=()=>{
-  showDlg('暫停選單', '選擇功能：', [
-    {t:'繼續生活冒險', a:()=>{}},
-    {t:'🔢 2048（數字邏輯合併）', a:()=>open2048()},
-    {t:'🧱 俄羅斯方塊（空間思考訓練）', a:()=>openTetris()},
-    {t:'開啟英文影子跟讀', a:()=>openEng()},
-    {t:'線上英文廣播收聽', a:()=>openYouTubeRadio()},
-    {t:'美術美感訓練', a:()=>interactArt()},
-    {t:'拼圖益智遊戲', a:()=>openPuzzle()},
-    {t:'社群防詐動態牆', a:()=>{ openPhone(); switchPhoneTab('fb'); }},
-    {t:'福利小舖', a:()=>openShop()}
-  ]);
-};
-document.getElementById('ctxBtn').onclick=tryInteract;
-document.getElementById('phBack').onclick=()=>{
-  if(document.getElementById('phTitle').textContent==='訊息清單') closePhone();
-  else showPhoneList();
-};
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2200); }
 
 document.getElementById('startGo').onclick=()=>{
-  try {
-    birthdays.player.m = parseInt(document.getElementById('inBirthM').value) || 5;
-    birthdays.player.d = parseInt(document.getElementById('inBirthD').value) || 8;
-    birthdays.mom.m = parseInt(document.getElementById('inMomBirthM').value) || 3;
-    birthdays.mom.d = parseInt(document.getElementById('inMomBirthD').value) || 17;
-    birthdays.dad.m = parseInt(document.getElementById('inDadBirthM').value) || 8;
-    birthdays.dad.d = parseInt(document.getElementById('inDadBirthD').value) || 20;
-    birthdays.emma.m = parseInt(document.getElementById('inEmmaBirthM').value) || 6;
-    birthdays.emma.d = parseInt(document.getElementById('inEmmaBirthD').value) || 12;
-  } catch(e) {}
-
   document.getElementById('start').style.display='none';
   initA(); sfx('ok');
-  toast('親友生日與寵物設定完成！開始生活冒險！');
+  toast('早安！點擊地面開始自由探索校園！');
 };
-
-// ============================================================
-// 13. 主遊戲更新與渲染循環
-// ============================================================
-initWorld();
-updateHUD();
-bindTetrisControls();
-bind2048Controls();
 
 let lastTime=performance.now();
 function gameLoop(now){
-  const dt=now-lastTime;
-  lastTime=now;
-  if(!dialogOpen && !phoneOpen){
-    update(dt);
-  }
-  ctx.clearRect(0,0,W,H);
-  drawWorld();
+  const dt=now-lastTime; lastTime=now;
+  update(dt);
+  renderCurrentRoom();
   requestAnimationFrame(gameLoop);
 }
 requestAnimationFrame(gameLoop);
